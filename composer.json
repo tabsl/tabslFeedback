@@ -1,0 +1,37 @@
+{
+  "name": "tabsl/tabslfeedback",
+  "description": "Feedback-Formular für Backend und Frontend mit KI-Aufbereitung und GitLab-Ticket-Anlage.",
+  "type": "oxideshop-module",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/tabsl/tabslFeedback",
+  "keywords": [
+    "oxid",
+    "modules",
+    "eShop",
+    "feedback",
+    "gitlab",
+    "openai"
+  ],
+  "authors": [
+    {
+      "name": "Tobias Merkl",
+      "homepage": "https://oxid-module.eu"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-fileinfo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tabsl\\Feedback\\": "../../../source/modules/tabsl/tabslFeedback"
+    }
+  },
+  "extra": {
+    "oxideshop": {
+      "target-directory": "tabsl/tabslFeedback"
+    }
+  }
+}
