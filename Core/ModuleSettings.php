@@ -14,10 +14,9 @@ use OxidEsales\Eshop\Core\Registry;
  * 'module:tabslFeedback' verwendet — die eindeutige Variante, die auch dann
  * korrekt liest, wenn ein anderes Modul ein gleichnamiges Setting führt.
  *
- * Abweichung von planning.md §5.3: dort war "eine private Zugriffsmethode je
- * Service" vorgesehen. Bei zwölf Settings und fünf Nutzern hätte das die
- * Setting-Namen über mehrere Dateien verteilt; sie liegen deshalb hier an einer
- * Stelle. Die Absicht der Planung — genau eine Zugriffsvariante — bleibt erfüllt.
+ * Bewusst nicht eine private Zugriffsmethode je Service: Bei zwölf Settings und
+ * fünf Nutzern hätte das die Setting-Namen über mehrere Dateien verteilt; sie
+ * liegen deshalb hier an einer Stelle.
  */
 class ModuleSettings
 {
@@ -34,13 +33,17 @@ class ModuleSettings
     }
 
     /**
-     * @return string bottom-left|bottom-right|center
+     * `none` bindet das Widget ohne sichtbaren Knopf ein — der Dialog geht dann
+     * nur über `window.tabslFeedback.open()` auf, aufgerufen von der Stelle im
+     * Shop, an der die Meldung entsteht.
+     *
+     * @return string bottom-left|bottom-right|center|none
      */
     public function getButtonPosition(): string
     {
         $position = (string) $this->get('tabslfeedback_button_position');
 
-        return in_array($position, ['bottom-left', 'bottom-right', 'center'], true)
+        return in_array($position, ['bottom-left', 'bottom-right', 'center', 'none'], true)
             ? $position
             : 'bottom-right';
     }
@@ -105,11 +108,11 @@ class ModuleSettings
     }
 
     /**
-     * Die drei GitLab-Angaben sind Pflicht (requirements.md C1). Fehlt eine davon,
+     * Die drei GitLab-Angaben sind Pflicht. Fehlt eine davon,
      * kann kein Issue entstehen — dann erscheint gar kein Feedback-Einstieg.
      *
      * Der OpenAI-Key gehört bewusst NICHT dazu: ohne ihn entsteht das Issue
-     * lediglich ohne Aufbereitung (B4), das ist ein zulässiger Betriebszustand.
+     * lediglich ohne Aufbereitung, das ist ein zulässiger Betriebszustand.
      */
     public function isConfigured(): bool
     {

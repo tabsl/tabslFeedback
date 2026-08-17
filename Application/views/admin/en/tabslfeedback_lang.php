@@ -29,10 +29,11 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Adds a feedback button to every storefront page. While disabled, the form remains reachable by calling any storefront page with ?tabslFeedback=1 — useful for testers without showing the button to every visitor. The setting therefore controls visibility, not availability: as soon as the GitLab settings are complete, the shop accepts feedback. Running it publicly without the tabslTurnstile module is at your own risk.',
 
         'SHOP_MODULE_tabslfeedback_button_position' => 'Button position',
-        'HELP_SHOP_MODULE_tabslfeedback_button_position' => 'Where the feedback button appears in the storefront.',
+        'HELP_SHOP_MODULE_tabslfeedback_button_position' => 'Where the feedback button appears in the storefront. "No button" shows no button — the form then only opens where a page calls window.tabslFeedback.open() itself. It is still embedded only while "Show feedback button in the storefront" is enabled.',
         'SHOP_MODULE_tabslfeedback_button_position_bottom-left' => 'Bottom left',
         'SHOP_MODULE_tabslfeedback_button_position_bottom-right' => 'Bottom right',
         'SHOP_MODULE_tabslfeedback_button_position_center' => 'Bottom centre',
+        'SHOP_MODULE_tabslfeedback_button_position_none' => 'No button',
 
         // GitLab
         'SHOP_MODULE_tabslfeedback_gitlab_url' => 'GitLab address',

@@ -17,11 +17,10 @@ use Tabsl\Feedback\Service\UiTexts;
  *
  * Der OXID-Admin ist ein Frameset, dessen Header nur wenige Pixel hoch ist — ein
  * Overlay ist dort baulich nicht darstellbar. Das Formular wird deshalb im
- * Hauptframe geöffnet, genau wie die vorhandenen Header-Links es tun
- * (planning.md §7 Nr. 1).
+ * Hauptframe geöffnet, genau wie die vorhandenen Header-Links es tun.
  *
- * Keine Turnstile-Prüfung: der Bereich ist bereits durch die Anmeldung geschützt
- * (requirements.md A1/C2). Die Eingabeprüfung ist dieselbe wie im Frontend —
+ * Keine Turnstile-Prüfung: der Bereich ist bereits durch die Anmeldung
+ * geschützt. Die Eingabeprüfung ist dieselbe wie im Frontend —
  * beide Controller nutzen InputValidator.
  */
 class FeedbackFormController extends AdminController
@@ -107,7 +106,7 @@ class FeedbackFormController extends AdminController
 
     /**
      * Der eingegebene Text bleibt bei einem Fehler stehen, damit er nicht neu
-     * getippt werden muss (requirements.md B4). Für die Screenshots gilt das
+     * getippt werden muss. Für die Screenshots gilt das
      * nicht — sie liegen nur im Browser und werden dort gehalten.
      */
     private function keepInput(string $message, string $name, string $email): void

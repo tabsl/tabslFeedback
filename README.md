@@ -27,7 +27,9 @@ Aufbereitung stattfand. Der Melder bemerkt keinen Unterschied.
 Meldung, aufgerufene Seite, Referrer, Browser inkl. Version und Betriebssystem,
 Fenster- und Bildschirmgröße, Shop-ID, Sprache, Währung, Theme mit Version,
 aktive Module mit Versionen, Shop- und PHP-Version. Bei angemeldeten Kunden
-optional Kundennummer, Name und E-Mail. Seite und Referrer werden zuvor
+optional Kundennummer, Name und E-Mail. Öffnet eine Shop-Seite das Formular
+selbst, steht davor zusätzlich der **Bezug** (siehe unten). Seite und Referrer
+werden zuvor
 bereinigt: Sitzungskennungen und geheimnisverdächtige Parameter (`sid`,
 `stoken`, `token`, `password`, `secret` …) werden durch `…` ersetzt; fachlich
 nützliche Parameter wie Kategorie, Suchbegriff oder Seitenzahl bleiben erhalten.
@@ -47,6 +49,35 @@ eingeschalteter Button bleibt sichtbar.
 > Feedback entgegen — auch bei ausgeblendetem Button. Wer das nicht möchte, lässt
 > die GitLab-Angaben leer oder deaktiviert das Modul. Gegen automatisierten
 > Missbrauch schützt allein `tabslTurnstile` (siehe unten).
+
+### Formular aus dem Shop heraus öffnen
+
+Wo eine Meldung entsteht, steht selten der Feedback-Button: im Bestellabschluss,
+in einem Konfigurator, in einem geöffneten Dialog. Solche Stellen öffnen das
+Formular selbst — ohne Seitenwechsel:
+
+```js
+window.tabslFeedback.open({ reference: 'Entwurf 4711' });
+```
+
+`reference` ist frei wählbar und erscheint im Ticket als eigene Zeile **Bezug**,
+direkt über der Seite. Sie beantwortet, was die URL nicht beantworten kann:
+worum es in der Meldung geht. Ohne Angabe öffnet der Dialog wie über den Button.
+
+Die Schnittstelle steht bereit, sobald das Widget auf der Seite liegt — also
+sobald „Feedback-Button im Shop anzeigen" eingeschaltet ist **oder** die Seite
+mit `?tabslFeedback=1` aufgerufen wurde.
+
+Soll der Shop den Dialog ausschließlich selbst öffnen, ohne dass irgendwo ein
+Button erscheint, braucht es **beides**: die Einstellung „Feedback-Button im Shop
+anzeigen" bleibt **eingeschaltet** und die Position steht auf `none`. Der
+Schalter bindet das Widget ein, die Position entscheidet über den Knopf. Nur die
+Position auf `none` zu stellen genügt nicht — bei ausgeschaltetem Schalter liegt
+auf gewöhnlichen Seiten kein Widget und damit kein `window.tabslFeedback`.
+
+> Der Wert reist als Angabe des Browsers und ist damit fälschbar wie jede andere
+> Client-Angabe. Er wird auf 200 Zeichen gekürzt und maskiert ins Ticket
+> geschrieben — als Hinweis gedacht, nicht als Beleg.
 
 ## Schnellstart
 
@@ -76,8 +107,8 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | Einstellung | Bedeutung | Standard |
 | --- | --- | --- |
 | `tabslfeedback_admin_enabled` | Feedback-Link im Backend-Header einblenden | aus |
-| `tabslfeedback_frontend_enabled` | Feedback-**Button** im Shop einblenden (nur Sichtbarkeit, nicht Erreichbarkeit) | aus |
-| `tabslfeedback_button_position` | `bottom-left`, `center` oder `bottom-right` | `bottom-right` |
+| `tabslfeedback_frontend_enabled` | Widget im Shop einbinden — mit Button, außer die Position steht auf `none` (nur Sichtbarkeit, nicht Erreichbarkeit) | aus |
+| `tabslfeedback_button_position` | `bottom-left`, `center`, `bottom-right` oder `none` (kein Button, siehe unten) | `bottom-right` |
 | `tabslfeedback_gitlab_url` | Basis-Adresse der GitLab-Instanz inkl. Schema, ohne `/api/v4` — **Pflicht** | leer |
 | `tabslfeedback_gitlab_project_id` | Numerische ID des Zielprojekts — **Pflicht** | leer |
 | `tabslfeedback_gitlab_token` | Project-Access-Token mit Scope `api` — **Pflicht** | leer |
@@ -102,7 +133,7 @@ Modul enthält **keine** Vorbelegung für Adressen, Projekt-IDs oder Zugangsdate
 
 Fest eingebaut, bewusst nicht konfigurierbar: 5 Bilder je Meldung, 10 MB je Bild,
 20 MB für alle Bilder zusammen, 5.000 Zeichen Freitext, je 255 Zeichen für Name
-und E-Mail; Formate PNG, JPG, GIF, WebP.
+und E-Mail, 200 Zeichen für den Bezug; Formate PNG, JPG, GIF, WebP.
 
 Alle Grenzen werden serverseitig durchgesetzt. Damit mehrere Screenshots
 durchkommen, sollten `post_max_size` und `memory_limit` der PHP-Installation
@@ -121,7 +152,8 @@ API-Key findet **keine** Übermittlung statt.
 
 **An die konfigurierte GitLab-Instanz** — Freitext, aufbereiteter Titel und
 Beschreibung, alle Screenshots, optional Name und E-Mail sowie der oben
-beschriebene technische Kontext. Kundendaten **nur** bei aktivem
+beschriebene technische Kontext; bei einem vom Shop selbst geöffneten Dialog
+zusätzlich der übergebene Bezug. Kundendaten **nur** bei aktivem
 `tabslfeedback_send_customer_data`. Nicht: IP-Adresse, Warenkorb- und
 Bestellkontext, Browser-Konsolenmeldungen. Bei einer eigenen GitLab-Installation
 verlassen die Daten die eigene Infrastruktur nicht.

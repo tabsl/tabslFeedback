@@ -16,11 +16,11 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActiv
  * Methode. Liefen beide auseinander, entstünde entweder ein Widget ohne Prüfung
  * oder eine Prüfung ohne Widget, die jede Absendung blockiert.
  *
- * Zustände (planning.md §4, Component 1):
+ * Zustände:
  *   Klasse fehlt / Modul deaktiviert / Site-Key leer -> isActive() = false, keine Prüfung
  *   aktiviert und konfiguriert                       -> isActive() = true, verify() entscheidet
  *
- * Es wird bewusst KEINE Client-IP an Turnstile übergeben (requirements.md B3);
+ * Es wird bewusst KEINE Client-IP an Turnstile übergeben;
  * das optionale Feld remoteip bleibt leer.
  */
 class TurnstileGate
@@ -49,7 +49,7 @@ class TurnstileGate
      * Fehler mit „kein Schutz vorgesehen" zusammen, würde der einzige
      * Missbrauchsschutz des Moduls still abgeschaltet. Absendungen werden in
      * diesem Fall abgewiesen (siehe SubmitController), während ein gar nicht
-     * installiertes Turnstile weiterhin folgenlos bleibt (requirements.md C2).
+     * installiertes Turnstile weiterhin folgenlos bleibt.
      *
      * @return string self::STATE_OFF|self::STATE_ON|self::STATE_ERROR
      */

@@ -13,9 +13,9 @@ use Tabsl\Feedback\Core\ModuleSettings;
  *
  * Der Dienst wirft nie — ein Ausfall (fehlender Key, Zeitüberschreitung,
  * Fehlerstatus, unbrauchbare Antwort) wird als null gemeldet. Die Ticket-Anlage
- * läuft dann ohne Aufbereitung weiter (requirements.md B4).
+ * läuft dann ohne Aufbereitung weiter.
  *
- * Bilddaten werden ausdrücklich nicht übermittelt (requirements.md B2).
+ * Bilddaten werden ausdrücklich nicht übermittelt.
  */
 class OpenAiService
 {
@@ -240,7 +240,7 @@ class OpenAiService
             ? trim((string) $content['description'])
             : '';
 
-        // Ein fehlender Titel gilt als unbrauchbare Antwort (planning.md §8), auch
+        // Ein fehlender Titel gilt als unbrauchbare Antwort, auch
         // wenn eine Beschreibung vorliegt: Diese besteht im Regelfall aus
         // Stichpunkten und ergäbe als Titel eine Markdown-Liste in der
         // Issue-Übersicht. Stattdessen greift der Rohtext-Fallback in

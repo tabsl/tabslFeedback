@@ -18,8 +18,8 @@ use Tabsl\Feedback\Core\ModuleSettings;
  *
  * ⚠️ Damit ist der öffentliche Endpunkt immer erreichbar, sobald das Modul
  * konfiguriert ist. Das Ausblenden des Buttons ist eine Frage der Darstellung,
- * keine Zugangssperre. Missbrauchsschutz leistet allein tabslTurnstile
- * (requirements.md C2) — für den öffentlichen Betrieb ist es dringend empfohlen.
+ * keine Zugangssperre. Missbrauchsschutz leistet allein tabslTurnstile — für den
+ * öffentlichen Betrieb ist es dringend empfohlen.
  */
 class FrontendAccess
 {
@@ -58,7 +58,9 @@ class FrontendAccess
 
     /**
      * Wurde die Seite mit `?tabslFeedback=1` aufgerufen? Dann öffnet sich der
-     * Dialog sofort — und der Button erscheint, auch wenn er sonst ausgeblendet ist.
+     * Dialog sofort — und das Widget liegt auf der Seite, auch wenn der Button
+     * sonst ausgeblendet ist. Ein Button erscheint dabei nur, wenn die Position
+     * nicht auf `none` steht.
      */
     public function isOpenRequested(): bool
     {

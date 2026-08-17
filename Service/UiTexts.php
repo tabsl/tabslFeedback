@@ -45,7 +45,7 @@ class UiTexts
      * Enthält eine Übersetzung mehr Platzhalter als Werte übergeben werden,
      * wirft vsprintf einen ValueError. Da diese Methode auch aus catch-Blöcken
      * heraus aufgerufen wird, entstünde daraus eine Fehlerseite statt der
-     * vorgesehenen neutralen Meldung (requirements.md B4) — deshalb fällt sie im
+     * vorgesehenen neutralen Meldung — deshalb fällt sie im
      * Zweifel auf den unformatierten Text zurück.
      *
      * @param array<string,string|int> $params

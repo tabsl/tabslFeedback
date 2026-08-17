@@ -19,7 +19,7 @@ $sMetadataVersion = '2.1';
 // tabsl module id
 $psModuleId = 'tabslFeedback';
 $psModuleName = '<b>tabsl</b>Feedback';
-$psModuleVersion = '1.0.0';
+$psModuleVersion = '1.1.0';
 
 // tabsl module description
 $psModuleDesc = 'Feedback-Formular für Backend und Frontend mit KI-Aufbereitung und GitLab-Ticket-Anlage.';
@@ -68,7 +68,7 @@ $aModule = [
         // Grundeinstellungen
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_admin_enabled', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_frontend_enabled', 'type' => 'bool', 'value' => false],
-        ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_button_position', 'type' => 'select', 'value' => 'bottom-right', 'constraints' => 'bottom-left|bottom-right|center'],
+        ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_button_position', 'type' => 'select', 'value' => 'bottom-right', 'constraints' => 'bottom-left|bottom-right|center|none'],
         // GitLab
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_url', 'type' => 'str', 'value' => ''],
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_project_id', 'type' => 'str', 'value' => ''],

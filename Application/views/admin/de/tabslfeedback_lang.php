@@ -32,10 +32,11 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Blendet im Shop auf allen Seiten einen Feedback-Button ein. Ist die Einstellung aus, bleibt das Formular über den Aufruf einer beliebigen Shop-Seite mit ?tabslFeedback=1 erreichbar — praktisch für Testende, ohne den Button für alle Besucher zu zeigen. Die Einstellung steuert also die Sichtbarkeit, nicht die Erreichbarkeit: Sobald die GitLab-Angaben vollständig sind, nimmt der Shop Feedback entgegen. Öffentlicher Betrieb ohne das Modul tabslTurnstile erfolgt auf eigenes Risiko.',
 
         'SHOP_MODULE_tabslfeedback_button_position' => 'Position des Buttons',
-        'HELP_SHOP_MODULE_tabslfeedback_button_position' => 'Wo der Feedback-Button im Shop erscheint.',
+        'HELP_SHOP_MODULE_tabslfeedback_button_position' => 'Wo der Feedback-Button im Shop erscheint. „Kein Button" zeigt keinen Knopf — dann öffnet das Formular nur dort, wo eine Seite es selbst über window.tabslFeedback.open() aufruft. Eingebunden wird es dafür weiterhin nur, solange „Feedback-Button im Shop anzeigen" eingeschaltet ist.',
         'SHOP_MODULE_tabslfeedback_button_position_bottom-left' => 'Unten links',
         'SHOP_MODULE_tabslfeedback_button_position_bottom-right' => 'Unten rechts',
         'SHOP_MODULE_tabslfeedback_button_position_center' => 'Unten mittig',
+        'SHOP_MODULE_tabslfeedback_button_position_none' => 'Kein Button',
 
         // GitLab
         'SHOP_MODULE_tabslfeedback_gitlab_url' => 'GitLab-Adresse',

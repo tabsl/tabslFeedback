@@ -31,7 +31,7 @@ class ViewConfig extends ViewConfig_parent
      * Soll der Feedback-Link im Backend-Header erscheinen?
      *
      * Ohne die drei GitLab-Pflichtangaben gibt es keinen Einstieg — ein Formular,
-     * das garantiert kein Ticket erzeugen kann, wird gar nicht erst angeboten (C1).
+     * das garantiert kein Ticket erzeugen kann, wird gar nicht erst angeboten.
      */
     public function isTabslFeedbackAdminAvailable(): bool
     {
@@ -60,7 +60,7 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * @return string bottom-left|bottom-right|center
+     * @return string bottom-left|bottom-right|center|none
      */
     public function getTabslFeedbackButtonPosition(): string
     {
@@ -94,9 +94,23 @@ class ViewConfig extends ViewConfig_parent
         return $this->getTabslFeedbackTurnstileGate()->getSiteKey();
     }
 
+    /**
+     * Mit Zeitstempel, weil `window.tabslFeedback` sonst an einem gecachten
+     * Skriptstand hängt: Eine Seite, die den Dialog selbst öffnet, findet die
+     * Schnittstelle beim wiederkehrenden Besucher nicht vor und ihr Einstieg
+     * bliebe wirkungslos.
+     */
     public function getTabslFeedbackAssetUrl(string $file): string
     {
-        return (string) $this->getModuleUrl('tabslFeedback', $file);
+        $url = (string) $this->getModuleUrl('tabslFeedback', $file);
+
+        // Pfad aus dem Ort dieser Klasse, nicht aus dem erwarteten Modulverzeichnis:
+        // Wird das Modul unter einem anderen Namen entpackt, fiele der Zeitstempel
+        // sonst still auf 0 zurück — und mit ihm der Zweck dieser Methode.
+        $path = dirname(__DIR__) . '/' . ltrim($file, '/');
+        $version = is_file($path) ? (string) filemtime($path) : '0';
+
+        return $url . (strpos($url, '?') === false ? '?' : '&') . 'v=' . $version;
     }
 
     /**
@@ -128,7 +142,7 @@ class ViewConfig extends ViewConfig_parent
 
     /**
      * Grenzwerte für die Vorabprüfung im Browser. Sie ersetzen die serverseitige
-     * Prüfung nicht, ersparen dem Melder aber den Roundtrip (requirements.md A3).
+     * Prüfung nicht, ersparen dem Melder aber den Roundtrip.
      *
      * @return string JSON für das data-Attribut des Widgets
      */

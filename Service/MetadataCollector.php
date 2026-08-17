@@ -13,11 +13,13 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActiv
 use Tabsl\Feedback\Core\ModuleSettings;
 
 /**
- * Sammelt die acht Umgebungsangaben aus requirements.md B3 und bringt sie in
+ * Sammelt die acht Umgebungsangaben und bringt sie in
  * eine im GitLab-Issue lesbare Form.
  *
  * Ausdrücklich NICHT erhoben: IP-Adresse, Warenkorb-/Bestellkontext und
- * Browser-Konsolenmeldungen. Eine nicht ermittelbare Angabe wird stillschweigend
+ * Browser-Konsolenmeldungen. Der Bezug ist keine Ausnahme davon — er wird nicht
+ * ermittelt, sondern von der aufrufenden Seite bewusst mitgegeben.
+ * Eine nicht ermittelbare Angabe wird stillschweigend
  * ausgelassen und darf die Ticket-Anlage nie verhindern — deshalb ist jeder
  * Einzelabruf gegen Ausfall abgesichert.
  */
@@ -67,6 +69,12 @@ class MetadataCollector
     private function collectRows(array $clientMeta, string $context, TicketLabels $labels): array
     {
         $rows = [$labels->get('context') => $context];
+
+        // Steht vor der Seite: Wo gemeldet wurde, sagt die URL — worum es geht,
+        // weiß nur die Stelle, die den Dialog geöffnet hat.
+        if (isset($clientMeta['reference'])) {
+            $rows[$labels->get('reference')] = $clientMeta['reference'];
+        }
 
         if (isset($clientMeta['url'])) {
             $rows[$labels->get('page')] = $clientMeta['url'];
@@ -174,8 +182,7 @@ class MetadataCollector
     }
 
     /**
-     * Kundendaten nur bei angemeldetem Kunden UND aktivierter Einstellung
-     * (requirements.md A4/B3).
+     * Kundendaten nur bei angemeldetem Kunden UND aktivierter Einstellung.
      */
     private function collectCustomer(TicketLabels $labels): string
     {

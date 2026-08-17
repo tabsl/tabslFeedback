@@ -86,7 +86,7 @@ class FeedbackService
             try {
                 $references[] = $this->gitLab->uploadFile($image['bytes'], $image['filename'], $image['mime']);
             } catch (FeedbackException $exception) {
-                // Ein einzelner Screenshot darf das Ticket nicht kosten (B2).
+                // Ein einzelner Screenshot darf das Ticket nicht kosten.
                 $failed++;
             }
         }
@@ -116,7 +116,7 @@ class FeedbackService
         }
 
         // Die Originalmeldung steht IMMER im Issue — eine schlechte oder
-        // ausgefallene Aufbereitung darf die Meldung nicht unbrauchbar machen (B1).
+        // ausgefallene Aufbereitung darf die Meldung nicht unbrauchbar machen.
         $blocks[] = '## ' . $labels->get('original_report') . "\n\n" . $this->asBlockquote($input->getMessage());
 
         $contact = $this->buildContactLine($input);

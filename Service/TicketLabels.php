@@ -7,8 +7,8 @@ namespace Tabsl\Feedback\Service;
 /**
  * Feste Texte im GitLab-Issue (Überschriften, Tabellen-Beschriftungen, Hinweise).
  *
- * Sie folgen der Einstellung "Ticket-Sprache" (requirements.md B1: "Die Sprache
- * des Tickets folgt der Modul-Einstellung"), nicht der Shop-Sprache des Melders.
+ * Sie folgen der Einstellung "Ticket-Sprache", nicht der Shop-Sprache des
+ * Melders.
  * Sonst entstünde bei "auf Englisch vereinheitlichen" ein Ticket mit englischem
  * KI-Text in deutschem Gerüst — und im Frontend wechselte die Gerüstsprache je
  * nach Besucher.
@@ -29,6 +29,7 @@ class TicketLabels
             'context' => 'Kontext',
             'context_admin' => 'Backend',
             'context_frontend' => 'Shop-Frontend',
+            'reference' => 'Bezug',
             'page' => 'Seite',
             'referrer' => 'Referrer',
             'client' => 'Browser / System',
@@ -57,6 +58,7 @@ class TicketLabels
             'context' => 'Context',
             'context_admin' => 'Backend',
             'context_frontend' => 'Storefront',
+            'reference' => 'Reference',
             'page' => 'Page',
             'referrer' => 'Referrer',
             'client' => 'Browser / system',

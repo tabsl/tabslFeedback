@@ -6,7 +6,7 @@
  *
  * Screenshots werden NIE als multipart/form-data gesendet, sondern als
  * base64-Daten-URL in einem normalen POST-Feld — Multipart-Uploads an index.php
- * sind in diesem Umfeld bereits an einer WAF gescheitert (planning.md §7 Nr. 2).
+ * sind in diesem Umfeld bereits an einer WAF gescheitert.
  */
 (function () {
     'use strict';
@@ -51,14 +51,21 @@
     }
 
     /**
-     * Die vier Angaben aus planning.md §8. Mehr wird nicht erhoben — insbesondere
+     * Die vier erhobenen Angaben. Mehr wird nicht erhoben — insbesondere
      * keine Konsolenmeldungen und kein Warenkorb-Kontext.
+     *
+     * Der Bezug ist die Ausnahme: Er wird nicht erhoben, sondern von der Stelle
+     * gesetzt, die den Dialog geöffnet hat (window.tabslFeedback.open).
      */
-    function collectMeta() {
+    function collectMeta(reference) {
         var meta = {
             url: window.location.href,
             referrer: document.referrer || ''
         };
+
+        if (reference) {
+            meta.reference = reference;
+        }
 
         if (window.innerWidth && window.innerHeight) {
             meta.viewport = { w: window.innerWidth, h: window.innerHeight };
@@ -279,15 +286,24 @@
         // wieder etwas eingegeben wird — sonst erzeugt ein zweiter Klick auf den
         // scheinbar noch bedienbaren Knopf ein zweites Ticket zur selben Meldung.
         this.submitted = false;
+
+        // Gegenstand der Meldung, gesetzt beim Öffnen. Gilt nur für den einen
+        // Vorgang: Wer den Dialog später ohne Bezug öffnet, meldet etwas anderes.
+        this.reference = '';
     }
 
     FrontendWidget.prototype.init = function () {
         var widget = createElement('div', 'tabslfeedback-widget');
 
-        this.trigger = this.buildTrigger();
+        // Position „none": Das Widget ist da, sein Knopf nicht. Gedacht für Shops,
+        // die den Dialog an der Stelle anbieten, an der die Meldung entsteht.
+        this.trigger = this.config.position === 'none' ? null : this.buildTrigger();
         this.overlay = this.buildDialog();
 
-        widget.appendChild(this.trigger);
+        if (this.trigger) {
+            widget.appendChild(this.trigger);
+        }
+
         widget.appendChild(this.overlay);
         document.body.appendChild(widget);
 
@@ -301,9 +317,11 @@
             self.refreshPreviews();
         });
 
-        this.trigger.addEventListener('click', function () {
-            self.open();
-        });
+        if (this.trigger) {
+            this.trigger.addEventListener('click', function () {
+                self.open();
+            });
+        }
 
         this.closeButton.addEventListener('click', function () {
             self.close();
@@ -505,7 +523,8 @@
         return actions;
     };
 
-    FrontendWidget.prototype.open = function () {
+    FrontendWidget.prototype.open = function (options) {
+        this.reference = options && options.reference ? String(options.reference) : '';
         this.overlay.hidden = false;
 
         // Die Bestätigung des letzten Vorgangs bleibt nach dem Absenden stehen;
@@ -624,7 +643,7 @@
         body.append('fb_message', values.message);
         body.append('fb_name', values.name);
         body.append('fb_email', values.email);
-        body.append('fb_meta', collectMeta());
+        body.append('fb_meta', collectMeta(this.reference));
 
         this.store.dataUrls().forEach(function (dataUrl) {
             body.append('fb_images[]', dataUrl);
@@ -658,7 +677,7 @@
                 }
 
                 // Der Text bleibt im Feld stehen, damit er nicht neu getippt
-                // werden muss (requirements.md B4).
+                // werden muss.
                 self.showMessage((result && result.message) || self.texts.errorGeneric, false);
                 self.resetTurnstile();
             })
@@ -685,6 +704,10 @@
         this.resetTurnstile();
         this.showMessage(message, true);
 
+        // Auch der Bezug fällt weg: Der Dialog bleibt nach dem Absenden offen, und
+        // eine darin getippte zweite Meldung betrifft nicht mehr denselben Gegenstand.
+        this.reference = '';
+
         // Gesperrt lassen: die Meldung ist raus, ein weiterer Klick würde nur ein
         // Duplikat erzeugen. Erst eine neue Eingabe gibt den Knopf wieder frei.
         this.submitted = true;
@@ -708,7 +731,7 @@
     /**
      * Setzt das Widget über seine Kennung zurück. Ein Token gilt nur einmal —
      * ohne das Zurücksetzen scheiterte ein zweiter Anlauf nach einem Fehler an
-     * der Bot-Prüfung, obwohl die Meldung erneut absendbar sein soll (B4).
+     * der Bot-Prüfung, obwohl die Meldung erneut absendbar sein soll.
      */
     FrontendWidget.prototype.resetTurnstile = function () {
         if (this.turnstileWidgetId === null
@@ -846,7 +869,7 @@
             return;
         }
 
-        new FrontendWidget({
+        var widget = new FrontendWidget({
             url: config.getAttribute('data-url') || '',
             stoken: config.getAttribute('data-stoken') || '',
             position: config.getAttribute('data-position') || 'bottom-right',
@@ -856,7 +879,18 @@
             turnstileSiteKey: config.getAttribute('data-turnstile-sitekey') || '',
             limits: parseJsonAttribute(config, 'data-limits', {}),
             texts: parseJsonAttribute(config, 'data-texts', {})
-        }).init();
+        });
+
+        widget.init();
+
+        // Einziger öffentlicher Anknüpfungspunkt: Der Shop öffnet den Dialog dort,
+        // wo die Meldung entsteht — `open({reference: 'Bestellung 1234'})` nennt
+        // dabei ihren Gegenstand, der sonst nur aus der URL zu erraten wäre.
+        window.tabslFeedback = {
+            open: function (options) {
+                widget.open(options);
+            }
+        };
     }
 
     if (document.readyState === 'loading') {

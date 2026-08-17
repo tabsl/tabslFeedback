@@ -1,7 +1,7 @@
 [{$smarty.block.parent}]
 
 [{* Feedback-Widget. Liegt auf base_js, weil dieser Block in ps und wave
-    vorhanden ist — after_body gibt es nur im ps-Theme (planning.md §7 Nr. 3).
+    vorhanden ist — after_body gibt es nur im ps-Theme.
     Die Konfiguration wandert über data-Attribute ins JavaScript; im Template
     steht bewusst keine Logik. *}]
 [{if $oViewConf->isTabslFeedbackFrontendAvailable()}]

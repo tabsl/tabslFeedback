@@ -13,7 +13,7 @@ use Tabsl\Feedback\Exception\FeedbackException;
  *
  * Die Fehler sind nach Vorgang unterscheidbar (TYPE_UPLOAD / TYPE_GITLAB), damit
  * FeedbackService einen fehlgeschlagenen Screenshot anders behandeln kann als
- * eine fehlgeschlagene Issue-Anlage. Kein Retry (planning.md §2).
+ * eine fehlgeschlagene Issue-Anlage. Kein Retry.
  */
 class GitLabService
 {
@@ -48,7 +48,7 @@ class GitLabService
             . $bytes . "\r\n"
             . '--' . $boundary . "--\r\n";
 
-        // Der Multipart-Verzicht aus planning.md §7 betrifft den EINGEHENDEN Weg
+        // Der Multipart-Verzicht betrifft nur den EINGEHENDEN Weg
         // Browser -> Shop. Ausgehend schreibt GitLab multipart/form-data vor.
         $response = $this->request(
             $this->buildProjectUrl('uploads'),

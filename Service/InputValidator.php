@@ -9,9 +9,9 @@ use Tabsl\Feedback\Exception\FeedbackException;
 /**
  * Gemeinsame Eingabeprüfung für Frontend- und Backend-Formular.
  *
- * Beide Controller nutzen diese Klasse, damit die Regeln nicht auseinanderlaufen
- * (planning.md §4, Component 2). Sämtliche Grenzwerte sind hier als Konstanten
- * hinterlegt — sie sind bewusst keine Einstellungen (planning.md §7).
+ * Beide Controller nutzen diese Klasse, damit die Regeln nicht
+ * auseinanderlaufen. Sämtliche Grenzwerte sind hier als Konstanten hinterlegt —
+ * sie sind bewusst keine Einstellungen.
  *
  * Alle Grenzen werden serverseitig durchgesetzt; die zusätzliche Prüfung im
  * Browser dient nur der Meldung ohne Roundtrip und ist keine Absicherung.
@@ -34,8 +34,14 @@ class InputValidator
 
     public const MAX_CONTACT_FIELD_LENGTH = 255;
 
+    /**
+     * Der Bezug benennt den Gegenstand der Meldung (Kennung eines Entwurfs, einer
+     * Bestellung, eines Artikels) — eine Kennung, kein zweites Meldungsfeld.
+     */
+    public const MAX_REFERENCE_LENGTH = 200;
+
     /** Erlaubte Schlüssel aus fb_meta; alles andere wird verworfen. */
-    private const CLIENT_META_KEYS = ['url', 'referrer', 'viewport', 'screen'];
+    private const CLIENT_META_KEYS = ['url', 'referrer', 'viewport', 'screen', 'reference'];
 
     /**
      * Query-Parameter, die aus URL und Referrer entfernt werden, bevor sie ins
@@ -108,7 +114,7 @@ class InputValidator
 
     /**
      * Leer ist zulässig; gesetzt und unplausibel weist die Absendung ab, bevor ein
-     * externer Dienst angesprochen wird (requirements.md A4).
+     * externer Dienst angesprochen wird.
      *
      * @throws FeedbackException
      */
@@ -283,7 +289,7 @@ class InputValidator
     }
 
     /**
-     * Übernimmt ausschließlich die vier erwarteten Angaben aus fb_meta. Werte
+     * Übernimmt ausschließlich die erwarteten Angaben aus fb_meta. Werte
      * bleiben unbereinigt — die Ausgabe-Maskierung übernimmt MetadataCollector,
      * der als einziger weiß, in welchen Kontext sie geschrieben werden.
      *
@@ -323,7 +329,8 @@ class InputValidator
             }
 
             if (is_scalar($value) && (string) $value !== '') {
-                $plain = mb_substr((string) $value, 0, 2000);
+                $limit = $key === 'reference' ? self::MAX_REFERENCE_LENGTH : 2000;
+                $plain = mb_substr((string) $value, 0, $limit);
 
                 $meta[$key] = in_array($key, ['url', 'referrer'], true)
                     ? $this->stripSensitiveQueryParams($plain)

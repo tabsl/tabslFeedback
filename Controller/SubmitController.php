@@ -19,7 +19,7 @@ use Tabsl\Feedback\Service\UiTexts;
  *
  * Die Antwort verrät nie, welche Systeme beteiligt waren: kein Ticket-Verweis,
  * keine GitLab-URL, kein Dienstname, kein Exception-Text — und in Erfolgs- wie
- * Fehlerfall derselbe HTTP-Status (requirements.md A2, planning.md §8).
+ * Fehlerfall derselbe HTTP-Status.
  */
 class SubmitController extends FrontendController
 {
@@ -57,12 +57,12 @@ class SubmitController extends FrontendController
         // Für anonyme Besucher startet der Shop keine Sitzung, weshalb die Seite
         // ein leeres stoken ausliefert. Beim Absenden entsteht dann doch eine
         // Sitzung — eine Prüfung würde also ausgerechnet die nicht angemeldeten
-        // Besucher aussperren, für die das Formular gedacht ist (requirements.md A2).
+        // Besucher aussperren, für die das Formular gedacht ist.
         //
         // Sie brächte hier auch keinen Schutz: Der Endpunkt nimmt bewusst von
         // jedem entgegen, ein fremd ausgelöster Request erreicht nichts, was ein
         // Angreifer nicht ebenso direkt tun könnte. Gegen Missbrauch steht
-        // tabslTurnstile (requirements.md C2), nicht ein Token.
+        // tabslTurnstile, nicht ein Token.
         //
         // Das Backend-Formular ist davon unberührt: Dort erzwingt der
         // AdminController ohnehin eine gültige Sitzung samt Token-Prüfung.
@@ -78,7 +78,7 @@ class SubmitController extends FrontendController
         }
 
         // Schlägt die Bot-Prüfung fehl, endet der Vorgang hier — es wird weder
-        // OpenAI noch GitLab angesprochen (requirements.md C2).
+        // OpenAI noch GitLab angesprochen.
         if ($turnstileState === TurnstileGate::STATE_ON
             && !$turnstile->verify((string) $this->getRequestValue(TurnstileGate::TOKEN_FIELD))
         ) {
@@ -101,7 +101,7 @@ class SubmitController extends FrontendController
             $this->respond(false, $exception->getUserMessageIdent(), 200, $exception->getUserMessageParams());
         } catch (\Throwable $exception) {
             // Ein unerwarteter Fehler darf im Shop nie als Fehlerseite sichtbar
-            // werden (requirements.md B4) — ohne Protokoll bliebe er allerdings
+            // werden — ohne Protokoll bliebe er allerdings
             // gänzlich unauffindbar.
             // Die Meldung stammt aus fremdem Code und kann Zeilenumbrüche oder
             // Eingaben des Melders enthalten — einzeilig und gekürzt ins Protokoll,
@@ -143,7 +143,7 @@ class SubmitController extends FrontendController
 
     /**
      * Bewusst der unescapte Zugriff: der Freitext muss unverändert ins Ticket
-     * (requirements.md B1) und die base64-Bilddaten dürfen nicht verändert
+     * und die base64-Bilddaten dürfen nicht verändert
      * werden. Die Prüfung übernimmt InputValidator.
      *
      * @param mixed $default

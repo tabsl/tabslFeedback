@@ -21,7 +21,7 @@
         [{/if}]
 
         [{* Die Bilder reisen als base64 in normalen POST-Feldern mit, nicht als
-            Datei-Upload — dieselbe Entscheidung wie im Frontend (planning.md §7 Nr. 2). *}]
+            Datei-Upload — dieselbe Entscheidung wie im Frontend. *}]
         <form id="tabslfeedback-admin-form"
               action="[{$oViewConf->getSelfLink()}]"
               method="post"
