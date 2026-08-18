@@ -243,6 +243,43 @@ OXID eShop 6.x, PHP 7.4 und PHP 8.x. Getestet mit den Themes `wave` und `ps`;
 das Frontend-Widget bindet sich an den Block `base_js` und setzt weder jQuery
 noch Bootstrap voraus.
 
+## Frontend-Assets
+
+Ausgeliefert werden `out/src/js/tabslfeedback.min.js` und
+`out/src/css/tabslfeedback.min.css`. Die lesbaren Quelldateien liegen unter
+demselben Namen ohne `.min` daneben und sind die **einzige** Stelle, an der
+Änderungen vorgenommen werden — die minifizierten Fassungen entstehen daraus:
+
+```bash
+make minify   # erzeugt die .min-Dateien neu
+make verify   # prüft, ob die .min-Dateien zum Quellstand passen
+```
+
+Beides braucht Node. Die Werkzeuge (`terser`, `clean-css-cli`) sind in
+`package.json` auf **exakte Versionen** festgelegt und werden beim ersten Lauf
+per `npm ci` installiert. Das ist kein Zufall: Eine andere terser-Version
+erzeugt aus derselben Quelle ein anderes Ergebnis, und da die minifizierten
+Dateien im Repository liegen, entstünde sonst bei jedem Beitragenden ein
+Komplett-Diff auf unveränderter Quelle.
+
+`make minify` bricht ab, wenn ein Werkzeug einen Fehler meldet oder keine bzw.
+eine leere Ausgabedatei entsteht; das erzeugte JavaScript wird zusätzlich mit
+`node --check` geprüft. Warnungen von `clean-css` werden ausgegeben, brechen den
+Lauf aber nicht ab — sie sind kein verlässliches Qualitätssignal: eine leere
+Property löst eine Warnung aus, obwohl die Ausgabe in Ordnung ist, während eine
+verworfene leere Regel stillschweigend passiert.
+
+`make verify` vergleicht **den Inhalt**: Es erzeugt die Assets in ein
+temporäres Verzeichnis neu und prüft sie byteweise gegen die eingecheckten
+Dateien. Ein Zeitstempel-Vergleich wäre wertlos, weil Git keine mtimes
+wiederherstellt — nach einem Clone liegen Quelle und `.min` in derselben
+Sekunde. So findet `verify` auch eine von Hand bearbeitete `.min`-Datei und
+eignet sich damit sowohl für einen Pre-Commit-Hook als auch für CI.
+
+> ⚠️ **Wer nur die Quelldatei ändert, ändert nichts am Shop.** Eingebunden wird
+> ausschließlich die `.min`-Fassung; ohne `make minify` läuft weiterhin der alte
+> Stand.
+
 ## Support
 
 Open Source, ohne Anspruch auf Support oder Reaktionszeiten. Fehlerberichte und

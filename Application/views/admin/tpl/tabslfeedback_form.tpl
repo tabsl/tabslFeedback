@@ -1,6 +1,6 @@
 [{include file="headitem.tpl" title="TABSLFEEDBACK_TITLE"|oxmultilangassign}]
 
-<link rel="stylesheet" type="text/css" href="[{$oViewConf->getTabslFeedbackAssetUrl('out/src/css/tabslfeedback.css')}]">
+<link rel="stylesheet" type="text/css" href="[{$oViewConf->getTabslFeedbackAssetUrl('out/src/css/tabslfeedback.min.css')}]">
 
 <div class="tabslfeedback-widget tabslfeedback-admin-page">
 
@@ -87,7 +87,7 @@
             </div>
         </form>
 
-        <script type="text/javascript" src="[{$oViewConf->getTabslFeedbackAssetUrl('out/src/js/tabslfeedback.js')}]" defer></script>
+        <script type="text/javascript" src="[{$oViewConf->getTabslFeedbackAssetUrl('out/src/js/tabslfeedback.min.js')}]" defer></script>
 
     [{/if}]
 

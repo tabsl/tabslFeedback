@@ -5,7 +5,7 @@
     Die Konfiguration wandert über data-Attribute ins JavaScript; im Template
     steht bewusst keine Logik. *}]
 [{if $oViewConf->isTabslFeedbackFrontendAvailable()}]
-    <link rel="stylesheet" type="text/css" href="[{$oViewConf->getTabslFeedbackAssetUrl('out/src/css/tabslfeedback.css')}]">
+    <link rel="stylesheet" type="text/css" href="[{$oViewConf->getTabslFeedbackAssetUrl('out/src/css/tabslfeedback.min.css')}]">
 
     [{* Die JSON-Werte müssen HTML-escaped werden: ihre strukturellen
         Anführungszeichen würden das Attribut sonst vorzeitig beenden. *}]
@@ -25,5 +25,5 @@
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     [{/if}]
 
-    <script type="text/javascript" src="[{$oViewConf->getTabslFeedbackAssetUrl('out/src/js/tabslfeedback.js')}]" defer></script>
+    <script type="text/javascript" src="[{$oViewConf->getTabslFeedbackAssetUrl('out/src/js/tabslfeedback.min.js')}]" defer></script>
 [{/if}]

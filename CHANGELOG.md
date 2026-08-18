@@ -7,13 +7,17 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-08-17
+## [1.1.0] - 2026-08-18
 
 ### Added
 
 - Formular aus dem Shop heraus öffnen: `window.tabslFeedback.open()` zeigt den Dialog ohne Seitenwechsel
 - Bezug am Ticket: `open({reference: '…'})` nennt den Gegenstand der Meldung, z. B. einen Entwurf oder eine Bestellung
 - Position „Kein Button": Das Formular ist eingebunden, aber nur dort erreichbar, wo der Shop es selbst öffnet
+
+### Changed
+
+- Shop und Backend laden Skript und Stylesheet in verkleinerter Fassung — rund 58 % weniger JavaScript und 36 % weniger CSS je Seitenaufruf
 
 ### Fixed
 
