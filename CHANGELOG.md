@@ -22,6 +22,7 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 ### Fixed
 
 - Skript und Stylesheet tragen einen Zeitstempel, damit wiederkehrende Besucher nach einem Update nicht auf einem alten Stand hängen bleiben
+- Nach dem Schließen des Dialogs steht der Fokus wieder auf dem Element, das ihn geöffnet hat
 
 ## [1.0.0] - 2026-07-25
 

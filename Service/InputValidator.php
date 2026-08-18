@@ -328,9 +328,15 @@ class InputValidator
                 continue;
             }
 
-            if (is_scalar($value) && (string) $value !== '') {
+            if (is_scalar($value)) {
                 $limit = $key === 'reference' ? self::MAX_REFERENCE_LENGTH : 2000;
-                $plain = mb_substr((string) $value, 0, $limit);
+                $plain = mb_substr(trim((string) $value), 0, $limit);
+
+                // Eine Angabe aus reinem Leerraum ist keine Angabe: Sie erzeugt
+                // sonst eine Tabellenzeile mit leerer Zelle im Ticket.
+                if ($plain === '') {
+                    continue;
+                }
 
                 $meta[$key] = in_array($key, ['url', 'referrer'], true)
                     ? $this->stripSensitiveQueryParams($plain)

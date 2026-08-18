@@ -290,6 +290,9 @@
         // Gegenstand der Meldung, gesetzt beim Öffnen. Gilt nur für den einen
         // Vorgang: Wer den Dialog später ohne Bezug öffnet, meldet etwas anderes.
         this.reference = '';
+
+        // Element, das den Dialog geöffnet hat — siehe close().
+        this.lastFocus = null;
     }
 
     FrontendWidget.prototype.init = function () {
@@ -525,6 +528,7 @@
 
     FrontendWidget.prototype.open = function (options) {
         this.reference = options && options.reference ? String(options.reference) : '';
+        this.lastFocus = document.activeElement;
         this.overlay.hidden = false;
 
         // Die Bestätigung des letzten Vorgangs bleibt nach dem Absenden stehen;
@@ -538,6 +542,17 @@
 
     FrontendWidget.prototype.close = function () {
         this.overlay.hidden = true;
+
+        // Fokus dorthin zurück, wo der Dialog aufging: Das versteckte Overlay gibt
+        // ihn sonst an den Seitenanfang ab. Bei Position "none" ist das der einzige
+        // Weg zurück — dort gibt es keinen Trigger, zu dem sich tabben liesse.
+        var origin = this.lastFocus;
+        this.lastFocus = null;
+
+        if (origin && origin !== document.body
+            && typeof origin.focus === 'function' && document.contains(origin)) {
+            origin.focus();
+        }
     };
 
     /**
