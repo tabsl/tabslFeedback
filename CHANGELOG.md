@@ -47,6 +47,6 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Sitzungskennungen und geheimnisverdächtige Parameter werden aus Seite und Referrer entfernt
 - Ohne vollständige GitLab-Angaben nimmt der Shop kein Feedback entgegen
 
-[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/tabsl/tabslFeedback/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/tabsl/tabslFeedback/releases/tag/v1.0.0
+[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/tabsl/tabslFeedback/compare/1.0.0...1.1.0
+[1.0.0]: https://github.com/tabsl/tabslFeedback/releases/tag/1.0.0
