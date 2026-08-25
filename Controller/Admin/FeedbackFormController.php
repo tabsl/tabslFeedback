@@ -35,7 +35,7 @@ class FeedbackFormController extends AdminController
     private $resultMessage = '';
 
     /** @var array<string,string> Bei Fehler erhalten gebliebene Eingaben */
-    private $formValues = ['fb_message' => '', 'fb_name' => '', 'fb_email' => ''];
+    private $formValues = ['fb_message' => '', 'fb_subject' => '', 'fb_name' => '', 'fb_email' => ''];
 
     public function render(): string
     {
@@ -46,7 +46,9 @@ class FeedbackFormController extends AdminController
 
         $this->_aViewData['tabslfeedbackAvailable'] = $available;
         $this->_aViewData['tabslfeedbackShowContactFields'] = $settings->showContactFields();
-        $this->_aViewData['tabslfeedbackShowAiNotice'] = $settings->usesAiProcessing();
+        $this->_aViewData['tabslfeedbackShowSubjectField'] = !$settings->isAiEnabled();
+        $this->_aViewData['tabslfeedbackShowScreenshots'] = $settings->areScreenshotsEnabled();
+        $this->_aViewData['tabslfeedbackNoticeText'] = $settings->getNoticeText();
         $this->_aViewData['tabslfeedbackResultOk'] = $this->resultOk;
         $this->_aViewData['tabslfeedbackResultMessage'] = $this->resultMessage;
         $this->_aViewData['tabslfeedbackValues'] = $this->formValues;
@@ -80,12 +82,14 @@ class FeedbackFormController extends AdminController
 
         $request = Registry::getRequest();
         $rawMessage = (string) $request->getRequestParameter('fb_message', '');
+        $rawSubject = (string) $request->getRequestParameter('fb_subject', '');
         $rawName = (string) $request->getRequestParameter('fb_name', '');
         $rawEmail = (string) $request->getRequestParameter('fb_email', '');
 
         try {
             $input = (new InputValidator())->validate(
                 $rawMessage,
+                $rawSubject,
                 (array) $request->getRequestParameter('fb_images', []),
                 $rawName,
                 $rawEmail,
@@ -96,10 +100,10 @@ class FeedbackFormController extends AdminController
 
             $this->setResult(true, 'TABSLFEEDBACK_THANKS');
         } catch (FeedbackException $exception) {
-            $this->keepInput($rawMessage, $rawName, $rawEmail);
+            $this->keepInput($rawMessage, $rawSubject, $rawName, $rawEmail);
             $this->setResult(false, $exception->getUserMessageIdent(), $exception->getUserMessageParams());
         } catch (\Throwable $exception) {
-            $this->keepInput($rawMessage, $rawName, $rawEmail);
+            $this->keepInput($rawMessage, $rawSubject, $rawName, $rawEmail);
             $this->setResult(false, 'TABSLFEEDBACK_ERROR_GENERIC');
         }
     }
@@ -109,10 +113,11 @@ class FeedbackFormController extends AdminController
      * getippt werden muss. Für die Screenshots gilt das
      * nicht — sie liegen nur im Browser und werden dort gehalten.
      */
-    private function keepInput(string $message, string $name, string $email): void
+    private function keepInput(string $message, string $subject, string $name, string $email): void
     {
         $this->formValues = [
             'fb_message' => $message,
+            'fb_subject' => $subject,
             'fb_name' => $name,
             'fb_email' => $email,
         ];

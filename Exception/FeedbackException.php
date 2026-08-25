@@ -14,9 +14,10 @@ use Exception;
  * VALIDATION erzeugt einen benennenden Hinweis, damit eine zu große Datei oder
  * eine unplausible E-Mail korrigierbar ist statt still zu scheitern.
  *
- * Ein Ausfall von OpenAI ist hier bewusst NICHT vertreten: er ist kein
- * Fehlerzustand des Vorgangs, sondern führt lediglich zu einem Issue ohne
- * Aufbereitung. OpenAiService signalisiert das per null-Rückgabe.
+ * Ein Ausfall der KI-Aufbereitung ist hier bewusst NICHT vertreten: er ist
+ * kein Fehlerzustand des Vorgangs, sondern führt lediglich zu einem Issue ohne
+ * Aufbereitung. OpenAiService und AnthropicService signalisieren das per
+ * null-Rückgabe.
  */
 class FeedbackException extends Exception
 {

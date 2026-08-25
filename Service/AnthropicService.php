@@ -9,17 +9,23 @@ use Tabsl\Feedback\Core\ModuleSettings;
 
 /**
  * Erzeugt aus dem Freitext des Melders einen Ticket-Titel und eine lesbare
- * Beschreibung — über die OpenAI Chat-Completions-API.
+ * Beschreibung — über die Anthropic Messages-API.
  *
  * Der Dienst wirft nie — ein Ausfall (fehlender Key, Zeitüberschreitung,
  * Fehlerstatus, unbrauchbare Antwort) wird als null gemeldet. Die Ticket-Anlage
- * läuft dann ohne Aufbereitung weiter.
+ * läuft dann ohne Aufbereitung weiter. Regeltext und Ergebnisprüfung teilt sich
+ * dieser Dienst mit OpenAiService über AiPromptBuilder — nur Anfrage und
+ * Antwort-Umschlag unterscheiden sich zwischen den Anbietern.
  *
  * Bilddaten werden ausdrücklich nicht übermittelt.
  */
-class OpenAiService implements AiTicketGeneratorInterface
+class AnthropicService implements AiTicketGeneratorInterface
 {
-    private const API_URL = 'https://api.openai.com/v1/chat/completions';
+    private const API_URL = 'https://api.anthropic.com/v1/messages';
+
+    private const API_VERSION = '2023-06-01';
+
+    private const MAX_TOKENS = 1024;
 
     private const TIMEOUT_SECONDS = 10;
 
@@ -37,22 +43,19 @@ class OpenAiService implements AiTicketGeneratorInterface
         $this->promptBuilder = $promptBuilder ?? new AiPromptBuilder();
     }
 
-    /**
-     * @return array{title:string,description:string}|null null = keine Aufbereitung möglich
-     */
     public function generateTicket(string $message): ?array
     {
-        $apiKey = $this->settings->getOpenAiKey();
+        $apiKey = $this->settings->getAnthropicKey();
 
         if ($apiKey === '') {
             return null;
         }
 
         $payload = [
-            'model' => $this->settings->getOpenAiModel(),
-            'response_format' => ['type' => 'json_object'],
+            'model' => $this->settings->getAnthropicModel(),
+            'max_tokens' => self::MAX_TOKENS,
+            'system' => $this->promptBuilder->buildSystemPrompt($this->settings),
             'messages' => [
-                ['role' => 'system', 'content' => $this->promptBuilder->buildSystemPrompt($this->settings)],
                 ['role' => 'user', 'content' => $message],
             ],
         ];
@@ -88,7 +91,8 @@ class OpenAiService implements AiTicketGeneratorInterface
         curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $apiKey,
+            'x-api-key: ' . $apiKey,
+            'anthropic-version: ' . self::API_VERSION,
         ]);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, self::CONNECT_TIMEOUT_SECONDS);
         curl_setopt($curl, CURLOPT_TIMEOUT, self::TIMEOUT_SECONDS);
@@ -103,10 +107,10 @@ class OpenAiService implements AiTicketGeneratorInterface
             // Ticket ohne Aufbereitung entstanden ist — abgelaufener Schlüssel,
             // erschöpftes Kontingent und Zeitüberschreitung sähen alle gleich aus.
             $this->log(
-                'openai request failed'
+                'anthropic request failed'
                 . ' — http ' . $status
                 . ($curlError !== '' ? ', curl: ' . $curlError : '')
-                . $this->describeApiError($response)
+                . $this->describeApiError($response, $apiKey)
             );
 
             return null;
@@ -119,9 +123,10 @@ class OpenAiService implements AiTicketGeneratorInterface
      * Fehlerangabe aus der API-Antwort, sofern eine gemeldet wurde. Enthält
      * niemals den Schlüssel — nur Typ und Meldung des Dienstes.
      *
-     * @param string|bool $response
+     * @param string|bool $response curl_exec() liefert bei einem Transportfehler
+     *                              (Timeout, DNS, …) bool false statt eines Strings.
      */
-    private function describeApiError($response): string
+    private function describeApiError($response, string $apiKey): string
     {
         if (!is_string($response) || $response === '') {
             return '';
@@ -136,10 +141,10 @@ class OpenAiService implements AiTicketGeneratorInterface
         $type = isset($decoded['error']['type']) ? (string) $decoded['error']['type'] : '';
         $message = isset($decoded['error']['message']) ? (string) $decoded['error']['message'] : '';
 
-        // OpenAI maskiert den Schlüssel in seinen Fehlertexten nur teilweise
-        // ("sk-proj-*****ltig") — Präfix und letzte Zeichen bleiben lesbar. Auch
-        // dieses Fragment hat im Protokoll nichts verloren.
-        $message = (string) preg_replace('/\bsk-[A-Za-z0-9_*\-]{4,}/', '[key]', $message);
+        // Anthropic-Fehlertexte zitieren den Schlüssel nicht üblicherweise, aber
+        // ein Betreiber könnte ihn versehentlich in einer eigenen Fehlermeldung
+        // wiederfinden — der Schlüssel selbst hat im Protokoll nichts verloren.
+        $message = str_replace($apiKey, '[key]', $message);
 
         // Einzeilig halten: ein Zeilenumbruch im Fremdtext ließe sich sonst als
         // eigener Protokolleintrag ausgeben.
@@ -164,16 +169,16 @@ class OpenAiService implements AiTicketGeneratorInterface
     {
         $decoded = json_decode($response, true);
 
-        if (!is_array($decoded) || !isset($decoded['choices'][0]['message']['content'])) {
-            $this->log('openai answered without usable content');
+        if (!is_array($decoded) || !isset($decoded['content'][0]['text']) || !is_string($decoded['content'][0]['text'])) {
+            $this->log('anthropic answered without usable content');
 
             return null;
         }
 
-        $content = json_decode((string) $decoded['choices'][0]['message']['content'], true);
+        $content = json_decode($this->promptBuilder->stripCodeFence($decoded['content'][0]['text']), true);
 
         if (!is_array($content)) {
-            $this->log('openai content was not valid json');
+            $this->log('anthropic content was not valid json');
 
             return null;
         }
@@ -183,7 +188,7 @@ class OpenAiService implements AiTicketGeneratorInterface
         if ($ticket === null) {
             $hasDescription = isset($content['description']) && is_scalar($content['description'])
                 && trim((string) $content['description']) !== '';
-            $this->log('openai returned no title' . ($hasDescription ? ' (description discarded)' : ''));
+            $this->log('anthropic returned no title' . ($hasDescription ? ' (description discarded)' : ''));
         }
 
         return $ticket;

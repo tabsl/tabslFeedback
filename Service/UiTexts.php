@@ -21,6 +21,7 @@ class UiTexts
         'triggerLabel' => 'TABSLFEEDBACK_TRIGGER',
         'title' => 'TABSLFEEDBACK_TITLE',
         'messageLabel' => 'TABSLFEEDBACK_MESSAGE_LABEL',
+        'subjectLabel' => 'TABSLFEEDBACK_SUBJECT_LABEL',
         'screenshotsLabel' => 'TABSLFEEDBACK_SCREENSHOTS_LABEL',
         'screenshotsHint' => 'TABSLFEEDBACK_SCREENSHOTS_HINT',
         'nameLabel' => 'TABSLFEEDBACK_NAME_LABEL',
@@ -30,7 +31,6 @@ class UiTexts
         'close' => 'TABSLFEEDBACK_CLOSE',
         'sending' => 'TABSLFEEDBACK_SENDING',
         'removeImage' => 'TABSLFEEDBACK_REMOVE_IMAGE',
-        'aiNotice' => 'TABSLFEEDBACK_AI_NOTICE',
         'thanks' => 'TABSLFEEDBACK_THANKS',
         'errorGeneric' => 'TABSLFEEDBACK_ERROR_GENERIC',
         'errorNetwork' => 'TABSLFEEDBACK_ERROR_NETWORK',
@@ -81,6 +81,7 @@ class UiTexts
             'maxImageBytes' => InputValidator::MAX_IMAGE_BYTES,
             'maxTotalBytes' => InputValidator::MAX_TOTAL_BYTES,
             'maxMessageLength' => InputValidator::MAX_MESSAGE_LENGTH,
+            'maxSubjectLength' => InputValidator::MAX_SUBJECT_LENGTH,
             'maxContactLength' => InputValidator::MAX_CONTACT_FIELD_LENGTH,
             'allowedMimeTypes' => InputValidator::ALLOWED_MIME_TYPES,
         ];
@@ -106,6 +107,10 @@ class UiTexts
         $texts['errorContactTooLong'] = sprintf(
             $this->translate('TABSLFEEDBACK_ERROR_CONTACT_TOO_LONG'),
             InputValidator::MAX_CONTACT_FIELD_LENGTH
+        );
+        $texts['errorSubjectTooLong'] = sprintf(
+            $this->translate('TABSLFEEDBACK_ERROR_SUBJECT_TOO_LONG'),
+            InputValidator::MAX_SUBJECT_LENGTH
         );
         $texts['errorTooManyImages'] = sprintf(
             $this->translate('TABSLFEEDBACK_ERROR_TOO_MANY_IMAGES'),

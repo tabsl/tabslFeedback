@@ -19,7 +19,7 @@ $sMetadataVersion = '2.1';
 // tabsl module id
 $psModuleId = 'tabslFeedback';
 $psModuleName = '<b>tabsl</b>Feedback';
-$psModuleVersion = '1.1.0';
+$psModuleVersion = '1.2.0';
 
 // tabsl module description
 $psModuleDesc = 'Feedback-Formular für Backend und Frontend mit KI-Aufbereitung und GitLab-Ticket-Anlage.';
@@ -69,18 +69,23 @@ $aModule = [
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_admin_enabled', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_frontend_enabled', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_button_position', 'type' => 'select', 'value' => 'bottom-right', 'constraints' => 'bottom-left|bottom-right|center|none'],
+        ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_notice_text', 'type' => 'str', 'value' => 'Ihre Meldung wird inklusive eventuell angehängter Screenshots zur Bearbeitung verwendet.'],
         // GitLab
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_url', 'type' => 'str', 'value' => ''],
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_project_id', 'type' => 'str', 'value' => ''],
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_token', 'type' => 'password', 'value' => ''],
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_assignee_id', 'type' => 'str', 'value' => ''],
-        // OpenAI
+        // KI-Aufbereitung
+        ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_ai_provider', 'type' => 'select', 'value' => 'openai', 'constraints' => 'none|openai|anthropic'],
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_openai_key', 'type' => 'password', 'value' => ''],
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_openai_model', 'type' => 'str', 'value' => 'gpt-4o-mini'],
+        ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_anthropic_key', 'type' => 'password', 'value' => ''],
+        ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_anthropic_model', 'type' => 'str', 'value' => 'claude-haiku-4-5-20251001'],
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_ticket_language', 'type' => 'select', 'value' => 'source', 'constraints' => 'source|en'],
         // Datenschutz
         ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_show_contact_fields', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_send_customer_data', 'type' => 'bool', 'value' => false],
+        ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_screenshots_enabled', 'type' => 'bool', 'value' => true],
     ],
     'events' => [
         'onActivate' => '\Tabsl\Feedback\Core\Setup::onActivate',

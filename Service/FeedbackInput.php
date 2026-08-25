@@ -15,6 +15,9 @@ class FeedbackInput
     /** @var string */
     private $message;
 
+    /** @var string Nur befüllt, wenn das Betreff-Feld eingeblendet ist (KI-Aufbereitung aus) */
+    private $subject;
+
     /** @var string */
     private $name;
 
@@ -31,9 +34,16 @@ class FeedbackInput
      * @param array<int,array{bytes:string,mime:string,filename:string}> $images
      * @param array<string,string> $clientMeta
      */
-    public function __construct(string $message, string $name, string $email, array $images, array $clientMeta)
-    {
+    public function __construct(
+        string $message,
+        string $subject,
+        string $name,
+        string $email,
+        array $images,
+        array $clientMeta
+    ) {
         $this->message = $message;
+        $this->subject = $subject;
         $this->name = $name;
         $this->email = $email;
         $this->images = $images;
@@ -43,6 +53,11 @@ class FeedbackInput
     public function getMessage(): string
     {
         return $this->message;
+    }
+
+    public function getSubject(): string
+    {
+        return $this->subject;
     }
 
     public function getName(): string

@@ -30,8 +30,8 @@ class FeedbackService
     /** @var ModuleSettings */
     private $settings;
 
-    /** @var OpenAiService */
-    private $openAi;
+    /** @var AiTicketGeneratorInterface|null null = Betreiber hat „ohne KI" gewählt */
+    private $aiService;
 
     /** @var GitLabService */
     private $gitLab;
@@ -41,12 +41,12 @@ class FeedbackService
 
     public function __construct(
         ?ModuleSettings $settings = null,
-        ?OpenAiService $openAi = null,
+        ?AiTicketGeneratorInterface $aiService = null,
         ?GitLabService $gitLab = null,
         ?MetadataCollector $metadata = null
     ) {
         $this->settings = $settings ?? new ModuleSettings();
-        $this->openAi = $openAi ?? new OpenAiService($this->settings);
+        $this->aiService = $aiService ?? $this->resolveAiService($this->settings);
         $this->gitLab = $gitLab ?? new GitLabService($this->settings);
         $this->metadata = $metadata ?? new MetadataCollector($this->settings);
     }
@@ -60,16 +60,46 @@ class FeedbackService
     {
         $labels = new TicketLabels($this->settings->getTicketLanguage());
 
-        $ticket = $this->openAi->generateTicket($input->getMessage());
-        $title = $ticket !== null
-            ? $ticket['title']
-            : $this->buildFallbackTitle($input->getMessage(), $labels);
+        $ticket = $this->aiService !== null ? $this->aiService->generateTicket($input->getMessage()) : null;
+        $title = $this->resolveTitle($ticket, $input, $labels);
 
-        $uploads = $this->uploadScreenshots($input->getImages());
+        $images = $this->settings->areScreenshotsEnabled() ? $input->getImages() : [];
+        $uploads = $this->uploadScreenshots($images);
 
         $description = $this->buildDescription($input, $contextKey, $labels, $ticket, $uploads);
 
         $this->gitLab->createIssue($title, $description);
+    }
+
+    private function resolveAiService(ModuleSettings $settings): ?AiTicketGeneratorInterface
+    {
+        switch ($settings->getAiProvider()) {
+            case ModuleSettings::AI_PROVIDER_OPENAI:
+                return new OpenAiService($settings);
+            case ModuleSettings::AI_PROVIDER_ANTHROPIC:
+                return new AnthropicService($settings);
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * @param array{title:string,description:string}|null $ticket
+     */
+    private function resolveTitle(?array $ticket, FeedbackInput $input, TicketLabels $labels): string
+    {
+        if ($ticket !== null) {
+            return $ticket['title'];
+        }
+
+        // Ohne KI-Aufbereitung ist das Betreff-Feld eingeblendet — trägt der
+        // Melder dort etwas ein, ist das ein besserer Titel als die erste Zeile
+        // des Freitexts.
+        if ($input->getSubject() !== '') {
+            return $input->getSubject();
+        }
+
+        return $this->buildFallbackTitle($input->getMessage(), $labels);
     }
 
     /**

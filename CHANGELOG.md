@@ -7,6 +7,16 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-25
+
+### Added
+
+- Modul auch ganz ohne KI-Aufbereitung nutzbar: `tabslfeedback_ai_provider` schaltet zwischen OpenAI, Anthropic und „Ohne KI" um
+- Anthropic (Claude) als zweiter KI-Anbieter neben OpenAI
+- Betreff-Feld im Formular, sichtbar sobald „Ohne KI" gewählt ist — sein Inhalt wird direkt zum Ticket-Titel
+- Screenshots über `tabslfeedback_screenshots_enabled` abschaltbar
+- Konfigurierbarer Hinweistext (`tabslfeedback_notice_text`) vor dem Absenden-Knopf, ersetzt den bisher fest an die KI-Aufbereitung gekoppelten Hinweis
+
 ## [1.1.0] - 2026-08-18
 
 ### Added
@@ -47,6 +57,7 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Sitzungskennungen und geheimnisverdächtige Parameter werden aus Seite und Referrer entfernt
 - Ohne vollständige GitLab-Angaben nimmt der Shop kein Feedback entgegen
 
-[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.1.0...HEAD
+[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/tabsl/tabslFeedback/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/tabsl/tabslFeedback/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/tabsl/tabslFeedback/releases/tag/1.0.0

@@ -90,6 +90,7 @@ class SubmitController extends FrontendController
         try {
             $input = (new InputValidator())->validate(
                 (string) $this->getRequestValue('fb_message'),
+                (string) $this->getRequestValue('fb_subject'),
                 (array) $this->getRequestValue('fb_images', []),
                 (string) $this->getRequestValue('fb_name'),
                 (string) $this->getRequestValue('fb_email'),

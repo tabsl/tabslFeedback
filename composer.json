@@ -10,7 +10,8 @@
     "eShop",
     "feedback",
     "gitlab",
-    "openai"
+    "openai",
+    "anthropic"
   ],
   "authors": [
     {

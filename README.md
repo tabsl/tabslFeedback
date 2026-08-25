@@ -1,8 +1,9 @@
 # tabslFeedback
 
 OXID eShop Modul für ein Feedback-Formular in Backend und Shop. Der Freitext des
-Melders wird von OpenAI zu Titel und Beschreibung aufbereitet; daraus entsteht
-ein GitLab-Issue mit Screenshots und technischem Kontext.
+Melders wird wahlweise von OpenAI oder Anthropic zu Titel und Beschreibung
+aufbereitet; daraus entsteht ein GitLab-Issue mit Screenshots und technischem
+Kontext. Auch ganz ohne KI nutzbar.
 
 Statt „Das geht nicht" per Telefon oder E-Mail — ohne URL, ohne Browser, ohne
 Screenshot, und ohne dass jemand die Meldung von Hand ins Ticketsystem überträgt.
@@ -14,14 +15,25 @@ links, im Shop ein kleiner Button auf jeder Seite (Position wählbar). „Beide
 aus" ist ein zulässiger Zustand; fehlen die GitLab-Pflichtangaben, erscheint
 gar kein Einstieg.
 
-**Screenshots aus der Zwischenablage** — Bild kopieren, im Formular `Strg+V`
-bzw. `⌘+V`. Mehrere Bilder pro Meldung, jedes mit Vorschau und einzeln
-entfernbar. Feedback ohne Bild bleibt möglich.
+**Screenshots aus der Zwischenablage, abschaltbar** — Bild kopieren, im
+Formular `Strg+V` bzw. `⌘+V`. Mehrere Bilder pro Meldung, jedes mit Vorschau und
+einzeln entfernbar. Feedback ohne Bild bleibt möglich. Über
+`tabslfeedback_screenshots_enabled` lässt sich die Funktion komplett
+ausblenden, etwa wenn Screenshots datenschutzrechtlich vermieden werden sollen.
 
-**KI-Aufbereitung mit Rückfallebene** — der ursprüngliche Wortlaut steht immer
-zusätzlich im Issue. Fehlt der API-Key oder antwortet OpenAI nicht, entsteht das
-Issue trotzdem: mit Rohtext, Screenshots, Kontext und einem Vermerk, dass keine
-Aufbereitung stattfand. Der Melder bemerkt keinen Unterschied.
+**KI-Aufbereitung mit Rückfallebene — oder ganz ohne KI** — der ursprüngliche
+Wortlaut steht immer zusätzlich im Issue. `tabslfeedback_ai_provider` wählt
+zwischen OpenAI, Anthropic und „Ohne KI". Fehlt bei aktivem Anbieter der
+API-Key oder antwortet der Dienst nicht, entsteht das Issue trotzdem: mit
+Rohtext, Screenshots, Kontext und einem Vermerk, dass keine Aufbereitung
+stattfand. Bei „Ohne KI" zeigt das Formular stattdessen ein Betreff-Feld, dessen
+Inhalt direkt zum Ticket-Titel wird. Der Melder bemerkt in keinem Fall einen
+Unterschied im Ablauf.
+
+**Konfigurierbarer Hinweistext** — `tabslfeedback_notice_text` zeigt einen
+kurzen, frei editierbaren Satz unmittelbar vor dem Absenden-Knopf, etwa zur
+Transparenz über die Übermittlung von Screenshots oder an einen KI-Dienst. Leer
+lässt den Hinweis entfallen.
 
 **Technischer Kontext am Ticket** — in einem eingeklappten Block: Herkunft der
 Meldung, aufgerufene Seite, Referrer, Browser inkl. Version und Betriebssystem,
@@ -113,11 +125,16 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_gitlab_project_id` | Numerische ID des Zielprojekts — **Pflicht** | leer |
 | `tabslfeedback_gitlab_token` | Project-Access-Token mit Scope `api` — **Pflicht** | leer |
 | `tabslfeedback_gitlab_assignee_id` | Benutzer-ID für die Zuweisung; leer = keine Zuweisung | leer |
-| `tabslfeedback_openai_key` | OpenAI API-Key; leer = Ticket ohne Aufbereitung | leer |
-| `tabslfeedback_openai_model` | Verwendetes Modell | `gpt-4o-mini` |
+| `tabslfeedback_notice_text` | Kurzer Hinweistext vor dem Absenden-Knopf; leer = kein Hinweis | Hinweis auf Screenshot-Übermittlung |
+| `tabslfeedback_ai_provider` | `none`, `openai` oder `anthropic` — bei `none` erscheint statt der Aufbereitung ein Betreff-Feld | `openai` |
+| `tabslfeedback_openai_key` | OpenAI API-Key; nur bei Anbieter `openai`; leer = Ticket ohne Aufbereitung | leer |
+| `tabslfeedback_openai_model` | Verwendetes OpenAI-Modell | `gpt-4o-mini` |
+| `tabslfeedback_anthropic_key` | Anthropic API-Key; nur bei Anbieter `anthropic`; leer = Ticket ohne Aufbereitung | leer |
+| `tabslfeedback_anthropic_model` | Verwendetes Anthropic-Modell | `claude-haiku-4-5-20251001` |
 | `tabslfeedback_ticket_language` | `source` = Sprache der Meldung behalten, `en` = immer Englisch | `source` |
 | `tabslfeedback_show_contact_fields` | Optionale Felder für Name und E-Mail anzeigen | aus |
 | `tabslfeedback_send_customer_data` | Bei angemeldeten Kunden Kundennummer, Name und E-Mail ins Ticket übernehmen | aus |
+| `tabslfeedback_screenshots_enabled` | Screenshot-Funktion im Formular anzeigen | an |
 
 Fehlt eine der drei GitLab-Pflichtangaben — oder das `http://` bzw. `https://`
 in der Adresse —, erscheint weder Header-Link noch Frontend-Button: ein
@@ -132,8 +149,9 @@ Modul enthält **keine** Vorbelegung für Adressen, Projekt-IDs oder Zugangsdate
 ### Grenzwerte
 
 Fest eingebaut, bewusst nicht konfigurierbar: 5 Bilder je Meldung, 10 MB je Bild,
-20 MB für alle Bilder zusammen, 5.000 Zeichen Freitext, je 255 Zeichen für Name
-und E-Mail, 200 Zeichen für den Bezug; Formate PNG, JPG, GIF, WebP.
+20 MB für alle Bilder zusammen, 5.000 Zeichen Freitext, 120 Zeichen für den
+Betreff (nur bei Anbieter „Ohne KI" sichtbar), je 255 Zeichen für Name und
+E-Mail, 200 Zeichen für den Bezug; Formate PNG, JPG, GIF, WebP.
 
 Alle Grenzen werden serverseitig durchgesetzt. Damit mehrere Screenshots
 durchkommen, sollten `post_max_size` und `memory_limit` der PHP-Installation
@@ -144,11 +162,13 @@ oberhalb von 20 MB liegen.
 Grundlage für die Datenschutzerklärung des einsetzenden Shops. Übermittelt wird
 ausschließlich beim Absenden einer Meldung.
 
-**An OpenAI (`api.openai.com`)** — ausschließlich der Freitext der Meldung.
-Nicht: Screenshots, Name, E-Mail, Kundendaten, Umgebungsdaten, IP-Adresse,
-Shop-Adresse. Schreibt ein Melder personenbezogene Angaben in den Freitext,
-werden diese mit übertragen — darauf hat das Modul keinen Einfluss. Ohne
-API-Key findet **keine** Übermittlung statt.
+**An OpenAI (`api.openai.com`) oder Anthropic (`api.anthropic.com`)** — je nach
+`tabslfeedback_ai_provider` ausschließlich der Freitext der Meldung, an genau
+einen der beiden Dienste. Nicht: Screenshots, Name, E-Mail, Kundendaten,
+Umgebungsdaten, IP-Adresse, Shop-Adresse. Schreibt ein Melder personenbezogene
+Angaben in den Freitext, werden diese mit übertragen — darauf hat das Modul
+keinen Einfluss. Steht der Anbieter auf „Ohne KI" oder fehlt der API-Key,
+findet **keine** Übermittlung statt.
 
 **An die konfigurierte GitLab-Instanz** — Freitext, aufbereiteter Titel und
 Beschreibung, alle Screenshots, optional Name und E-Mail sowie der oben
@@ -221,11 +241,12 @@ Es gibt bewusst kein eigenes Rate-Limiting: ohne Zwischenspeicher wäre es nur
 
 ## Kosten
 
-**GitLab** — keine zusätzlichen Kosten. **OpenAI** — je Meldung ein Aufruf mit
-dem Freitext (höchstens 5.000 Zeichen) und einer kurzen Antwort; mit dem
-voreingestellten `gpt-4o-mini` liegen die Kosten pro Meldung bei Bruchteilen
-eines Cents, Bilder werden nicht übermittelt. **Cloudflare Turnstile** —
-dauerhaft kostenlos.
+**GitLab** — keine zusätzlichen Kosten. **OpenAI oder Anthropic** — je Meldung
+ein Aufruf mit dem Freitext (höchstens 5.000 Zeichen) und einer kurzen
+Antwort; mit den voreingestellten Modellen (`gpt-4o-mini` bzw.
+`claude-haiku-4-5-20251001`) liegen die Kosten pro Meldung bei Bruchteilen
+eines Cents, Bilder werden nicht übermittelt. Bei Anbieter „Ohne KI" entfällt
+dieser Posten vollständig. **Cloudflare Turnstile** — dauerhaft kostenlos.
 
 ## Was das Modul nicht tut
 

@@ -13,6 +13,7 @@ return [
     'TABSLFEEDBACK_TRIGGER' => 'Feedback',
     'TABSLFEEDBACK_TITLE' => 'Send feedback',
     'TABSLFEEDBACK_MESSAGE_LABEL' => 'Message',
+    'TABSLFEEDBACK_SUBJECT_LABEL' => 'Subject',
     'TABSLFEEDBACK_SCREENSHOTS_LABEL' => 'Screenshots',
     'TABSLFEEDBACK_SCREENSHOTS_HINT' => 'Paste an image from the clipboard with Ctrl+V or ⌘+V. Several images are possible.',
     'TABSLFEEDBACK_NAME_LABEL' => 'Name (optional)',
@@ -22,7 +23,6 @@ return [
     'TABSLFEEDBACK_CLOSE' => 'Close',
     'TABSLFEEDBACK_SENDING' => 'Sending …',
     'TABSLFEEDBACK_REMOVE_IMAGE' => 'Remove image',
-    'TABSLFEEDBACK_AI_NOTICE' => 'The text you enter is sent to an AI service for processing. Screenshots are not sent there.',
 
     // Responses
     'TABSLFEEDBACK_THANKS' => 'Thank you for your feedback.',
@@ -35,6 +35,7 @@ return [
     'TABSLFEEDBACK_ERROR_MESSAGE_TOO_LONG' => 'The message is too long (%d characters at most).',
     'TABSLFEEDBACK_ERROR_EMAIL_INVALID' => 'Please check the email address you entered.',
     'TABSLFEEDBACK_ERROR_CONTACT_TOO_LONG' => 'Name and email may be %d characters long at most.',
+    'TABSLFEEDBACK_ERROR_SUBJECT_TOO_LONG' => 'The subject is too long (%d characters at most).',
     'TABSLFEEDBACK_ERROR_TOO_MANY_IMAGES' => 'A maximum of %d images is possible.',
     'TABSLFEEDBACK_ERROR_IMAGE_TOO_LARGE' => 'One image is too large (%d MB per image at most).',
     'TABSLFEEDBACK_ERROR_IMAGES_TOO_LARGE' => 'The images are too large in total (%d MB at most).',

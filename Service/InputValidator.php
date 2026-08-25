@@ -35,6 +35,13 @@ class InputValidator
     public const MAX_CONTACT_FIELD_LENGTH = 255;
 
     /**
+     * Nur relevant, wenn das Betreff-Feld eingeblendet ist (KI-Aufbereitung
+     * aus). Am Titel-Limit der KI-Aufbereitung orientiert — beides wird
+     * letztlich zum GitLab-Issue-Titel.
+     */
+    public const MAX_SUBJECT_LENGTH = 120;
+
+    /**
      * Der Bezug benennt den Gegenstand der Meldung (Kennung eines Entwurfs, einer
      * Bestellung, eines Artikels) — eine Kennung, kein zweites Meldungsfeld.
      */
@@ -68,6 +75,7 @@ class InputValidator
      */
     public function validate(
         string $rawMessage,
+        string $rawSubject,
         array $rawImages,
         string $rawName,
         string $rawEmail,
@@ -88,11 +96,29 @@ class InputValidator
 
         return new FeedbackInput(
             $message,
+            $this->validateSubject($rawSubject),
             $this->validateContactField($rawName),
             $this->validateEmail($rawEmail),
             $this->validateImages($rawImages),
             $this->extractClientMeta($rawMeta)
         );
+    }
+
+    /**
+     * @throws FeedbackException
+     */
+    private function validateSubject(string $raw): string
+    {
+        $value = trim($raw);
+
+        if (mb_strlen($value) > self::MAX_SUBJECT_LENGTH) {
+            throw FeedbackException::validation(
+                'TABSLFEEDBACK_ERROR_SUBJECT_TOO_LONG',
+                ['max' => self::MAX_SUBJECT_LENGTH]
+            );
+        }
+
+        return $value;
     }
 
     /**

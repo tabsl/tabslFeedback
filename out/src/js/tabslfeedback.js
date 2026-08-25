@@ -253,6 +253,10 @@
             return texts.errorMessageTooLong;
         }
 
+        if (values.subject && values.subject.length > limits.maxSubjectLength) {
+            return texts.errorSubjectTooLong;
+        }
+
         if (values.name.length > limits.maxContactLength || values.email.length > limits.maxContactLength) {
             return texts.errorContactTooLong;
         }
@@ -312,13 +316,15 @@
 
         var self = this;
 
-        this.store = new ImageStore(this.limits, this.texts, function (message) {
-            self.showMessage(message, false);
-        });
+        if (this.config.showScreenshots) {
+            this.store = new ImageStore(this.limits, this.texts, function (message) {
+                self.showMessage(message, false);
+            });
 
-        bindPaste(this.dialog, this.store, function () {
-            self.refreshPreviews();
-        });
+            bindPaste(this.dialog, this.store, function () {
+                self.refreshPreviews();
+            });
+        }
 
         if (this.trigger) {
             this.trigger.addEventListener('click', function () {
@@ -415,8 +421,16 @@
         this.messageBox.setAttribute('role', 'status');
 
         this.form.appendChild(this.messageBox);
+
+        if (this.config.showSubject) {
+            this.form.appendChild(this.buildSubjectField());
+        }
+
         this.form.appendChild(this.buildMessageField());
-        this.form.appendChild(this.buildScreenshotField());
+
+        if (this.config.showScreenshots) {
+            this.form.appendChild(this.buildScreenshotField());
+        }
 
         if (this.config.showContactFields) {
             this.form.appendChild(this.buildContactField('name'));
@@ -432,10 +446,10 @@
             this.form.appendChild(this.turnstileHolder);
         }
 
-        // Transparenzhinweis direkt vor dem Absenden — nur wenn tatsächlich eine
-        // KI-Aufbereitung konfiguriert ist.
-        if (this.config.aiNotice) {
-            this.form.appendChild(createElement('p', 'tabslfeedback-notice', this.texts.aiNotice));
+        // Vom Betreiber konfigurierter Hinweis direkt vor dem Absenden — nur
+        // wenn ein Text hinterlegt ist.
+        if (this.config.notice) {
+            this.form.appendChild(createElement('p', 'tabslfeedback-notice', this.config.notice));
         }
 
         this.form.appendChild(this.buildActions());
@@ -459,6 +473,23 @@
 
         field.appendChild(label);
         field.appendChild(this.messageInput);
+
+        return field;
+    };
+
+    FrontendWidget.prototype.buildSubjectField = function () {
+        var field = createElement('div', 'tabslfeedback-field');
+        var label = createElement('label', 'tabslfeedback-label', this.texts.subjectLabel);
+
+        this.subjectInput = createElement('input', 'tabslfeedback-input');
+        this.subjectInput.type = 'text';
+        this.subjectInput.id = 'tabslfeedback-subject';
+        this.subjectInput.name = 'fb_subject';
+        this.subjectInput.maxLength = this.limits.maxSubjectLength;
+        label.setAttribute('for', this.subjectInput.id);
+
+        field.appendChild(label);
+        field.appendChild(this.subjectInput);
 
         return field;
     };
@@ -616,6 +647,10 @@
     };
 
     FrontendWidget.prototype.refreshPreviews = function () {
+        if (!this.store) {
+            return;
+        }
+
         var self = this;
 
         renderPreviews(this.previewList, this.store, this.texts, function () {
@@ -632,6 +667,7 @@
     FrontendWidget.prototype.collectValues = function () {
         return {
             message: this.messageInput.value,
+            subject: this.subjectInput ? this.subjectInput.value : '',
             name: this.nameInput ? this.nameInput.value : '',
             email: this.emailInput ? this.emailInput.value : ''
         };
@@ -656,13 +692,16 @@
         body.append('stoken', this.config.stoken);
 
         body.append('fb_message', values.message);
+        body.append('fb_subject', values.subject);
         body.append('fb_name', values.name);
         body.append('fb_email', values.email);
         body.append('fb_meta', collectMeta(this.reference));
 
-        this.store.dataUrls().forEach(function (dataUrl) {
-            body.append('fb_images[]', dataUrl);
-        });
+        if (this.store) {
+            this.store.dataUrls().forEach(function (dataUrl) {
+                body.append('fb_images[]', dataUrl);
+            });
+        }
 
         var turnstileToken = this.readTurnstileToken();
 
@@ -706,6 +745,10 @@
     FrontendWidget.prototype.onSuccess = function (message) {
         this.messageInput.value = '';
 
+        if (this.subjectInput) {
+            this.subjectInput.value = '';
+        }
+
         if (this.nameInput) {
             this.nameInput.value = '';
         }
@@ -714,7 +757,10 @@
             this.emailInput.value = '';
         }
 
-        this.store.clear();
+        if (this.store) {
+            this.store.clear();
+        }
+
         this.refreshPreviews();
         this.resetTurnstile();
         this.showMessage(message, true);
@@ -782,7 +828,7 @@
         var messageBox = form.querySelector('.tabslfeedback-message--client');
         var messageInput = form.querySelector('[name="fb_message"]');
 
-        if (!previewList || !imageContainer || !messageInput) {
+        if (!messageInput) {
             return;
         }
 
@@ -795,25 +841,31 @@
             messageBox.hidden = !text;
         }
 
-        var store = new ImageStore(limits, texts, showError);
+        // Screenshots sind serverseitig konfigurierbar — fehlt das Markup im
+        // Formular, entfällt Paste-Verwaltung und Bild-Versand.
+        var store = null;
 
-        function sync() {
-            showError('');
-            renderPreviews(previewList, store, texts, sync);
+        if (previewList && imageContainer) {
+            store = new ImageStore(limits, texts, showError);
 
-            // Die Bilder reisen als normale POST-Felder mit, nicht als Upload.
-            imageContainer.innerHTML = '';
+            var sync = function () {
+                showError('');
+                renderPreviews(previewList, store, texts, sync);
 
-            store.dataUrls().forEach(function (dataUrl) {
-                var hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = 'fb_images[]';
-                hidden.value = dataUrl;
-                imageContainer.appendChild(hidden);
-            });
+                // Die Bilder reisen als normale POST-Felder mit, nicht als Upload.
+                imageContainer.innerHTML = '';
+
+                store.dataUrls().forEach(function (dataUrl) {
+                    var hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'fb_images[]';
+                    hidden.value = dataUrl;
+                    imageContainer.appendChild(hidden);
+                });
+            };
+
+            bindPaste(form, store, sync);
         }
-
-        bindPaste(form, store, sync);
 
         var metaField = form.querySelector('[name="fb_meta"]');
         var submitButton = form.querySelector('button[type="submit"]');
@@ -827,12 +879,14 @@
                 return;
             }
 
+            var subjectField = form.querySelector('[name="fb_subject"]');
             var nameField = form.querySelector('[name="fb_name"]');
             var emailField = form.querySelector('[name="fb_email"]');
 
             var error = validateFields(
                 {
                     message: messageInput.value,
+                    subject: subjectField ? subjectField.value : '',
                     name: nameField ? nameField.value : '',
                     email: emailField ? emailField.value : ''
                 },
@@ -889,8 +943,10 @@
             stoken: config.getAttribute('data-stoken') || '',
             position: config.getAttribute('data-position') || 'bottom-right',
             showContactFields: config.getAttribute('data-contact') === '1',
+            showSubject: config.getAttribute('data-subject') === '1',
+            showScreenshots: config.getAttribute('data-screenshots') === '1',
             autoOpen: config.getAttribute('data-autoopen') === '1',
-            aiNotice: config.getAttribute('data-ai-notice') === '1',
+            notice: config.getAttribute('data-notice') || '',
             turnstileSiteKey: config.getAttribute('data-turnstile-sitekey') || '',
             limits: parseJsonAttribute(config, 'data-limits', {}),
             texts: parseJsonAttribute(config, 'data-texts', {})

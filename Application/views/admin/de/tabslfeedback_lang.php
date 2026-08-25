@@ -38,6 +38,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_button_position_center' => 'Unten mittig',
         'SHOP_MODULE_tabslfeedback_button_position_none' => 'Kein Button',
 
+        'SHOP_MODULE_tabslfeedback_notice_text' => 'Hinweistext im Formular',
+        'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Kurzer Text unmittelbar vor dem Absenden-Knopf, im Backend- wie im Frontend-Formular. Leer lässt den Hinweis entfallen. Der Standardtext weist auf die Übermittlung von Screenshots hin — anzupassen, sobald sich Umfang oder Empfänger der Übermittlung ändern, etwa bei aktiver KI-Aufbereitung.',
+
         // GitLab
         'SHOP_MODULE_tabslfeedback_gitlab_url' => 'GitLab-Adresse',
         'HELP_SHOP_MODULE_tabslfeedback_gitlab_url' => 'Basis-Adresse der GitLab-Instanz inklusive Schema, z. B. https://gitlab.com — ohne /api/v4. Bitte https verwenden: über http wird der Zugangs-Token unverschlüsselt übertragen. Fehlt das Schema, gilt die Konfiguration als unvollständig und es erscheint kein Feedback-Einstieg. Pflichtangabe.',
@@ -52,14 +55,26 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_gitlab_assignee_id' => 'Numerische GitLab-Benutzer-ID, der neue Tickets zugewiesen werden. Steht im GitLab-Profil der Person. Bleibt das Feld leer, wird niemand zugewiesen.',
 
         // KI-Aufbereitung
-        'SHOP_MODULE_tabslfeedback_openai_key' => 'OpenAI API-Key',
-        'HELP_SHOP_MODULE_tabslfeedback_openai_key' => 'Ohne Key entsteht das Ticket trotzdem — dann mit dem unveränderten Meldungstext statt einer Aufbereitung. Bilder werden nie an OpenAI übermittelt.',
+        'SHOP_MODULE_tabslfeedback_ai_provider' => 'KI-Anbieter',
+        'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Ob und über welchen Dienst der Freitext zu Titel und Beschreibung aufbereitet wird. „Ohne KI" verzichtet vollständig auf eine externe Übermittlung — im Formular erscheint dafür ein Betreff-Feld, dessen Inhalt direkt als Ticket-Titel dient. Bei OpenAI oder Anthropic bleibt zusätzlich der jeweilige API-Key erforderlich; fehlt er, entsteht das Ticket ebenfalls ohne Aufbereitung.',
+        'SHOP_MODULE_tabslfeedback_ai_provider_none' => 'Ohne KI',
+        'SHOP_MODULE_tabslfeedback_ai_provider_openai' => 'OpenAI',
+        'SHOP_MODULE_tabslfeedback_ai_provider_anthropic' => 'Anthropic (Claude)',
 
-        'SHOP_MODULE_tabslfeedback_openai_model' => 'Modell',
+        'SHOP_MODULE_tabslfeedback_openai_key' => 'OpenAI API-Key',
+        'HELP_SHOP_MODULE_tabslfeedback_openai_key' => 'Nur wirksam, wenn KI-Anbieter auf OpenAI steht. Ohne Key entsteht das Ticket trotzdem — dann mit dem unveränderten Meldungstext statt einer Aufbereitung. Bilder werden nie an OpenAI übermittelt.',
+
+        'SHOP_MODULE_tabslfeedback_openai_model' => 'OpenAI-Modell',
         'HELP_SHOP_MODULE_tabslfeedback_openai_model' => 'Das für die Aufbereitung verwendete Modell. Der Standardwert gpt-4o-mini genügt für diese Aufgabe; anzupassen nur, wenn das Modell abgekündigt wird.',
 
+        'SHOP_MODULE_tabslfeedback_anthropic_key' => 'Anthropic API-Key',
+        'HELP_SHOP_MODULE_tabslfeedback_anthropic_key' => 'Nur wirksam, wenn KI-Anbieter auf Anthropic steht. Ohne Key entsteht das Ticket trotzdem — dann mit dem unveränderten Meldungstext statt einer Aufbereitung. Bilder werden nie an Anthropic übermittelt.',
+
+        'SHOP_MODULE_tabslfeedback_anthropic_model' => 'Anthropic-Modell',
+        'HELP_SHOP_MODULE_tabslfeedback_anthropic_model' => 'Das für die Aufbereitung verwendete Modell. Der Standardwert claude-haiku-4-5-20251001 genügt für diese Aufgabe; anzupassen nur, wenn das Modell abgekündigt wird.',
+
         'SHOP_MODULE_tabslfeedback_ticket_language' => 'Sprache des Tickets',
-        'HELP_SHOP_MODULE_tabslfeedback_ticket_language' => 'Ob Titel und Beschreibung in der Sprache der Meldung bleiben oder einheitlich auf Englisch erzeugt werden.',
+        'HELP_SHOP_MODULE_tabslfeedback_ticket_language' => 'Ob Titel und Beschreibung in der Sprache der Meldung bleiben oder einheitlich auf Englisch erzeugt werden. Gilt auch für die festen Ticket-Überschriften ohne KI-Aufbereitung.',
         'SHOP_MODULE_tabslfeedback_ticket_language_source' => 'Sprache der Meldung beibehalten',
         'SHOP_MODULE_tabslfeedback_ticket_language_en' => 'Immer Englisch',
 
@@ -69,6 +84,9 @@ $aLang = array_merge(
 
         'SHOP_MODULE_tabslfeedback_send_customer_data' => 'Kundendaten übermitteln',
         'HELP_SHOP_MODULE_tabslfeedback_send_customer_data' => 'Ergänzt bei angemeldeten Kunden Kundennummer, Name und E-Mail im Ticket. Ist die Einstellung aus, werden keine Kundendaten übermittelt.',
+
+        'SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Screenshots erlauben',
+        'HELP_SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Blendet die Screenshot-Funktion im Formular ein. Ist die Einstellung aus, entfällt der Bereich vollständig — auch technisch mitgesendete Bilder werden dann verworfen.',
     ],
     require __DIR__ . '/../../../messages/de.php'
 );

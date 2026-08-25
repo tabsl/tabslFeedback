@@ -35,6 +35,19 @@
 
             <p class="tabslfeedback-message tabslfeedback-message--error tabslfeedback-message--client" hidden></p>
 
+            [{if $tabslfeedbackShowSubjectField}]
+                <div class="tabslfeedback-field">
+                    <label class="tabslfeedback-label" for="tabslfeedback-admin-subject">
+                        [{oxmultilang ident="TABSLFEEDBACK_SUBJECT_LABEL"}]
+                    </label>
+                    <input class="tabslfeedback-input"
+                           id="tabslfeedback-admin-subject"
+                           type="text"
+                           name="fb_subject"
+                           value="[{$tabslfeedbackValues.fb_subject|escape:'html'}]">
+                </div>
+            [{/if}]
+
             <div class="tabslfeedback-field">
                 <label class="tabslfeedback-label" for="tabslfeedback-admin-message">
                     [{oxmultilang ident="TABSLFEEDBACK_MESSAGE_LABEL"}]
@@ -45,12 +58,14 @@
                           rows="7">[{$tabslfeedbackValues.fb_message|escape:'html'}]</textarea>
             </div>
 
-            <div class="tabslfeedback-field">
-                <span class="tabslfeedback-label">[{oxmultilang ident="TABSLFEEDBACK_SCREENSHOTS_LABEL"}]</span>
-                <span class="tabslfeedback-hint">[{oxmultilang ident="TABSLFEEDBACK_SCREENSHOTS_HINT"}]</span>
-                <ul class="tabslfeedback-previews"></ul>
-                <div class="tabslfeedback-image-values"></div>
-            </div>
+            [{if $tabslfeedbackShowScreenshots}]
+                <div class="tabslfeedback-field">
+                    <span class="tabslfeedback-label">[{oxmultilang ident="TABSLFEEDBACK_SCREENSHOTS_LABEL"}]</span>
+                    <span class="tabslfeedback-hint">[{oxmultilang ident="TABSLFEEDBACK_SCREENSHOTS_HINT"}]</span>
+                    <ul class="tabslfeedback-previews"></ul>
+                    <div class="tabslfeedback-image-values"></div>
+                </div>
+            [{/if}]
 
             [{if $tabslfeedbackShowContactFields}]
                 <div class="tabslfeedback-field">
@@ -76,8 +91,8 @@
                 </div>
             [{/if}]
 
-            [{if $tabslfeedbackShowAiNotice}]
-                <p class="tabslfeedback-notice">[{oxmultilang ident="TABSLFEEDBACK_AI_NOTICE"}]</p>
+            [{if $tabslfeedbackNoticeText}]
+                <p class="tabslfeedback-notice">[{$tabslfeedbackNoticeText|escape:'html'}]</p>
             [{/if}]
 
             <div class="tabslfeedback-actions">

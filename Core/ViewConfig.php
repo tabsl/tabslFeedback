@@ -73,12 +73,26 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * Der Hinweis auf die KI-Übermittlung erscheint nur, wenn tatsächlich eine
-     * stattfindet — ohne hinterlegten Schlüssel wäre er schlicht falsch.
+     * Ohne KI-Aufbereitung entsteht kein Titel aus dem Freitext — das
+     * Betreff-Feld gleicht das aus.
      */
-    public function showTabslFeedbackAiNotice(): bool
+    public function showTabslFeedbackSubjectField(): bool
     {
-        return $this->getTabslFeedbackSettings()->usesAiProcessing();
+        return !$this->getTabslFeedbackSettings()->isAiEnabled();
+    }
+
+    public function showTabslFeedbackScreenshots(): bool
+    {
+        return $this->getTabslFeedbackSettings()->areScreenshotsEnabled();
+    }
+
+    /**
+     * Freier, vom Betreiber konfigurierter Hinweistext im Formular. Leer lässt
+     * den Hinweis entfallen.
+     */
+    public function getTabslFeedbackNoticeText(): string
+    {
+        return $this->getTabslFeedbackSettings()->getNoticeText();
     }
 
     /**

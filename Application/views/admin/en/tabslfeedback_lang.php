@@ -35,6 +35,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_button_position_center' => 'Bottom centre',
         'SHOP_MODULE_tabslfeedback_button_position_none' => 'No button',
 
+        'SHOP_MODULE_tabslfeedback_notice_text' => 'Notice text in the form',
+        'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Short text shown right before the submit button, in both the backend and storefront form. Leave empty to omit the notice. The default text mentions that screenshots are transmitted — adjust it once the scope or recipient of the transmission changes, for example with AI processing enabled.',
+
         // GitLab
         'SHOP_MODULE_tabslfeedback_gitlab_url' => 'GitLab address',
         'HELP_SHOP_MODULE_tabslfeedback_gitlab_url' => 'Base address of the GitLab instance including the scheme, e.g. https://gitlab.com — without /api/v4. Please use https: over http the access token travels unencrypted. Without a scheme the configuration counts as incomplete and no feedback entry point appears. Required.',
@@ -49,14 +52,26 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_gitlab_assignee_id' => 'Numeric GitLab user ID that new issues are assigned to, shown on that person\'s GitLab profile. Leave empty to create issues without an assignee.',
 
         // AI processing
-        'SHOP_MODULE_tabslfeedback_openai_key' => 'OpenAI API key',
-        'HELP_SHOP_MODULE_tabslfeedback_openai_key' => 'Without a key the issue is still created — carrying the unchanged report instead of a processed version. Images are never sent to OpenAI.',
+        'SHOP_MODULE_tabslfeedback_ai_provider' => 'AI provider',
+        'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Whether and through which service the report is turned into a title and description. "Without AI" skips any external transmission entirely — the form then shows a subject field instead, whose content is used directly as the issue title. With OpenAI or Anthropic, the matching API key remains required; without it, the issue is created without processing as well.',
+        'SHOP_MODULE_tabslfeedback_ai_provider_none' => 'Without AI',
+        'SHOP_MODULE_tabslfeedback_ai_provider_openai' => 'OpenAI',
+        'SHOP_MODULE_tabslfeedback_ai_provider_anthropic' => 'Anthropic (Claude)',
 
-        'SHOP_MODULE_tabslfeedback_openai_model' => 'Model',
+        'SHOP_MODULE_tabslfeedback_openai_key' => 'OpenAI API key',
+        'HELP_SHOP_MODULE_tabslfeedback_openai_key' => 'Only effective while AI provider is set to OpenAI. Without a key the issue is still created — carrying the unchanged report instead of a processed version. Images are never sent to OpenAI.',
+
+        'SHOP_MODULE_tabslfeedback_openai_model' => 'OpenAI model',
         'HELP_SHOP_MODULE_tabslfeedback_openai_model' => 'The model used for processing. The default gpt-4o-mini is sufficient for this task; change it only once the model is discontinued.',
 
+        'SHOP_MODULE_tabslfeedback_anthropic_key' => 'Anthropic API key',
+        'HELP_SHOP_MODULE_tabslfeedback_anthropic_key' => 'Only effective while AI provider is set to Anthropic. Without a key the issue is still created — carrying the unchanged report instead of a processed version. Images are never sent to Anthropic.',
+
+        'SHOP_MODULE_tabslfeedback_anthropic_model' => 'Anthropic model',
+        'HELP_SHOP_MODULE_tabslfeedback_anthropic_model' => 'The model used for processing. The default claude-haiku-4-5-20251001 is sufficient for this task; change it only once the model is discontinued.',
+
         'SHOP_MODULE_tabslfeedback_ticket_language' => 'Issue language',
-        'HELP_SHOP_MODULE_tabslfeedback_ticket_language' => 'Whether title and description keep the language of the report or are always written in English.',
+        'HELP_SHOP_MODULE_tabslfeedback_ticket_language' => 'Whether title and description keep the language of the report or are always written in English. Also applies to the fixed issue headings when AI processing is off.',
         'SHOP_MODULE_tabslfeedback_ticket_language_source' => 'Keep the language of the report',
         'SHOP_MODULE_tabslfeedback_ticket_language_en' => 'Always English',
 
@@ -66,6 +81,9 @@ $aLang = array_merge(
 
         'SHOP_MODULE_tabslfeedback_send_customer_data' => 'Include customer data',
         'HELP_SHOP_MODULE_tabslfeedback_send_customer_data' => 'Adds customer number, name and email of signed-in customers to the issue. While disabled, no customer data is transmitted.',
+
+        'SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Allow screenshots',
+        'HELP_SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Shows the screenshot feature in the form. While disabled, the whole section is omitted — images sent regardless are discarded as well.',
     ],
     require __DIR__ . '/../../../messages/en.php'
 );

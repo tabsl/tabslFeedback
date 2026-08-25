@@ -15,8 +15,10 @@
          data-stoken="[{$oViewConf->getSessionChallengeToken()|escape:'html'}]"
          data-position="[{$oViewConf->getTabslFeedbackButtonPosition()|escape:'html'}]"
          data-contact="[{if $oViewConf->showTabslFeedbackContactFields()}]1[{else}]0[{/if}]"
+         data-subject="[{if $oViewConf->showTabslFeedbackSubjectField()}]1[{else}]0[{/if}]"
+         data-screenshots="[{if $oViewConf->showTabslFeedbackScreenshots()}]1[{else}]0[{/if}]"
          data-autoopen="[{if $oViewConf->isTabslFeedbackAutoOpen()}]1[{else}]0[{/if}]"
-         data-ai-notice="[{if $oViewConf->showTabslFeedbackAiNotice()}]1[{else}]0[{/if}]"
+         data-notice="[{$oViewConf->getTabslFeedbackNoticeText()|escape:'html'}]"
          data-turnstile-sitekey="[{if $oViewConf->isTabslFeedbackTurnstileActive()}][{$oViewConf->getTabslFeedbackTurnstileSiteKey()|escape:'html'}][{/if}]"
          data-limits="[{$oViewConf->getTabslFeedbackLimitsJson()|escape:'html'}]"
          data-texts="[{$oViewConf->getTabslFeedbackTextsJson()|escape:'html'}]"></div>
