@@ -13,20 +13,21 @@ $aLang = array_merge(
 
         // Navigation
         'TABSLFEEDBACK_ADMIN_LINK' => 'Feedback',
-        'TABSLFEEDBACK_ADMIN_UNAVAILABLE' => 'The feedback form is not available. Check under Extensions → Modules → tabslFeedback whether the backend form is enabled and the GitLab address, project ID and token are set.',
+        'TABSLFEEDBACK_ADMIN_UNAVAILABLE' => 'The feedback form is not available. Check under Extensions → Modules → tabslFeedback whether the backend form is enabled and the selected ticket target is fully set up: for GitLab the address, project ID and token, for weclapp the https address and API token.',
 
         // Setting groups
         'SHOP_MODULE_GROUP_tabslfeedback_main' => 'General',
         'SHOP_MODULE_GROUP_tabslfeedback_gitlab' => 'GitLab',
+        'SHOP_MODULE_GROUP_tabslfeedback_weclapp' => 'weclapp',
         'SHOP_MODULE_GROUP_tabslfeedback_openai' => 'AI processing',
         'SHOP_MODULE_GROUP_tabslfeedback_privacy' => 'Privacy',
 
         // General
         'SHOP_MODULE_tabslfeedback_admin_enabled' => 'Backend form enabled',
-        'HELP_SHOP_MODULE_tabslfeedback_admin_enabled' => 'Adds a feedback link to the top left of the backend header. The link stays hidden while the GitLab settings are incomplete.',
+        'HELP_SHOP_MODULE_tabslfeedback_admin_enabled' => 'Adds a feedback link to the top left of the backend header. The link stays hidden while the selected ticket target is not fully set up.',
 
         'SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Show feedback button in the storefront',
-        'HELP_SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Adds a feedback button to every storefront page. While disabled, the form remains reachable by calling any storefront page with ?tabslFeedback=1 — useful for testers without showing the button to every visitor. The setting therefore controls visibility, not availability: as soon as the GitLab settings are complete, the shop accepts feedback. Running it publicly without the tabslTurnstile module is at your own risk.',
+        'HELP_SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Adds a feedback button to every storefront page. While disabled, the form remains reachable by calling any storefront page with ?tabslFeedback=1 — useful for testers without showing the button to every visitor. The setting therefore controls visibility, not availability: as soon as the selected ticket target is fully set up, the shop accepts feedback. Running it publicly without the tabslTurnstile module is at your own risk.',
 
         'SHOP_MODULE_tabslfeedback_button_position' => 'Button position',
         'HELP_SHOP_MODULE_tabslfeedback_button_position' => 'Where the feedback button appears in the storefront. "No button" shows no button — the form then only opens where a page calls window.tabslFeedback.open() itself. It is still embedded only while "Show feedback button in the storefront" is enabled.',
@@ -37,6 +38,11 @@ $aLang = array_merge(
 
         'SHOP_MODULE_tabslfeedback_notice_text' => 'Notice text in the form',
         'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Short text shown right before the submit button, in both the backend and storefront form. Leave empty to omit the notice. The default text mentions that screenshots are transmitted — adjust it once the scope or recipient of the transmission changes, for example with AI processing enabled.',
+
+        'SHOP_MODULE_tabslfeedback_ticket_target' => 'Ticket target',
+        'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Where a report turns into a ticket: as an issue in GitLab or as a helpdesk ticket in weclapp. Only the settings of the matching group apply.',
+        'SHOP_MODULE_tabslfeedback_ticket_target_gitlab' => 'GitLab',
+        'SHOP_MODULE_tabslfeedback_ticket_target_weclapp' => 'weclapp',
 
         // GitLab
         'SHOP_MODULE_tabslfeedback_gitlab_url' => 'GitLab address',
@@ -51,27 +57,49 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_gitlab_assignee_id' => 'Assignee (user ID)',
         'HELP_SHOP_MODULE_tabslfeedback_gitlab_assignee_id' => 'Numeric GitLab user ID that new issues are assigned to, shown on that person\'s GitLab profile. Leave empty to create issues without an assignee.',
 
+        // weclapp
+        'SHOP_MODULE_tabslfeedback_weclapp_url' => 'weclapp address',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_url' => 'Address of the weclapp tenant, e.g. https://company.weclapp.com. A trailing /webapp/api/v2 is ignored. Only https is accepted; without https the configuration counts as incomplete and no feedback entry point appears. Required for ticket target weclapp.',
+
+        'SHOP_MODULE_tabslfeedback_weclapp_token' => 'API token',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_token' => 'API token of a weclapp user, found under user name → My settings → API token. The token carries all rights of its user, so create a dedicated user with helpdesk rights only. Tickets are created as this user. Generating a new token invalidates the previous one. Required for ticket target weclapp.',
+
+        'SHOP_MODULE_tabslfeedback_weclapp_ticket_status_id' => 'Ticket status (ID)',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_status_id' => 'Numeric ID of the status new tickets start with. Shown in the weclapp address bar while the status is open in the helpdesk settings. Leave empty for the tenant default.',
+
+        'SHOP_MODULE_tabslfeedback_weclapp_ticket_priority_id' => 'Priority (ID)',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_priority_id' => 'Numeric ID of the priority for new tickets, found the same way as the status. Leave empty for the tenant default.',
+
+        'SHOP_MODULE_tabslfeedback_weclapp_ticket_channel_id' => 'Channel (ID)',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_channel_id' => 'Numeric ID of the ticket channel, for example a dedicated "Shop feedback" channel. Leave empty for the tenant default channel.',
+
+        'SHOP_MODULE_tabslfeedback_weclapp_ticket_category_id' => 'Category (ID)',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_category_id' => 'Numeric ID of the ticket category. Leave empty for no category.',
+
+        'SHOP_MODULE_tabslfeedback_weclapp_assignee_id' => 'Assignee (user ID)',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_assignee_id' => 'Numeric weclapp user ID that new tickets are assigned to. Leave empty for no assignment by the module; assignment rules in weclapp still apply.',
+
         // AI processing
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'AI provider',
-        'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Whether and through which service the report is turned into a title and description. "Without AI" skips any external transmission entirely — the form then shows a subject field instead, whose content is used directly as the issue title. With OpenAI or Anthropic, the matching API key remains required; without it, the issue is created without processing as well.',
+        'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Whether and through which service the report is turned into a title and description. "Without AI" skips any external transmission entirely — the form then shows a subject field instead, whose content is used directly as the ticket title. With OpenAI or Anthropic, the matching API key remains required; without it, the ticket is created without processing as well.',
         'SHOP_MODULE_tabslfeedback_ai_provider_none' => 'Without AI',
         'SHOP_MODULE_tabslfeedback_ai_provider_openai' => 'OpenAI',
         'SHOP_MODULE_tabslfeedback_ai_provider_anthropic' => 'Anthropic (Claude)',
 
         'SHOP_MODULE_tabslfeedback_openai_key' => 'OpenAI API key',
-        'HELP_SHOP_MODULE_tabslfeedback_openai_key' => 'Only effective while AI provider is set to OpenAI. Without a key the issue is still created — carrying the unchanged report instead of a processed version. Images are never sent to OpenAI.',
+        'HELP_SHOP_MODULE_tabslfeedback_openai_key' => 'Only effective while AI provider is set to OpenAI. Without a key the ticket is still created — carrying the unchanged report instead of a processed version. Images are never sent to OpenAI.',
 
         'SHOP_MODULE_tabslfeedback_openai_model' => 'OpenAI model',
         'HELP_SHOP_MODULE_tabslfeedback_openai_model' => 'The model used for processing. The default gpt-4o-mini is sufficient for this task; change it only once the model is discontinued.',
 
         'SHOP_MODULE_tabslfeedback_anthropic_key' => 'Anthropic API key',
-        'HELP_SHOP_MODULE_tabslfeedback_anthropic_key' => 'Only effective while AI provider is set to Anthropic. Without a key the issue is still created — carrying the unchanged report instead of a processed version. Images are never sent to Anthropic.',
+        'HELP_SHOP_MODULE_tabslfeedback_anthropic_key' => 'Only effective while AI provider is set to Anthropic. Without a key the ticket is still created — carrying the unchanged report instead of a processed version. Images are never sent to Anthropic.',
 
         'SHOP_MODULE_tabslfeedback_anthropic_model' => 'Anthropic model',
         'HELP_SHOP_MODULE_tabslfeedback_anthropic_model' => 'The model used for processing. The default claude-haiku-4-5-20251001 is sufficient for this task; change it only once the model is discontinued.',
 
-        'SHOP_MODULE_tabslfeedback_ticket_language' => 'Issue language',
-        'HELP_SHOP_MODULE_tabslfeedback_ticket_language' => 'Whether title and description keep the language of the report or are always written in English. Also applies to the fixed issue headings when AI processing is off.',
+        'SHOP_MODULE_tabslfeedback_ticket_language' => 'Ticket language',
+        'HELP_SHOP_MODULE_tabslfeedback_ticket_language' => 'Whether title and description keep the language of the report or are always written in English. Also applies to the fixed ticket headings when AI processing is off.',
         'SHOP_MODULE_tabslfeedback_ticket_language_source' => 'Keep the language of the report',
         'SHOP_MODULE_tabslfeedback_ticket_language_en' => 'Always English',
 
@@ -80,7 +108,7 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_show_contact_fields' => 'Adds two optional fields for follow-up questions. The form remains submittable without them.',
 
         'SHOP_MODULE_tabslfeedback_send_customer_data' => 'Include customer data',
-        'HELP_SHOP_MODULE_tabslfeedback_send_customer_data' => 'Adds customer number, name and email of signed-in customers to the issue. While disabled, no customer data is transmitted.',
+        'HELP_SHOP_MODULE_tabslfeedback_send_customer_data' => 'Adds customer number, name and email of signed-in customers to the ticket. While disabled, no customer data is transmitted.',
 
         'SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Allow screenshots',
         'HELP_SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Shows the screenshot feature in the form. While disabled, the whole section is omitted — images sent regardless are discarded as well.',

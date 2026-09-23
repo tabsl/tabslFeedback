@@ -18,7 +18,7 @@ use Tabsl\Feedback\Exception\FeedbackException;
  */
 class InputValidator
 {
-    /** Deckt "mehrere Screenshots" ab und begrenzt die GitLab-Uploads im synchronen Pfad. */
+    /** Deckt "mehrere Screenshots" ab und begrenzt die Uploads zum Ticket-Ziel im synchronen Pfad. */
     public const MAX_IMAGES = 5;
 
     /** 10 MB je Bild, gemessen an den DEKODIERTEN Bytes. */
@@ -37,7 +37,7 @@ class InputValidator
     /**
      * Nur relevant, wenn das Betreff-Feld eingeblendet ist (KI-Aufbereitung
      * aus). Am Titel-Limit der KI-Aufbereitung orientiert — beides wird
-     * letztlich zum GitLab-Issue-Titel.
+     * letztlich zum Ticket-Titel.
      */
     public const MAX_SUBJECT_LENGTH = 120;
 
@@ -56,7 +56,7 @@ class InputValidator
      *
      * OXID hängt je nach Konfiguration die Sitzungskennung an Links; ein Melder
      * kann eine Seite also mit gültigem `sid` oder `stoken` in der Adresszeile
-     * aufrufen. Unbereinigt stünde diese Kennung im GitLab-Issue und wäre für
+     * aufrufen. Unbereinigt stünde diese Kennung im Ticket und wäre für
      * jeden lesbar, der das Projekt einsehen darf — solange die Sitzung läuft,
      * ließe sich damit deren Übernahme versuchen.
      */

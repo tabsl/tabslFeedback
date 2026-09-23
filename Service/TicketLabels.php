@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tabsl\Feedback\Service;
 
 /**
- * Feste Texte im GitLab-Issue (Überschriften, Tabellen-Beschriftungen, Hinweise).
+ * Feste Texte im Ticket (Überschriften, Tabellen-Beschriftungen, Hinweise).
  *
  * Sie folgen der Einstellung "Ticket-Sprache", nicht der Shop-Sprache des
  * Melders.
@@ -21,6 +21,7 @@ class TicketLabels
             'contact' => 'Rückfrage möglich bei',
             'screenshots' => 'Screenshots',
             'upload_failed' => 'Hinweis: %d Screenshot(s) konnten nicht übertragen werden.',
+            'screenshots_attached' => '%d Screenshot(s) übermittelt, siehe Dokumente am Ticket.',
             'no_ai' => 'Hinweis: automatisch angelegt, ohne KI-Aufbereitung.',
             'environment' => 'Umgebung',
             'active_modules' => 'Aktive Module',
@@ -50,6 +51,7 @@ class TicketLabels
             'contact' => 'Contact for questions',
             'screenshots' => 'Screenshots',
             'upload_failed' => 'Note: %d screenshot(s) could not be transferred.',
+            'screenshots_attached' => '%d screenshot(s) submitted, see the documents on this ticket.',
             'no_ai' => 'Note: created automatically, without AI processing.',
             'environment' => 'Environment',
             'active_modules' => 'Active modules',

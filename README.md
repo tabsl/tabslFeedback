@@ -2,8 +2,8 @@
 
 OXID eShop Modul für ein Feedback-Formular in Backend und Shop. Der Freitext des
 Melders wird wahlweise von OpenAI oder Anthropic zu Titel und Beschreibung
-aufbereitet; daraus entsteht ein GitLab-Issue mit Screenshots und technischem
-Kontext. Auch ganz ohne KI nutzbar.
+aufbereitet; daraus entsteht ein GitLab-Issue oder ein weclapp-Helpdesk-Ticket
+mit Screenshots und technischem Kontext. Auch ganz ohne KI nutzbar.
 
 Statt „Das geht nicht" per Telefon oder E-Mail — ohne URL, ohne Browser, ohne
 Screenshot, und ohne dass jemand die Meldung von Hand ins Ticketsystem überträgt.
@@ -12,8 +12,13 @@ Screenshot, und ohne dass jemand die Meldung von Hand ins Ticketsystem überträ
 
 **Zwei Einstiege, getrennt schaltbar** — im Backend ein Link im Header oben
 links, im Shop ein kleiner Button auf jeder Seite (Position wählbar). „Beide
-aus" ist ein zulässiger Zustand; fehlen die GitLab-Pflichtangaben, erscheint
-gar kein Einstieg.
+aus" ist ein zulässiger Zustand; ist das Ticket-Ziel nicht vollständig
+eingerichtet, erscheint gar kein Einstieg.
+
+**GitLab oder weclapp** — `tabslfeedback_ticket_target` bestimmt, wo das Ticket
+entsteht: als GitLab-Issue oder als Ticket im weclapp-Helpdesk. Inhalt und
+Ablauf sind für den Melder identisch. In weclapp hängen die Screenshots als
+Dokumente am Ticket; die Beschreibung ist dort HTML statt Markdown.
 
 **Screenshots aus der Zwischenablage, abschaltbar** — Bild kopieren, im
 Formular `Strg+V` bzw. `⌘+V`. Mehrere Bilder pro Meldung, jedes mit Vorschau und
@@ -22,9 +27,9 @@ einzeln entfernbar. Feedback ohne Bild bleibt möglich. Über
 ausblenden, etwa wenn Screenshots datenschutzrechtlich vermieden werden sollen.
 
 **KI-Aufbereitung mit Rückfallebene — oder ganz ohne KI** — der ursprüngliche
-Wortlaut steht immer zusätzlich im Issue. `tabslfeedback_ai_provider` wählt
+Wortlaut steht immer zusätzlich im Ticket. `tabslfeedback_ai_provider` wählt
 zwischen OpenAI, Anthropic und „Ohne KI". Fehlt bei aktivem Anbieter der
-API-Key oder antwortet der Dienst nicht, entsteht das Issue trotzdem: mit
+API-Key oder antwortet der Dienst nicht, entsteht das Ticket trotzdem: mit
 Rohtext, Screenshots, Kontext und einem Vermerk, dass keine Aufbereitung
 stattfand. Bei „Ohne KI" zeigt das Formular stattdessen ein Betreff-Feld, dessen
 Inhalt direkt zum Ticket-Titel wird. Der Melder bemerkt in keinem Fall einen
@@ -57,9 +62,9 @@ eingeschalteter Button bleibt sichtbar.
 > ⚠️ **Der Parameter ist bewusst nicht durch ein Geheimnis geschützt**, und sein
 > Name steht in diesem quelloffenen Repository. Die Einstellung „Feedback-Button
 > im Shop anzeigen" regelt deshalb nur die **Sichtbarkeit**, nicht die
-> **Erreichbarkeit**: Sobald die GitLab-Angaben vollständig sind, nimmt der Shop
-> Feedback entgegen — auch bei ausgeblendetem Button. Wer das nicht möchte, lässt
-> die GitLab-Angaben leer oder deaktiviert das Modul. Gegen automatisierten
+> **Erreichbarkeit**: Sobald das Ticket-Ziel vollständig eingerichtet ist, nimmt
+> der Shop Feedback entgegen — auch bei ausgeblendetem Button. Wer das nicht
+> möchte, lässt die Zugangsdaten leer oder deaktiviert das Modul. Gegen automatisierten
 > Missbrauch schützt allein `tabslTurnstile` (siehe unten).
 
 ### Formular aus dem Shop heraus öffnen
@@ -112,6 +117,24 @@ Backend unter **Erweiterungen → Module** aktivieren.
 3. **Benutzer-ID der zuständigen Person** — steht in deren GitLab-Profil. Bleibt
    das Feld leer, entstehen Issues ohne Zuweisung.
 
+### weclapp vorbereiten
+
+Nur nötig bei Ticket-Ziel `weclapp`.
+
+1. **Adresse** — die Adresse des Mandanten, z. B. `https://firma.weclapp.com`.
+   Nur `https` ist zulässig.
+2. **API-Benutzer und Token** — einen eigenen weclapp-Benutzer anlegen, der nur
+   Helpdesk-Rechte hat, und dessen Token unter **Benutzername → Meine
+   Einstellungen → API-Token** kopieren. Der Token trägt sämtliche Rechte seines
+   Benutzers, eine feinere Beschränkung bietet weclapp nicht. Tickets und
+   Kommentare erscheinen unter diesem Benutzer. Wer einen neuen Token erzeugt,
+   macht den bisherigen ungültig.
+3. **Optional: Status, Priorität, Kanal, Kategorie, zuständige Person** — die
+   numerische ID steht in der Adresszeile, wenn der Eintrag in weclapp geöffnet
+   ist. Leer bleibt die Voreinstellung des Mandanten wirksam. Verlangt der
+   Mandant eine Angabe, die fehlt, lehnt weclapp das Ticket ab; das Shop-Log
+   nennt dann das fehlende Feld, etwa `ticketStatusId (notNull)`.
+
 ### Modul konfigurieren
 
 Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
@@ -121,10 +144,18 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_admin_enabled` | Feedback-Link im Backend-Header einblenden | aus |
 | `tabslfeedback_frontend_enabled` | Widget im Shop einbinden — mit Button, außer die Position steht auf `none` (nur Sichtbarkeit, nicht Erreichbarkeit) | aus |
 | `tabslfeedback_button_position` | `bottom-left`, `center`, `bottom-right` oder `none` (kein Button, siehe unten) | `bottom-right` |
-| `tabslfeedback_gitlab_url` | Basis-Adresse der GitLab-Instanz inkl. Schema, ohne `/api/v4` — **Pflicht** | leer |
-| `tabslfeedback_gitlab_project_id` | Numerische ID des Zielprojekts — **Pflicht** | leer |
-| `tabslfeedback_gitlab_token` | Project-Access-Token mit Scope `api` — **Pflicht** | leer |
+| `tabslfeedback_ticket_target` | `gitlab` oder `weclapp` — wo das Ticket entsteht | `gitlab` |
+| `tabslfeedback_gitlab_url` | Basis-Adresse der GitLab-Instanz inkl. Schema, ohne `/api/v4` — **Pflicht** bei Ziel `gitlab` | leer |
+| `tabslfeedback_gitlab_project_id` | Numerische ID des Zielprojekts — **Pflicht** bei Ziel `gitlab` | leer |
+| `tabslfeedback_gitlab_token` | Project-Access-Token mit Scope `api` — **Pflicht** bei Ziel `gitlab` | leer |
 | `tabslfeedback_gitlab_assignee_id` | Benutzer-ID für die Zuweisung; leer = keine Zuweisung | leer |
+| `tabslfeedback_weclapp_url` | Adresse des weclapp-Mandanten mit `https://` — **Pflicht** bei Ziel `weclapp` | leer |
+| `tabslfeedback_weclapp_token` | API-Token eines weclapp-Benutzers — **Pflicht** bei Ziel `weclapp` | leer |
+| `tabslfeedback_weclapp_ticket_status_id` | Status-ID neuer Tickets; leer = Voreinstellung | leer |
+| `tabslfeedback_weclapp_ticket_priority_id` | Prioritäts-ID; leer = Voreinstellung | leer |
+| `tabslfeedback_weclapp_ticket_channel_id` | Kanal-ID; leer = Standard-Kanal | leer |
+| `tabslfeedback_weclapp_ticket_category_id` | Kategorie-ID; leer = keine Kategorie | leer |
+| `tabslfeedback_weclapp_assignee_id` | Benutzer-ID für die Zuweisung; leer = keine Zuweisung | leer |
 | `tabslfeedback_notice_text` | Kurzer Hinweistext vor dem Absenden-Knopf; leer = kein Hinweis | Hinweis auf Screenshot-Übermittlung |
 | `tabslfeedback_ai_provider` | `none`, `openai` oder `anthropic` — bei `none` erscheint statt der Aufbereitung ein Betreff-Feld | `openai` |
 | `tabslfeedback_openai_key` | OpenAI API-Key; nur bei Anbieter `openai`; leer = Ticket ohne Aufbereitung | leer |
@@ -136,9 +167,10 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_send_customer_data` | Bei angemeldeten Kunden Kundennummer, Name und E-Mail ins Ticket übernehmen | aus |
 | `tabslfeedback_screenshots_enabled` | Screenshot-Funktion im Formular anzeigen | an |
 
-Fehlt eine der drei GitLab-Pflichtangaben — oder das `http://` bzw. `https://`
-in der Adresse —, erscheint weder Header-Link noch Frontend-Button: ein
-Formular, das kein Ticket erzeugen kann, wird gar nicht erst angeboten. Das
+Fehlt eine Pflichtangabe des gewählten Ziels — bei GitLab eine der drei
+Angaben oder das `http://` bzw. `https://` in der Adresse, bei weclapp Token oder
+`https://` —, erscheint weder Header-Link noch Frontend-Button: ein Formular,
+das kein Ticket erzeugen kann, wird gar nicht erst angeboten. Das
 Modul enthält **keine** Vorbelegung für Adressen, Projekt-IDs oder Zugangsdaten.
 
 > ⚠️ **Die GitLab-Adresse sollte auf `https://` lauten.** Der Zugangs-Token wird
@@ -157,6 +189,14 @@ Alle Grenzen werden serverseitig durchgesetzt. Damit mehrere Screenshots
 durchkommen, sollten `post_max_size` und `memory_limit` der PHP-Installation
 oberhalb von 20 MB liegen.
 
+Bei Ticket-Ziel weclapp entsteht das Ticket vor den Screenshots. Für deren
+Übertragung gilt ein festes Zeitbudget von 20 Sekunden; nicht mehr übertragene
+Bilder vermerkt ein interner Kommentar am Ticket. Der Timeout des Webservers
+(etwa `fastcgi_read_timeout` bei nginx, Standard 60 Sekunden) sollte bei
+weclapp mindestens 90 Sekunden betragen. Sonst kann der Melder eine
+Fehlermeldung sehen, obwohl das Ticket bereits angelegt ist, und durch
+erneutes Absenden ein zweites Ticket erzeugen.
+
 ## Welche Daten gehen an wen
 
 Grundlage für die Datenschutzerklärung des einsetzenden Shops. Übermittelt wird
@@ -170,13 +210,15 @@ Angaben in den Freitext, werden diese mit übertragen — darauf hat das Modul
 keinen Einfluss. Steht der Anbieter auf „Ohne KI" oder fehlt der API-Key,
 findet **keine** Übermittlung statt.
 
-**An die konfigurierte GitLab-Instanz** — Freitext, aufbereiteter Titel und
+**An die konfigurierte GitLab-Instanz bzw. den weclapp-Mandanten** — je nach
+`tabslfeedback_ticket_target` an genau eines der beiden Ziele: Freitext, aufbereiteter Titel und
 Beschreibung, alle Screenshots, optional Name und E-Mail sowie der oben
 beschriebene technische Kontext; bei einem vom Shop selbst geöffneten Dialog
 zusätzlich der übergebene Bezug. Kundendaten **nur** bei aktivem
 `tabslfeedback_send_customer_data`. Nicht: IP-Adresse, Warenkorb- und
 Bestellkontext, Browser-Konsolenmeldungen. Bei einer eigenen GitLab-Installation
-verlassen die Daten die eigene Infrastruktur nicht.
+verlassen die Daten die eigene Infrastruktur nicht; bei weclapp liegen sie beim
+Mandanten in der weclapp-Cloud, Screenshots als Dokumente am Ticket.
 
 **An Cloudflare (`challenges.cloudflare.com`)** — nur bei aktivem
 `tabslTurnstile`: der Turnstile-Token und die von Cloudflare selbst erhobenen
@@ -185,7 +227,7 @@ weitergegeben; das optionale Feld `remoteip` bleibt leer.
 
 **Nirgendwohin** — das Modul legt **keine** eigene Datenbanktabelle an und
 speichert Meldungen nirgends im Shop. Kein Zwischenspeicher, keine Wiedervorlage:
-Ist GitLab nicht erreichbar, ist die Meldung verloren, und der Melder erhält eine
+Ist das Ticket-Ziel nicht erreichbar, ist die Meldung verloren, und der Melder erhält eine
 Fehlermeldung statt einer falschen Bestätigung.
 
 ### Ins Shop-Log
@@ -195,8 +237,10 @@ Shop-Log fest, jeweils mit dem Präfix `[tabslFeedback]`:
 
 | Ereignis | Stufe |
 | --- | --- |
-| Issue-Anlage fehlgeschlagen (Meldung verloren) | `error` |
+| Issue- bzw. Ticket-Anlage fehlgeschlagen (Meldung verloren) — bei weclapp inkl. HTTP-Status und abgelehnter Felder | `error` |
+| weclapp antwortet bei der Ticket-Anlage nicht (Zeitüberschreitung) — Ticket kann trotzdem entstanden sein, vor erneutem Absenden in weclapp nachsehen | `error` |
 | Screenshot-Upload fehlgeschlagen (Bild fehlt im Ticket) | `error` |
+| Interner Kommentar am weclapp-Ticket fehlgeschlagen | `error` |
 | KI-Aufbereitung fehlgeschlagen — inkl. HTTP-Status und Fehlermeldung | `error` |
 | Absendung bei unvollständiger Konfiguration abgewiesen | `error` |
 | Unerwarteter Fehler beim Absenden (einzeilig und gekürzt) | `error` |
@@ -220,14 +264,15 @@ Screenshots und Zugangsdaten.
 ## Missbrauchsschutz im Shop
 
 Das Frontend-Formular ist öffentlich erreichbar. Jede Absendung erzeugt ein
-GitLab-Issue und einen kostenpflichtigen OpenAI-Aufruf — ein Bot kann also
-sowohl das Projekt fluten als auch Kosten verursachen.
+GitLab-Issue bzw. weclapp-Ticket und einen kostenpflichtigen OpenAI-Aufruf — ein
+Bot kann also sowohl das Projekt bzw. den Helpdesk fluten als auch Kosten
+verursachen.
 
 Das Modul unterstützt dafür [tabslTurnstile](https://github.com/tabsl/tabslTurnstile)
 (Cloudflare Turnstile für OXID 6): Ist es installiert, aktiviert und mit
 Site-Key konfiguriert, erscheint im Formular ein Turnstile-Widget und die
 Absendung wird serverseitig geprüft — besteht die Prüfung nicht, entsteht
-**weder** ein Issue **noch** wird OpenAI angesprochen. Fehlt das Modul, läuft
+**weder** ein Ticket **noch** wird OpenAI angesprochen. Fehlt das Modul, läuft
 tabslFeedback vollständig weiter; der Schutz entfällt ersatzlos, ohne Fehler und
 ohne Installationsaufforderung. Das Backend-Formular ist von der Prüfung
 ausgenommen, da bereits durch die Anmeldung geschützt.
@@ -241,7 +286,9 @@ Es gibt bewusst kein eigenes Rate-Limiting: ohne Zwischenspeicher wäre es nur
 
 ## Kosten
 
-**GitLab** — keine zusätzlichen Kosten. **OpenAI oder Anthropic** — je Meldung
+**GitLab** — keine zusätzlichen Kosten. **weclapp** — keine Kosten über die
+bestehende weclapp-Lizenz hinaus; der API-Benutzer belegt allerdings einen
+Benutzer-Platz. **OpenAI oder Anthropic** — je Meldung
 ein Aufruf mit dem Freitext (höchstens 5.000 Zeichen) und einer kurzen
 Antwort; mit den voreingestellten Modellen (`gpt-4o-mini` bzw.
 `claude-haiku-4-5-20251001`) liegen die Kosten pro Meldung bei Bruchteilen
@@ -250,13 +297,16 @@ dieser Posten vollständig. **Cloudflare Turnstile** — dauerhaft kostenlos.
 
 ## Was das Modul nicht tut
 
-- Keine Feedback-Übersicht, kein Archiv, keine Wiedervorlage — GitLab ist die
-  einzige Ablage
+- Keine Feedback-Übersicht, kein Archiv, keine Wiedervorlage — GitLab bzw.
+  weclapp ist die einzige Ablage
 - Keine Hintergrundverarbeitung: das Ticket entsteht beim Absenden
 - Keine Bildauswertung durch die KI
-- Keine Labels, keine Priorität, keine Kategorisierung, keine Duplikaterkennung
+- Keine Labels, keine automatische Einstufung von Priorität oder Kategorie, keine
+  Duplikaterkennung; bei weclapp lassen sich Priorität und Kategorie fest vorgeben
 - Keine Rückmeldung an den Melder über den Bearbeitungsstand
-- Genau ein GitLab-Projekt je Shop; keine Jira-, GitHub- oder E-Mail-Ziele
+- Genau ein Ziel je Shop: ein GitLab-Projekt oder ein weclapp-Mandant, nicht
+  beide zugleich; keine Jira-, GitHub- oder E-Mail-Ziele
+- Keine Verknüpfung des Melders mit einem weclapp-Kunden oder -Kontakt
 
 ## Kompatibilität
 

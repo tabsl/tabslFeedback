@@ -9,19 +9,31 @@ use Tabsl\Feedback\Exception\FeedbackException;
 
 /**
  * Fachlicher Kern: führt Freitext, Screenshots und Umgebungsdaten zu einem
- * GitLab-Issue zusammen.
+ * GitLab-Issue oder weclapp-Ticket zusammen.
  *
  * Beide Formulare nutzen diesen Service, damit Backend und Frontend garantiert
  * dasselbe Ticket-Format erzeugen. Hier — und nur hier — ist festgelegt, welcher
- * Ausfall den Vorgang beendet:
+ * Ausfall den Vorgang beendet, für beide Ziele gleich:
  *
- *   KI nicht verfügbar   -> Ersatztitel, Vermerk im Issue, weiter
- *   Screenshot-Upload    -> Vermerk im Issue, übrige Bilder und Issue laufen weiter
- *   Issue-Anlage         -> Abbruch, Fehler an den Aufrufer
+ *   KI nicht verfügbar   -> Ersatztitel, Vermerk im Ticket, weiter
+ *   Screenshot-Upload    -> Vermerk im Ticket, übrige Bilder und Ticket laufen weiter
+ *   Ticket-Anlage        -> Abbruch, Fehler an den Aufrufer
+ *
+ * Bei weclapp entsteht das Ticket vor den Uploads; der Upload-Vermerk kommt
+ * deshalb als interner Kommentar statt in die Beschreibung.
  */
 class FeedbackService
 {
     private const MAX_FALLBACK_TITLE_LENGTH = 120;
+
+    /**
+     * Bei weclapp existiert das Ticket schon, während die Screenshots noch
+     * laufen. Bricht in dieser Phase ein Webserver-Timeout (nginx: 60 s) den
+     * Request ab, sieht der Melder einen Fehler und sendet erneut — ein
+     * Doppel-Ticket. Nach Ablauf des Budgets gelten restliche Bilder deshalb
+     * als nicht übertragen, statt die Antwort weiter hinauszuzögern.
+     */
+    private const WECLAPP_UPLOAD_BUDGET_SECONDS = 20;
 
     public const CONTEXT_ADMIN = 'context_admin';
 
@@ -39,22 +51,32 @@ class FeedbackService
     /** @var MetadataCollector */
     private $metadata;
 
+    /** @var WeclappService */
+    private $weclapp;
+
+    /** @var WeclappDescriptionBuilder */
+    private $weclappDescription;
+
     public function __construct(
         ?ModuleSettings $settings = null,
         ?AiTicketGeneratorInterface $aiService = null,
         ?GitLabService $gitLab = null,
-        ?MetadataCollector $metadata = null
+        ?MetadataCollector $metadata = null,
+        ?WeclappService $weclapp = null,
+        ?WeclappDescriptionBuilder $weclappDescription = null
     ) {
         $this->settings = $settings ?? new ModuleSettings();
         $this->aiService = $aiService ?? $this->resolveAiService($this->settings);
         $this->gitLab = $gitLab ?? new GitLabService($this->settings);
         $this->metadata = $metadata ?? new MetadataCollector($this->settings);
+        $this->weclapp = $weclapp ?? new WeclappService($this->settings);
+        $this->weclappDescription = $weclappDescription ?? new WeclappDescriptionBuilder();
     }
 
     /**
      * @param string $contextKey self::CONTEXT_ADMIN|self::CONTEXT_FRONTEND
      *
-     * @throws FeedbackException vom Typ GITLAB oder CONFIG — nur diese beenden den Vorgang
+     * @throws FeedbackException vom Typ GITLAB, WECLAPP oder CONFIG — nur diese beenden den Vorgang
      */
     public function submit(FeedbackInput $input, string $contextKey): void
     {
@@ -64,11 +86,78 @@ class FeedbackService
         $title = $this->resolveTitle($ticket, $input, $labels);
 
         $images = $this->settings->areScreenshotsEnabled() ? $input->getImages() : [];
+
+        if ($this->settings->getTicketTarget() === ModuleSettings::TICKET_TARGET_WECLAPP) {
+            $this->submitToWeclapp($input, $contextKey, $labels, $ticket, $title, $images);
+
+            return;
+        }
+
+        $this->submitToGitLab($input, $contextKey, $labels, $ticket, $title, $images);
+    }
+
+    /**
+     * @param array{title:string,description:string}|null $ticket
+     * @param array<int,array{bytes:string,mime:string,filename:string}> $images
+     */
+    private function submitToGitLab(
+        FeedbackInput $input,
+        string $contextKey,
+        TicketLabels $labels,
+        ?array $ticket,
+        string $title,
+        array $images
+    ): void {
         $uploads = $this->uploadScreenshots($images);
 
         $description = $this->buildDescription($input, $contextKey, $labels, $ticket, $uploads);
 
         $this->gitLab->createIssue($title, $description);
+    }
+
+    /**
+     * @param array{title:string,description:string}|null $ticket
+     * @param array<int,array{bytes:string,mime:string,filename:string}> $images
+     */
+    private function submitToWeclapp(
+        FeedbackInput $input,
+        string $contextKey,
+        TicketLabels $labels,
+        ?array $ticket,
+        string $title,
+        array $images
+    ): void {
+        $description = $this->weclappDescription->build(
+            $input,
+            $labels,
+            $ticket,
+            count($images),
+            $this->metadata->collectEnvironment($input->getClientMeta(), $contextKey, $labels)
+        );
+
+        $ticketId = $this->weclapp->createTicket($title, $description);
+
+        $failed = 0;
+        $deadline = microtime(true) + self::WECLAPP_UPLOAD_BUDGET_SECONDS;
+
+        foreach ($images as $image) {
+            if (microtime(true) > $deadline) {
+                $failed++;
+
+                continue;
+            }
+
+            try {
+                $this->weclapp->uploadDocument($ticketId, $image['bytes'], $image['filename'], $image['mime']);
+            } catch (FeedbackException $exception) {
+                // Ein einzelner Screenshot darf das Ticket nicht kosten.
+                $failed++;
+            }
+        }
+
+        if ($failed > 0) {
+            $this->weclapp->addInternalComment($ticketId, sprintf($labels->get('upload_failed'), $failed));
+        }
     }
 
     private function resolveAiService(ModuleSettings $settings): ?AiTicketGeneratorInterface

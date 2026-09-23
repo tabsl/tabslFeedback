@@ -119,7 +119,7 @@ class GitLabService
      */
     private function assertConfigured(): void
     {
-        if (!$this->settings->isConfigured()) {
+        if (!$this->settings->isGitLabConfigured()) {
             $this->log('error', 'GitLab url, project id or token is missing or malformed');
 
             throw FeedbackException::config('GitLab url, project id or token is missing');

@@ -7,6 +7,11 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- weclapp als zweites Ticket-Ziel neben GitLab: `tabslfeedback_ticket_target` wählt, wo aus einer Meldung ein Ticket entsteht. Das weclapp-Ticket enthält KI-Aufbereitung, Originalmeldung, Kontakt und technischen Kontext; Screenshots hängen als Dokumente am Ticket
+- Status, Priorität, Kanal, Kategorie und zuständige Person des weclapp-Tickets sind über ihre IDs vorgebbar; leer gilt die Voreinstellung des Mandanten
+
 ## [1.2.0] - 2026-08-25
 
 ### Added

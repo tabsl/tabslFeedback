@@ -14,9 +14,9 @@ use OxidEsales\Eshop\Core\Registry;
  * 'module:tabslFeedback' verwendet — die eindeutige Variante, die auch dann
  * korrekt liest, wenn ein anderes Modul ein gleichnamiges Setting führt.
  *
- * Bewusst nicht eine private Zugriffsmethode je Service: Bei siebzehn Settings
- * und fünf Nutzern hätte das die Setting-Namen über mehrere Dateien verteilt;
- * sie liegen deshalb hier an einer Stelle.
+ * Bewusst nicht eine private Zugriffsmethode je Service: Bei rund zwei Dutzend
+ * Settings und etwa zehn Nutzern hätte das die Setting-Namen über mehrere
+ * Dateien verteilt; sie liegen deshalb hier an einer Stelle.
  */
 class ModuleSettings
 {
@@ -27,6 +27,10 @@ class ModuleSettings
     public const AI_PROVIDER_OPENAI = 'openai';
 
     public const AI_PROVIDER_ANTHROPIC = 'anthropic';
+
+    public const TICKET_TARGET_GITLAB = 'gitlab';
+
+    public const TICKET_TARGET_WECLAPP = 'weclapp';
 
     public function isAdminFormEnabled(): bool
     {
@@ -54,6 +58,19 @@ class ModuleSettings
             : 'bottom-right';
     }
 
+    /**
+     * Ein fehlender Wert ist der Normalfall nach einem reinen Datei-Deploy ohne
+     * erneute Aktivierung — dann gilt weiter GitLab, das bisher einzige Ziel.
+     *
+     * @return string gitlab|weclapp
+     */
+    public function getTicketTarget(): string
+    {
+        return $this->get('tabslfeedback_ticket_target') === self::TICKET_TARGET_WECLAPP
+            ? self::TICKET_TARGET_WECLAPP
+            : self::TICKET_TARGET_GITLAB;
+    }
+
     public function getGitLabUrl(): string
     {
         return rtrim(trim((string) $this->get('tabslfeedback_gitlab_url')), '/');
@@ -72,6 +89,47 @@ class ModuleSettings
     public function getGitLabAssigneeId(): string
     {
         return trim((string) $this->get('tabslfeedback_gitlab_assignee_id'));
+    }
+
+    /**
+     * Ohne API-Pfad: Wer die Adresse aus der Dokumentation samt
+     * `/webapp/api/v2` kopiert, bekäme sonst einen verdoppelten Pfad.
+     */
+    public function getWeclappUrl(): string
+    {
+        $url = rtrim(trim((string) $this->get('tabslfeedback_weclapp_url')), '/');
+
+        return (string) preg_replace('#/webapp(/api(/v\d+)?)?$#i', '', $url);
+    }
+
+    public function getWeclappToken(): string
+    {
+        return trim((string) $this->get('tabslfeedback_weclapp_token'));
+    }
+
+    public function getWeclappTicketStatusId(): string
+    {
+        return $this->getNumericId('tabslfeedback_weclapp_ticket_status_id');
+    }
+
+    public function getWeclappTicketPriorityId(): string
+    {
+        return $this->getNumericId('tabslfeedback_weclapp_ticket_priority_id');
+    }
+
+    public function getWeclappTicketChannelId(): string
+    {
+        return $this->getNumericId('tabslfeedback_weclapp_ticket_channel_id');
+    }
+
+    public function getWeclappTicketCategoryId(): string
+    {
+        return $this->getNumericId('tabslfeedback_weclapp_ticket_category_id');
+    }
+
+    public function getWeclappAssigneeId(): string
+    {
+        return $this->getNumericId('tabslfeedback_weclapp_assignee_id');
     }
 
     /**
@@ -167,14 +225,21 @@ class ModuleSettings
     }
 
     /**
-     * Die drei GitLab-Angaben sind Pflicht. Fehlt eine davon,
-     * kann kein Issue entstehen — dann erscheint gar kein Feedback-Einstieg.
+     * Das gewählte Ticket-Ziel muss vollständig konfiguriert sein. Andernfalls
+     * kann kein Ticket entstehen — dann erscheint gar kein Feedback-Einstieg.
      *
      * Anbieter und Key der KI-Aufbereitung gehören bewusst NICHT dazu: ohne sie
-     * entsteht das Issue lediglich ohne Aufbereitung, das ist ein zulässiger
+     * entsteht das Ticket lediglich ohne Aufbereitung, das ist ein zulässiger
      * Betriebszustand.
      */
     public function isConfigured(): bool
+    {
+        return $this->getTicketTarget() === self::TICKET_TARGET_WECLAPP
+            ? $this->isWeclappConfigured()
+            : $this->isGitLabConfigured();
+    }
+
+    public function isGitLabConfigured(): bool
     {
         return $this->hasValidGitLabUrl()
             && $this->getGitLabProjectId() !== ''
@@ -204,6 +269,36 @@ class ModuleSettings
     public function usesUnencryptedGitLabUrl(): bool
     {
         return parse_url($this->getGitLabUrl(), PHP_URL_SCHEME) === 'http';
+    }
+
+    /**
+     * weclapp ist ein reiner https-Dienst; eine http-Adresse ist ein Tippfehler
+     * und würde den Token unverschlüsselt übertragen. Ein Restpfad stammt meist
+     * aus der Browserzeile (`/webapp/view/…`) und führte zu 404 bei jeder
+     * Meldung — dann besser gar kein Einstieg.
+     */
+    public function isWeclappConfigured(): bool
+    {
+        $url = parse_url($this->getWeclappUrl());
+
+        return is_array($url)
+            && strtolower((string) ($url['scheme'] ?? '')) === 'https'
+            && (string) ($url['host'] ?? '') !== ''
+            && !isset($url['path'])
+            && !isset($url['query'])
+            && !isset($url['fragment'])
+            && $this->getWeclappToken() !== '';
+    }
+
+    /**
+     * Alles außer reinen Ziffern gilt als nicht gesetzt — ein Tippfehler soll
+     * zur weclapp-Voreinstellung führen, nicht zu einem abgelehnten Ticket.
+     */
+    private function getNumericId(string $name): string
+    {
+        $id = trim((string) $this->get($name));
+
+        return ctype_digit($id) ? $id : '';
     }
 
     /**

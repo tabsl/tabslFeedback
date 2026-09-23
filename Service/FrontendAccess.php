@@ -10,7 +10,7 @@ use Tabsl\Feedback\Core\ModuleSettings;
 /**
  * Entscheidet, ob und wie das Feedback-Formular im Shop erscheint.
  *
- * Die Funktion ist verfügbar, sobald die GitLab-Angaben vollständig sind. Die
+ * Die Funktion ist verfügbar, sobald das gewählte Ticket-Ziel eingerichtet ist. Die
  * Einstellung „Feedback-Button im Shop anzeigen" steuert allein die Sichtbarkeit
  * des Buttons — nicht, ob Feedback entgegengenommen wird. Dadurch lässt sich das
  * Formular jederzeit über `?tabslFeedback=1` öffnen, auch wenn der Button
@@ -34,8 +34,8 @@ class FrontendAccess
     }
 
     /**
-     * Darf eine Absendung entgegengenommen werden? Einzige Bedingung ist eine
-     * vollständige GitLab-Konfiguration — ohne sie könnte kein Ticket entstehen.
+     * Darf eine Absendung entgegengenommen werden? Einzige Bedingung ist ein
+     * vollständig eingerichtetes Ticket-Ziel — ohne es könnte kein Ticket entstehen.
      */
     public function isSubmitAllowed(): bool
     {

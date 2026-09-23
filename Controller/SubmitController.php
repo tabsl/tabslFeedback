@@ -78,7 +78,7 @@ class SubmitController extends FrontendController
         }
 
         // Schlägt die Bot-Prüfung fehl, endet der Vorgang hier — es wird weder
-        // OpenAI noch GitLab angesprochen.
+        // die KI noch das Ticket-Ziel angesprochen.
         if ($turnstileState === TurnstileGate::STATE_ON
             && !$turnstile->verify((string) $this->getRequestValue(TurnstileGate::TOKEN_FIELD))
         ) {

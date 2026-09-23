@@ -14,7 +14,7 @@ use Tabsl\Feedback\Core\ModuleSettings;
 
 /**
  * Sammelt die acht Umgebungsangaben und bringt sie in
- * eine im GitLab-Issue lesbare Form.
+ * eine im Ticket lesbare Form.
  *
  * Ausdrücklich NICHT erhoben: IP-Adresse, Warenkorb-/Bestellkontext und
  * Browser-Konsolenmeldungen. Der Bezug ist keine Ausnahme davon — er wird nicht
@@ -59,6 +59,23 @@ class MetadataCollector
             . $table . "\n"
             . $this->buildModuleSection($labels)
             . '</details>';
+    }
+
+    /**
+     * Dieselben Angaben wie buildEnvironmentSection(), als Daten — für Ziele,
+     * die kein Markdown darstellen.
+     *
+     * @param array<string,string> $clientMeta Geprüfte Angaben aus fb_meta
+     * @param string $contextKey context_admin|context_frontend
+     *
+     * @return array{rows:array<string,string>,modules:array<string,string>}
+     */
+    public function collectEnvironment(array $clientMeta, string $contextKey, TicketLabels $labels): array
+    {
+        return [
+            'rows' => $this->collectRows($clientMeta, $labels->get($contextKey), $labels),
+            'modules' => $this->collectActiveModules(),
+        ];
     }
 
     /**

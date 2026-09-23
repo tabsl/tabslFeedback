@@ -30,7 +30,7 @@ class ViewConfig extends ViewConfig_parent
     /**
      * Soll der Feedback-Link im Backend-Header erscheinen?
      *
-     * Ohne die drei GitLab-Pflichtangaben gibt es keinen Einstieg — ein Formular,
+     * Ohne vollständig eingerichtetes Ticket-Ziel gibt es keinen Einstieg — ein Formular,
      * das garantiert kein Ticket erzeugen kann, wird gar nicht erst angeboten.
      */
     public function isTabslFeedbackAdminAvailable(): bool

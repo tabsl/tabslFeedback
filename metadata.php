@@ -22,7 +22,7 @@ $psModuleName = '<b>tabsl</b>Feedback';
 $psModuleVersion = '1.2.0';
 
 // tabsl module description
-$psModuleDesc = 'Feedback-Formular für Backend und Frontend mit KI-Aufbereitung und GitLab-Ticket-Anlage.';
+$psModuleDesc = 'Feedback-Formular für Backend und Frontend mit KI-Aufbereitung und Ticket-Anlage in GitLab oder weclapp.';
 
 /**
  * Module information
@@ -35,7 +35,7 @@ $aModule = [
     ],
     'description' => [
         'de' => $psModuleDesc,
-        'en' => 'Feedback form for backend and frontend with AI processing and GitLab issue creation.',
+        'en' => 'Feedback form for backend and frontend with AI processing and ticket creation in GitLab or weclapp.',
     ],
     'thumbnail' => '',
     'version' => $psModuleVersion,
@@ -69,12 +69,21 @@ $aModule = [
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_admin_enabled', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_frontend_enabled', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_button_position', 'type' => 'select', 'value' => 'bottom-right', 'constraints' => 'bottom-left|bottom-right|center|none'],
+        ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_ticket_target', 'type' => 'select', 'value' => 'gitlab', 'constraints' => 'gitlab|weclapp'],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_notice_text', 'type' => 'str', 'value' => 'Ihre Meldung wird inklusive eventuell angehängter Screenshots zur Bearbeitung verwendet.'],
         // GitLab
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_url', 'type' => 'str', 'value' => ''],
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_project_id', 'type' => 'str', 'value' => ''],
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_token', 'type' => 'password', 'value' => ''],
         ['group' => 'tabslfeedback_gitlab', 'name' => 'tabslfeedback_gitlab_assignee_id', 'type' => 'str', 'value' => ''],
+        // weclapp
+        ['group' => 'tabslfeedback_weclapp', 'name' => 'tabslfeedback_weclapp_url', 'type' => 'str', 'value' => ''],
+        ['group' => 'tabslfeedback_weclapp', 'name' => 'tabslfeedback_weclapp_token', 'type' => 'password', 'value' => ''],
+        ['group' => 'tabslfeedback_weclapp', 'name' => 'tabslfeedback_weclapp_ticket_status_id', 'type' => 'str', 'value' => ''],
+        ['group' => 'tabslfeedback_weclapp', 'name' => 'tabslfeedback_weclapp_ticket_priority_id', 'type' => 'str', 'value' => ''],
+        ['group' => 'tabslfeedback_weclapp', 'name' => 'tabslfeedback_weclapp_ticket_channel_id', 'type' => 'str', 'value' => ''],
+        ['group' => 'tabslfeedback_weclapp', 'name' => 'tabslfeedback_weclapp_ticket_category_id', 'type' => 'str', 'value' => ''],
+        ['group' => 'tabslfeedback_weclapp', 'name' => 'tabslfeedback_weclapp_assignee_id', 'type' => 'str', 'value' => ''],
         // KI-Aufbereitung
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_ai_provider', 'type' => 'select', 'value' => 'openai', 'constraints' => 'none|openai|anthropic'],
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_openai_key', 'type' => 'password', 'value' => ''],
