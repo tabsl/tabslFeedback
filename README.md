@@ -2,8 +2,8 @@
 
 OXID eShop Modul für ein Feedback-Formular in Backend und Shop. Der Freitext des
 Melders wird wahlweise von OpenAI oder Anthropic zu Titel und Beschreibung
-aufbereitet; daraus entsteht ein GitLab-Issue oder ein weclapp-Helpdesk-Ticket
-mit Screenshots und technischem Kontext. Auch ganz ohne KI nutzbar.
+aufbereitet; daraus entsteht ein GitLab-Issue, ein weclapp-Helpdesk-Ticket oder
+ein Jira-Cloud-Vorgang mit Screenshots und technischem Kontext. Auch ganz ohne KI nutzbar.
 
 Statt „Das geht nicht" per Telefon oder E-Mail — ohne URL, ohne Browser, ohne
 Screenshot, und ohne dass jemand die Meldung von Hand ins Ticketsystem überträgt.
@@ -15,10 +15,11 @@ links, im Shop ein kleiner Button auf jeder Seite (Position wählbar). „Beide
 aus" ist ein zulässiger Zustand; ist das Ticket-Ziel nicht vollständig
 eingerichtet, erscheint gar kein Einstieg.
 
-**GitLab oder weclapp** — `tabslfeedback_ticket_target` bestimmt, wo das Ticket
-entsteht: als GitLab-Issue oder als Ticket im weclapp-Helpdesk. Inhalt und
-Ablauf sind für den Melder identisch. In weclapp hängen die Screenshots als
-Dokumente am Ticket; die Beschreibung ist dort HTML statt Markdown.
+**GitLab, weclapp oder Jira Cloud** — `tabslfeedback_ticket_target` bestimmt, wo
+das Ticket entsteht: als GitLab-Issue, als Ticket im weclapp-Helpdesk oder als
+Vorgang in Jira Cloud. Inhalt und Ablauf sind für den Melder identisch. In
+weclapp hängen die Screenshots als Dokumente, in Jira als Anhänge am Ticket; die
+Beschreibung ist dort HTML bzw. Atlassian Document Format statt Markdown.
 
 **Screenshots aus der Zwischenablage, abschaltbar** — Bild kopieren, im
 Formular `Strg+V` bzw. `⌘+V`. Mehrere Bilder pro Meldung, jedes mit Vorschau und
@@ -129,11 +130,41 @@ Nur nötig bei Ticket-Ziel `weclapp`.
    Benutzers, eine feinere Beschränkung bietet weclapp nicht. Tickets und
    Kommentare erscheinen unter diesem Benutzer. Wer einen neuen Token erzeugt,
    macht den bisherigen ungültig.
-3. **Optional: Status, Priorität, Kanal, Kategorie, zuständige Person** — die
-   numerische ID steht in der Adresszeile, wenn der Eintrag in weclapp geöffnet
-   ist. Leer bleibt die Voreinstellung des Mandanten wirksam. Verlangt der
-   Mandant eine Angabe, die fehlt, lehnt weclapp das Ticket ab; das Shop-Log
-   nennt dann das fehlende Feld, etwa `ticketStatusId (notNull)`.
+3. **Priorität und Kanal (dringend empfohlen)** — die numerische ID steht in der
+   Adresszeile, wenn der Eintrag in weclapp geöffnet ist. Beide sind in weclapp
+   Pflichtfelder eines Tickets; für den Status gibt es eine Voreinstellung, für
+   die Priorität dokumentiert weclapp keine. Ohne eingetragene ID kann deshalb
+   jede Meldung abgelehnt werden. Das Shop-Log nennt dann das fehlende Feld,
+   etwa `ticketPriorityId (not_empty)`. Dasselbe gilt für Pflicht-Zusatzfelder,
+   die der Mandant am Ticket eingerichtet hat; sie unterstützt das Modul nicht.
+4. **Optional: Status, Kategorie, zuständige Person** — ebenfalls als
+   numerische ID; leer bleibt die Voreinstellung des Mandanten wirksam.
+
+### Jira Cloud vorbereiten
+
+Nur nötig bei Ticket-Ziel `jira`. Unterstützt wird ausschließlich Jira Cloud,
+nicht Jira Data Center oder Server.
+
+1. **Konto** — ein eigenes Atlassian-Konto für den Shop anlegen, das im
+   Zielprojekt nur Vorgänge anlegen darf. Der API-Token trägt die Rechte seines
+   Kontos. Vorgänge und Kommentare erscheinen unter diesem Konto.
+2. **API-Token** — unter **id.atlassian.com → Sicherheit → API-Token** erstellen.
+   Ein Token läuft nach **höchstens einem Jahr** ab; danach entstehen keine
+   Vorgänge mehr und das Shop-Log meldet `http 401`. Ablaufdatum notieren.
+3. **Adresse** — die Site-Adresse, z. B. `https://firma.atlassian.net`. Wer statt
+   eines normalen Kontos einen Atlassian-Service-Account nutzt, trägt die
+   Gateway-Adresse `https://api.atlassian.com/ex/jira/<Cloud-ID>` ein und gibt
+   dem Token die Scopes `read:jira-work` und `write:jira-work`. Die Cloud-ID
+   steht unter `https://firma.atlassian.net/_edge/tenant_info`.
+4. **Projekt-Key und Vorgangstyp** — etwa `SHOP`; der Vorgangstyp steht auf
+   `Task` voreingestellt. Er muss im Projekt existieren, sonst nennt das
+   Shop-Log das Feld `issuetype`. Statt des Namens lässt sich die numerische ID
+   des Vorgangstyps eintragen; sie hängt nicht von der Sprache der Site ab. Der
+   Vorgangstyp darf außer Zusammenfassung und Beschreibung **keine weiteren
+   Pflichtfelder** haben. Sonst lehnt Jira jede
+   Meldung ab, und das Shop-Log nennt das fehlende Feld, etwa `customfield_10020`.
+5. **Optional: zuständige Person** — deren accountId steht in der Adresse ihres
+   Jira-Profils. Die Person muss im Projekt zuweisbar sein.
 
 ### Modul konfigurieren
 
@@ -144,7 +175,7 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_admin_enabled` | Feedback-Link im Backend-Header einblenden | aus |
 | `tabslfeedback_frontend_enabled` | Widget im Shop einbinden — mit Button, außer die Position steht auf `none` (nur Sichtbarkeit, nicht Erreichbarkeit) | aus |
 | `tabslfeedback_button_position` | `bottom-left`, `center`, `bottom-right` oder `none` (kein Button, siehe unten) | `bottom-right` |
-| `tabslfeedback_ticket_target` | `gitlab` oder `weclapp` — wo das Ticket entsteht | `gitlab` |
+| `tabslfeedback_ticket_target` | `gitlab`, `weclapp` oder `jira` — wo das Ticket entsteht | `gitlab` |
 | `tabslfeedback_gitlab_url` | Basis-Adresse der GitLab-Instanz inkl. Schema, ohne `/api/v4` — **Pflicht** bei Ziel `gitlab` | leer |
 | `tabslfeedback_gitlab_project_id` | Numerische ID des Zielprojekts — **Pflicht** bei Ziel `gitlab` | leer |
 | `tabslfeedback_gitlab_token` | Project-Access-Token mit Scope `api` — **Pflicht** bei Ziel `gitlab` | leer |
@@ -152,10 +183,16 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_weclapp_url` | Adresse des weclapp-Mandanten mit `https://` — **Pflicht** bei Ziel `weclapp` | leer |
 | `tabslfeedback_weclapp_token` | API-Token eines weclapp-Benutzers — **Pflicht** bei Ziel `weclapp` | leer |
 | `tabslfeedback_weclapp_ticket_status_id` | Status-ID neuer Tickets; leer = Voreinstellung | leer |
-| `tabslfeedback_weclapp_ticket_priority_id` | Prioritäts-ID; leer = Voreinstellung | leer |
-| `tabslfeedback_weclapp_ticket_channel_id` | Kanal-ID; leer = Standard-Kanal | leer |
+| `tabslfeedback_weclapp_ticket_priority_id` | Prioritäts-ID — dringend empfohlen, siehe oben | leer |
+| `tabslfeedback_weclapp_ticket_channel_id` | Kanal-ID — dringend empfohlen, siehe oben | leer |
 | `tabslfeedback_weclapp_ticket_category_id` | Kategorie-ID; leer = keine Kategorie | leer |
 | `tabslfeedback_weclapp_assignee_id` | Benutzer-ID für die Zuweisung; leer = keine Zuweisung | leer |
+| `tabslfeedback_jira_url` | Site- oder Gateway-Adresse mit `https://` — **Pflicht** bei Ziel `jira` | leer |
+| `tabslfeedback_jira_email` | E-Mail des Kontos, zu dem der Token gehört — **Pflicht** bei Ziel `jira` | leer |
+| `tabslfeedback_jira_token` | API-Token — **Pflicht** bei Ziel `jira` | leer |
+| `tabslfeedback_jira_project_key` | Projekt-Key oder numerische Projekt-ID — **Pflicht** bei Ziel `jira` | leer |
+| `tabslfeedback_jira_issue_type` | Name oder ID des Vorgangstyps; leer = `Task` | `Task` |
+| `tabslfeedback_jira_assignee_account_id` | accountId für die Zuweisung; leer = Standardzuweisung des Projekts | leer |
 | `tabslfeedback_notice_text` | Kurzer Hinweistext vor dem Absenden-Knopf; leer = kein Hinweis | Hinweis auf Screenshot-Übermittlung |
 | `tabslfeedback_ai_provider` | `none`, `openai` oder `anthropic` — bei `none` erscheint statt der Aufbereitung ein Betreff-Feld | `openai` |
 | `tabslfeedback_openai_key` | OpenAI API-Key; nur bei Anbieter `openai`; leer = Ticket ohne Aufbereitung | leer |
@@ -169,7 +206,9 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 
 Fehlt eine Pflichtangabe des gewählten Ziels — bei GitLab eine der drei
 Angaben oder das `http://` bzw. `https://` in der Adresse, bei weclapp Token oder
-`https://` —, erscheint weder Header-Link noch Frontend-Button: ein Formular,
+`https://`, bei Jira Cloud eine der vier Pflichtangaben, `https://`, ein gültiger
+Projekt-Key oder eine Adresse ohne zusätzlichen Pfad (außer der Gateway-Adresse) —,
+erscheint weder Header-Link noch Frontend-Button: ein Formular,
 das kein Ticket erzeugen kann, wird gar nicht erst angeboten. Das
 Modul enthält **keine** Vorbelegung für Adressen, Projekt-IDs oder Zugangsdaten.
 
@@ -189,11 +228,11 @@ Alle Grenzen werden serverseitig durchgesetzt. Damit mehrere Screenshots
 durchkommen, sollten `post_max_size` und `memory_limit` der PHP-Installation
 oberhalb von 20 MB liegen.
 
-Bei Ticket-Ziel weclapp entsteht das Ticket vor den Screenshots. Für deren
-Übertragung gilt ein festes Zeitbudget von 20 Sekunden; nicht mehr übertragene
-Bilder vermerkt ein interner Kommentar am Ticket. Der Timeout des Webservers
-(etwa `fastcgi_read_timeout` bei nginx, Standard 60 Sekunden) sollte bei
-weclapp mindestens 90 Sekunden betragen. Sonst kann der Melder eine
+Bei den Ticket-Zielen weclapp und Jira Cloud entsteht das Ticket vor den
+Screenshots. Für deren Übertragung gilt ein festes Zeitbudget von 20 Sekunden;
+nicht mehr übertragene Bilder vermerkt ein Kommentar am Ticket. Der Timeout des
+Webservers (etwa `fastcgi_read_timeout` bei nginx, Standard 60 Sekunden) sollte
+bei diesen Zielen mindestens 120 Sekunden betragen. Sonst kann der Melder eine
 Fehlermeldung sehen, obwohl das Ticket bereits angelegt ist, und durch
 erneutes Absenden ein zweites Ticket erzeugen.
 
@@ -210,15 +249,17 @@ Angaben in den Freitext, werden diese mit übertragen — darauf hat das Modul
 keinen Einfluss. Steht der Anbieter auf „Ohne KI" oder fehlt der API-Key,
 findet **keine** Übermittlung statt.
 
-**An die konfigurierte GitLab-Instanz bzw. den weclapp-Mandanten** — je nach
-`tabslfeedback_ticket_target` an genau eines der beiden Ziele: Freitext, aufbereiteter Titel und
+**An die konfigurierte GitLab-Instanz, den weclapp-Mandanten bzw. die
+Jira-Cloud-Site** — je nach `tabslfeedback_ticket_target` an genau eines der
+drei Ziele: Freitext, aufbereiteter Titel und
 Beschreibung, alle Screenshots, optional Name und E-Mail sowie der oben
 beschriebene technische Kontext; bei einem vom Shop selbst geöffneten Dialog
 zusätzlich der übergebene Bezug. Kundendaten **nur** bei aktivem
 `tabslfeedback_send_customer_data`. Nicht: IP-Adresse, Warenkorb- und
 Bestellkontext, Browser-Konsolenmeldungen. Bei einer eigenen GitLab-Installation
 verlassen die Daten die eigene Infrastruktur nicht; bei weclapp liegen sie beim
-Mandanten in der weclapp-Cloud, Screenshots als Dokumente am Ticket.
+Mandanten in der weclapp-Cloud, Screenshots als Dokumente am Ticket; bei Jira
+Cloud in der Atlassian-Cloud, Screenshots als Anhänge am Vorgang.
 
 **An Cloudflare (`challenges.cloudflare.com`)** — nur bei aktivem
 `tabslTurnstile`: der Turnstile-Token und die von Cloudflare selbst erhobenen
@@ -237,10 +278,10 @@ Shop-Log fest, jeweils mit dem Präfix `[tabslFeedback]`:
 
 | Ereignis | Stufe |
 | --- | --- |
-| Issue- bzw. Ticket-Anlage fehlgeschlagen (Meldung verloren) — bei weclapp inkl. HTTP-Status und abgelehnter Felder | `error` |
-| weclapp antwortet bei der Ticket-Anlage nicht (Zeitüberschreitung) — Ticket kann trotzdem entstanden sein, vor erneutem Absenden in weclapp nachsehen | `error` |
+| Issue- bzw. Ticket-Anlage fehlgeschlagen (Meldung verloren) — bei weclapp und Jira inkl. HTTP-Status und abgelehnter Felder, bei Jira `401` mit Hinweis auf abgelaufenen Token | `error` |
+| weclapp bzw. Jira antwortet bei der Ticket-Anlage nicht (Zeitüberschreitung) — Ticket kann trotzdem entstanden sein, vor erneutem Absenden nachsehen | `error` |
 | Screenshot-Upload fehlgeschlagen (Bild fehlt im Ticket) | `error` |
-| Interner Kommentar am weclapp-Ticket fehlgeschlagen | `error` |
+| Kommentar am weclapp-Ticket bzw. Jira-Vorgang fehlgeschlagen | `error` |
 | KI-Aufbereitung fehlgeschlagen — inkl. HTTP-Status und Fehlermeldung | `error` |
 | Absendung bei unvollständiger Konfiguration abgewiesen | `error` |
 | Unerwarteter Fehler beim Absenden (einzeilig und gekürzt) | `error` |
@@ -264,8 +305,8 @@ Screenshots und Zugangsdaten.
 ## Missbrauchsschutz im Shop
 
 Das Frontend-Formular ist öffentlich erreichbar. Jede Absendung erzeugt ein
-GitLab-Issue bzw. weclapp-Ticket und einen kostenpflichtigen OpenAI-Aufruf — ein
-Bot kann also sowohl das Projekt bzw. den Helpdesk fluten als auch Kosten
+Ticket im gewählten Ziel und einen kostenpflichtigen OpenAI-Aufruf — ein Bot
+kann also sowohl das Projekt bzw. den Helpdesk fluten als auch Kosten
 verursachen.
 
 Das Modul unterstützt dafür [tabslTurnstile](https://github.com/tabsl/tabslTurnstile)
@@ -288,7 +329,8 @@ Es gibt bewusst kein eigenes Rate-Limiting: ohne Zwischenspeicher wäre es nur
 
 **GitLab** — keine zusätzlichen Kosten. **weclapp** — keine Kosten über die
 bestehende weclapp-Lizenz hinaus; der API-Benutzer belegt allerdings einen
-Benutzer-Platz. **OpenAI oder Anthropic** — je Meldung
+Benutzer-Platz. **Jira Cloud** — keine Kosten über die Jira-Lizenz hinaus; ein
+normales Konto für den Shop belegt allerdings einen Benutzer-Platz. **OpenAI oder Anthropic** — je Meldung
 ein Aufruf mit dem Freitext (höchstens 5.000 Zeichen) und einer kurzen
 Antwort; mit den voreingestellten Modellen (`gpt-4o-mini` bzw.
 `claude-haiku-4-5-20251001`) liegen die Kosten pro Meldung bei Bruchteilen
@@ -297,15 +339,18 @@ dieser Posten vollständig. **Cloudflare Turnstile** — dauerhaft kostenlos.
 
 ## Was das Modul nicht tut
 
-- Keine Feedback-Übersicht, kein Archiv, keine Wiedervorlage — GitLab bzw.
-  weclapp ist die einzige Ablage
+- Keine Feedback-Übersicht, kein Archiv, keine Wiedervorlage — das gewählte
+  Ticket-Ziel ist die einzige Ablage
 - Keine Hintergrundverarbeitung: das Ticket entsteht beim Absenden
 - Keine Bildauswertung durch die KI
 - Keine Labels, keine automatische Einstufung von Priorität oder Kategorie, keine
   Duplikaterkennung; bei weclapp lassen sich Priorität und Kategorie fest vorgeben
 - Keine Rückmeldung an den Melder über den Bearbeitungsstand
-- Genau ein Ziel je Shop: ein GitLab-Projekt oder ein weclapp-Mandant, nicht
-  beide zugleich; keine Jira-, GitHub- oder E-Mail-Ziele
+- Genau ein Ziel je Shop: ein GitLab-Projekt, ein weclapp-Mandant oder ein
+  Jira-Cloud-Projekt, nicht mehrere zugleich; kein Jira Data Center, keine
+  GitHub- oder E-Mail-Ziele
+- Bei Jira keine Zusatzfelder: Vorgangstypen mit weiteren Pflichtfeldern werden
+  nicht unterstützt
 - Keine Verknüpfung des Melders mit einem weclapp-Kunden oder -Kontakt
 
 ## Kompatibilität

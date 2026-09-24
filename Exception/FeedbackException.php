@@ -9,8 +9,8 @@ use Exception;
 /**
  * Fehlerzustände der Feedback-Verarbeitung.
  *
- * Für den Melder sind CONFIG, UPLOAD, GITLAB und WECLAPP ununterscheidbar — er
- * sieht in allen Fällen dieselbe neutrale Meldung. Nur
+ * Für den Melder sind CONFIG, UPLOAD, GITLAB, WECLAPP und JIRA ununterscheidbar
+ * — er sieht in allen Fällen dieselbe neutrale Meldung. Nur
  * VALIDATION erzeugt einen benennenden Hinweis, damit eine zu große Datei oder
  * eine unplausible E-Mail korrigierbar ist statt still zu scheitern.
  *
@@ -26,6 +26,7 @@ class FeedbackException extends Exception
     public const TYPE_UPLOAD = 'upload';
     public const TYPE_GITLAB = 'gitlab';
     public const TYPE_WECLAPP = 'weclapp';
+    public const TYPE_JIRA = 'jira';
 
     /** @var string */
     private $type;
@@ -78,6 +79,11 @@ class FeedbackException extends Exception
     public static function weclapp(string $internalMessage): self
     {
         return new self(self::TYPE_WECLAPP, 'TABSLFEEDBACK_ERROR_GENERIC', $internalMessage);
+    }
+
+    public static function jira(string $internalMessage): self
+    {
+        return new self(self::TYPE_JIRA, 'TABSLFEEDBACK_ERROR_GENERIC', $internalMessage);
     }
 
     public function getType(): string

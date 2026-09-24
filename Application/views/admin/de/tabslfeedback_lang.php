@@ -16,12 +16,13 @@ $aLang = array_merge(
 
         // Navigation
         'TABSLFEEDBACK_ADMIN_LINK' => 'Feedback',
-        'TABSLFEEDBACK_ADMIN_UNAVAILABLE' => 'Das Feedback-Formular ist nicht verfügbar. Prüfen Sie unter Erweiterungen → Module → tabslFeedback, ob das Backend-Formular aktiviert und das gewählte Ticket-Ziel vollständig eingerichtet ist: bei GitLab Adresse, Projekt-ID und Token, bei weclapp https-Adresse und API-Token.',
+        'TABSLFEEDBACK_ADMIN_UNAVAILABLE' => 'Das Feedback-Formular ist nicht verfügbar. Prüfen Sie unter Erweiterungen → Module → tabslFeedback, ob das Backend-Formular aktiviert und das gewählte Ticket-Ziel vollständig eingerichtet ist: bei GitLab Adresse, Projekt-ID und Token, bei weclapp https-Adresse und API-Token, bei Jira Cloud Adresse, E-Mail, API-Token und Projekt.',
 
         // Einstellungsgruppen
         'SHOP_MODULE_GROUP_tabslfeedback_main' => 'Grundeinstellungen',
         'SHOP_MODULE_GROUP_tabslfeedback_gitlab' => 'GitLab',
         'SHOP_MODULE_GROUP_tabslfeedback_weclapp' => 'weclapp',
+        'SHOP_MODULE_GROUP_tabslfeedback_jira' => 'Jira Cloud',
         'SHOP_MODULE_GROUP_tabslfeedback_openai' => 'KI-Aufbereitung',
         'SHOP_MODULE_GROUP_tabslfeedback_privacy' => 'Datenschutz',
 
@@ -43,9 +44,10 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Kurzer Text unmittelbar vor dem Absenden-Knopf, im Backend- wie im Frontend-Formular. Leer lässt den Hinweis entfallen. Der Standardtext weist auf die Übermittlung von Screenshots hin — anzupassen, sobald sich Umfang oder Empfänger der Übermittlung ändern, etwa bei aktiver KI-Aufbereitung.',
 
         'SHOP_MODULE_tabslfeedback_ticket_target' => 'Ticket-Ziel',
-        'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Wo aus einer Meldung ein Ticket entsteht: als Issue in GitLab oder als Helpdesk-Ticket in weclapp. Es gelten jeweils nur die Angaben der passenden Einstellungsgruppe.',
+        'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Wo aus einer Meldung ein Ticket entsteht: als Issue in GitLab, als Helpdesk-Ticket in weclapp oder als Vorgang in Jira Cloud. Es gelten jeweils nur die Angaben der passenden Einstellungsgruppe.',
         'SHOP_MODULE_tabslfeedback_ticket_target_gitlab' => 'GitLab',
         'SHOP_MODULE_tabslfeedback_ticket_target_weclapp' => 'weclapp',
+        'SHOP_MODULE_tabslfeedback_ticket_target_jira' => 'Jira Cloud',
 
         // GitLab
         'SHOP_MODULE_tabslfeedback_gitlab_url' => 'GitLab-Adresse',
@@ -71,16 +73,35 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_status_id' => 'Numerische ID des Status, mit dem neue Tickets entstehen. Steht in weclapp in der Adresszeile, wenn der Status unter den Helpdesk-Einstellungen geöffnet ist. Leer = Voreinstellung des Mandanten.',
 
         'SHOP_MODULE_tabslfeedback_weclapp_ticket_priority_id' => 'Priorität (ID)',
-        'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_priority_id' => 'Numerische ID der Priorität für neue Tickets, zu finden wie beim Status. Leer = Voreinstellung des Mandanten.',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_priority_id' => 'Numerische ID der Priorität für neue Tickets, zu finden wie beim Status. Dringend empfohlen: Die Priorität ist in weclapp ein Pflichtfeld, eine Voreinstellung ist nicht dokumentiert. Fehlt sie, kann weclapp jede Meldung ablehnen; das Shop-Log nennt dann ticketPriorityId.',
 
         'SHOP_MODULE_tabslfeedback_weclapp_ticket_channel_id' => 'Kanal (ID)',
-        'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_channel_id' => 'Numerische ID des Ticket-Kanals, etwa eines eigens angelegten Kanals "Shop-Feedback". Leer = Standard-Kanal des Mandanten.',
+        'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_channel_id' => 'Numerische ID des Ticket-Kanals, etwa eines eigens angelegten Kanals "Shop-Feedback". Dringend empfohlen: Der Kanal ist in weclapp ein Pflichtfeld, einen Standard-Kanal muss der Mandant eigens festgelegt haben.',
 
         'SHOP_MODULE_tabslfeedback_weclapp_ticket_category_id' => 'Kategorie (ID)',
         'HELP_SHOP_MODULE_tabslfeedback_weclapp_ticket_category_id' => 'Numerische ID der Ticket-Kategorie. Leer = keine Kategorie.',
 
         'SHOP_MODULE_tabslfeedback_weclapp_assignee_id' => 'Zuständige Person (Benutzer-ID)',
         'HELP_SHOP_MODULE_tabslfeedback_weclapp_assignee_id' => 'Numerische weclapp-Benutzer-ID, der neue Tickets zugewiesen werden. Leer = keine Zuweisung durch das Modul; Zuweisungsregeln in weclapp greifen weiterhin.',
+
+        // Jira Cloud
+        'SHOP_MODULE_tabslfeedback_jira_url' => 'Jira-Adresse',
+        'HELP_SHOP_MODULE_tabslfeedback_jira_url' => 'Adresse der Jira-Cloud-Site, z. B. https://firma.atlassian.net. Nur Jira Cloud, kein Data Center oder Server. Für den Token eines Atlassian-Service-Accounts stattdessen die Gateway-Adresse https://api.atlassian.com/ex/jira/{Cloud-ID} eintragen; die Cloud-ID steht unter https://firma.atlassian.net/_edge/tenant_info. Ein angehängtes /rest/api/3 wird ignoriert. Nur https ist zulässig. Pflichtangabe bei Ticket-Ziel Jira Cloud.',
+
+        'SHOP_MODULE_tabslfeedback_jira_email' => 'E-Mail des Kontos',
+        'HELP_SHOP_MODULE_tabslfeedback_jira_email' => 'E-Mail-Adresse des Atlassian-Kontos bzw. Service-Accounts, zu dem der API-Token gehört. Pflichtangabe bei Ticket-Ziel Jira Cloud.',
+
+        'SHOP_MODULE_tabslfeedback_jira_token' => 'API-Token',
+        'HELP_SHOP_MODULE_tabslfeedback_jira_token' => 'API-Token, erstellt unter id.atlassian.com → Sicherheit → API-Token. Ein Token läuft nach höchstens einem Jahr ab; danach entstehen keine Vorgänge mehr und das Shop-Log meldet http 401. Der Token trägt die Rechte seines Kontos, deshalb ein eigenes Konto verwenden, das nur im Zielprojekt Vorgänge anlegen darf. Pflichtangabe bei Ticket-Ziel Jira Cloud.',
+
+        'SHOP_MODULE_tabslfeedback_jira_project_key' => 'Projekt-Key',
+        'HELP_SHOP_MODULE_tabslfeedback_jira_project_key' => 'Key des Zielprojekts, z. B. SHOP, oder dessen numerische ID. Pflichtangabe bei Ticket-Ziel Jira Cloud.',
+
+        'SHOP_MODULE_tabslfeedback_jira_issue_type' => 'Vorgangstyp',
+        'HELP_SHOP_MODULE_tabslfeedback_jira_issue_type' => 'Name des Vorgangstyps, z. B. Task oder Bug, oder dessen numerische ID. Die ID ist sprachunabhängig und deshalb robuster als der Name. Der Typ muss im Projekt existieren und darf außer Zusammenfassung und Beschreibung keine weiteren Pflichtfelder haben, sonst lehnt Jira jede Meldung ab; das Shop-Log nennt dann das Feld. Leer = Task.',
+
+        'SHOP_MODULE_tabslfeedback_jira_assignee_account_id' => 'Zuständige Person (accountId)',
+        'HELP_SHOP_MODULE_tabslfeedback_jira_assignee_account_id' => 'Atlassian-accountId der Person, der neue Vorgänge zugewiesen werden; sie steht in der Adresse des Jira-Profils. Die Person muss im Projekt zuweisbar sein, sonst lehnt Jira jede Meldung ab. Leer = Standardzuweisung des Projekts.',
 
         // KI-Aufbereitung
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'KI-Anbieter',

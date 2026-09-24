@@ -10,7 +10,17 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 ### Added
 
 - weclapp als zweites Ticket-Ziel neben GitLab: `tabslfeedback_ticket_target` wählt, wo aus einer Meldung ein Ticket entsteht. Das weclapp-Ticket enthält KI-Aufbereitung, Originalmeldung, Kontakt und technischen Kontext; Screenshots hängen als Dokumente am Ticket
-- Status, Priorität, Kanal, Kategorie und zuständige Person des weclapp-Tickets sind über ihre IDs vorgebbar; leer gilt die Voreinstellung des Mandanten
+- Status, Priorität, Kanal, Kategorie und zuständige Person des weclapp-Tickets sind über ihre IDs vorgebbar; Priorität und Kanal sind in weclapp Pflichtfelder und sollten gesetzt werden
+- Jira Cloud als drittes Ticket-Ziel: Vorgang mit KI-Aufbereitung, Originalmeldung, Kontakt und technischem Kontext im Atlassian Document Format, Screenshots als Anhänge. Anmeldung per E-Mail und API-Token, auch für Atlassian-Service-Accounts über die Gateway-Adresse
+
+### Changed
+
+- Ticket-Ziele laufen intern über eine gemeinsame Schnittstelle
+- GitLab: Originalmeldung und KI-Beschreibung stehen im Issue als Codeblock statt als Zitat bzw. Fließtext
+
+### Security
+
+- GitLab: Über das öffentliche Formular ließen sich Links, Bilder, HTML und @-Erwähnungen ins Issue schreiben, über eine Anweisung an die KI zusätzlich Quick Actions wie `/assign` oder `/close`. Freitext und KI-Text werden jetzt als Codeblock gesetzt und von GitLab nicht mehr ausgewertet
 
 ## [1.2.0] - 2026-08-25
 

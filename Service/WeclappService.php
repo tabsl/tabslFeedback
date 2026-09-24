@@ -14,7 +14,7 @@ use Tabsl\Feedback\Exception\FeedbackException;
  *
  * Anders als bei GitLab entsteht das Ticket zuerst; die Bilder hängen danach
  * am Ticket. Die Fehler sind nach Vorgang unterscheidbar (TYPE_WECLAPP /
- * TYPE_UPLOAD), damit FeedbackService einen fehlgeschlagenen Screenshot anders
+ * TYPE_UPLOAD), damit WeclappTicketTarget einen fehlgeschlagenen Screenshot anders
  * behandeln kann als eine fehlgeschlagene Ticket-Anlage. Kein Retry.
  */
 class WeclappService
@@ -29,6 +29,17 @@ class WeclappService
      * als die Warteschlangenzeit verzögert bei Überlast nur die Fehlermeldung.
      */
     private const TIMEOUT_SECONDS = 30;
+
+    /**
+     * Wartet eine Anfrage länger in der weclapp-Warteschlange, lehnt weclapp sie
+     * mit 429 ab, bevor die Verarbeitung beginnt. Ohne diese Grenze könnte ein
+     * Ticket noch entstehen, nachdem das Modul aufgegeben hat — der Melder sähe
+     * einen Fehler und sendete erneut.
+     */
+    private const QUEUE_WAIT_MILLISECONDS = 10000;
+
+    /** Der Vermerk ist entbehrlich; er darf die Antwort an den Melder kaum verzögern. */
+    private const COMMENT_TIMEOUT_SECONDS = 10;
 
     private const CONNECT_TIMEOUT_SECONDS = 5;
 
@@ -80,10 +91,11 @@ class WeclappService
 
         $response = $this->request('/ticket', $body, 'application/json');
 
-        if (!$response['ok'] && $response['status'] === 0) {
-            // Ohne Antwort (Zeitüberschreitung, abgebrochene Verbindung) kann
-            // weclapp das Ticket trotzdem angelegt haben — die Warteschlange
-            // arbeitet weiter, wenn der Client schon aufgegeben hat.
+        if (!$response['ok'] && $response['status'] < 300) {
+            // Ohne vollständige Antwort (Zeitüberschreitung, abgebrochene
+            // Verbindung, auch nach dem Erfolgsstatus) kann weclapp das Ticket
+            // trotzdem angelegt haben — die Warteschlange arbeitet weiter, wenn
+            // der Client schon aufgegeben hat.
             $this->log('error', 'ticket creation got no answer — ticket state unknown, check weclapp before resubmitting'
                 . $this->describeFailure($response));
 
@@ -116,8 +128,13 @@ class WeclappService
      *
      * @throws FeedbackException vom Typ UPLOAD oder CONFIG
      */
-    public function uploadDocument(string $ticketId, string $bytes, string $filename, string $mime): void
-    {
+    public function uploadDocument(
+        string $ticketId,
+        string $bytes,
+        string $filename,
+        string $mime,
+        int $timeoutSeconds = self::TIMEOUT_SECONDS
+    ): void {
         $this->assertConfigured();
 
         $safeFilename = (string) preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
@@ -130,7 +147,7 @@ class WeclappService
 
         // Roher Body mit dem Bildtyp als Content-Type: bei multipart speichert
         // weclapp "multipart/form-data" als Medientyp des Dokuments.
-        $response = $this->request('/document/upload?' . $query, $bytes, $mime);
+        $response = $this->request('/document/upload?' . $query, $bytes, $mime, $timeoutSeconds);
 
         if (!$response['ok']) {
             $this->log('error', 'screenshot upload failed for ' . $safeFilename . $this->describeFailure($response));
@@ -153,14 +170,18 @@ class WeclappService
             'entityName' => 'ticket',
             'entityId' => $ticketId,
             'comment' => $comment,
+            // Alle drei sind im Schema Pflicht; ob weclapp für fehlende
+            // Werte einen Default setzt, ist nicht dokumentiert.
             'publicComment' => false,
+            'privateComment' => false,
+            'solution' => false,
         ]);
 
         if ($body === false) {
             return;
         }
 
-        $response = $this->request('/comment', $body, 'application/json');
+        $response = $this->request('/comment', $body, 'application/json', self::COMMENT_TIMEOUT_SECONDS);
 
         if (!$response['ok']) {
             $this->log('error', 'internal comment on ticket failed' . $this->describeFailure($response));
@@ -182,7 +203,12 @@ class WeclappService
     /**
      * @return array{ok:bool,status:int,body:string,curlError:string}
      */
-    private function request(string $resource, string $body, string $contentType): array
+    private function request(
+        string $resource,
+        string $body,
+        string $contentType,
+        int $timeoutSeconds = self::TIMEOUT_SECONDS
+    ): array
     {
         $curl = curl_init($this->settings->getWeclappUrl() . self::API_PATH . $resource);
 
@@ -198,19 +224,20 @@ class WeclappService
             'Accept: application/json',
             'Content-Type: ' . $contentType,
             'User-Agent: tabslFeedback',
+            'X-Weclapp-Wait-Timeout-Ms: ' . self::QUEUE_WAIT_MILLISECONDS,
         ]);
         // weclapp komprimiert auch ohne Anforderung; leer = cURL dekomprimiert
         // jedes unterstützte Verfahren.
         curl_setopt($curl, CURLOPT_ENCODING, '');
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, self::CONNECT_TIMEOUT_SECONDS);
-        curl_setopt($curl, CURLOPT_TIMEOUT, self::TIMEOUT_SECONDS);
+        curl_setopt($curl, CURLOPT_TIMEOUT, $timeoutSeconds);
 
         $response = curl_exec($curl);
         $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $curlError = curl_error($curl);
         curl_close($curl);
 
-        // Die Spec nennt für die Anlage 201, im Betrieb wurde auch 200 beobachtet.
+        // Die Spec nennt für die Anlage 201, für den Upload 200 — jeder 2xx gilt als Erfolg.
         return [
             'ok' => is_string($response) && $status >= 200 && $status < 300,
             'status' => $status,
@@ -258,7 +285,11 @@ class WeclappService
                     ? (string) preg_replace('#^.*/#', '', (string) $error['type'])
                     : '';
 
-                $parts[] = $location . ($rule !== '' ? ' (' . $rule . ')' : '');
+                // errorCode (etwa platform.unknown_property) nennt die Ursache
+                // auch dann, wenn location fehlt, und spiegelt keine Werte.
+                $code = isset($error['errorCode']) && is_scalar($error['errorCode']) ? (string) $error['errorCode'] : '';
+
+                $parts[] = $location . ($rule !== '' ? ' (' . $rule . ')' : '') . ($code !== '' ? ' [' . $code . ']' : '');
             }
         }
 

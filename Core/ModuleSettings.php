@@ -14,8 +14,8 @@ use OxidEsales\Eshop\Core\Registry;
  * 'module:tabslFeedback' verwendet — die eindeutige Variante, die auch dann
  * korrekt liest, wenn ein anderes Modul ein gleichnamiges Setting führt.
  *
- * Bewusst nicht eine private Zugriffsmethode je Service: Bei rund zwei Dutzend
- * Settings und etwa zehn Nutzern hätte das die Setting-Namen über mehrere
+ * Bewusst nicht eine private Zugriffsmethode je Service: Bei rund dreißig
+ * Settings und über zehn Nutzern hätte das die Setting-Namen über mehrere
  * Dateien verteilt; sie liegen deshalb hier an einer Stelle.
  */
 class ModuleSettings
@@ -31,6 +31,8 @@ class ModuleSettings
     public const TICKET_TARGET_GITLAB = 'gitlab';
 
     public const TICKET_TARGET_WECLAPP = 'weclapp';
+
+    public const TICKET_TARGET_JIRA = 'jira';
 
     public function isAdminFormEnabled(): bool
     {
@@ -62,12 +64,14 @@ class ModuleSettings
      * Ein fehlender Wert ist der Normalfall nach einem reinen Datei-Deploy ohne
      * erneute Aktivierung — dann gilt weiter GitLab, das bisher einzige Ziel.
      *
-     * @return string gitlab|weclapp
+     * @return string gitlab|weclapp|jira
      */
     public function getTicketTarget(): string
     {
-        return $this->get('tabslfeedback_ticket_target') === self::TICKET_TARGET_WECLAPP
-            ? self::TICKET_TARGET_WECLAPP
+        $target = $this->get('tabslfeedback_ticket_target');
+
+        return in_array($target, [self::TICKET_TARGET_WECLAPP, self::TICKET_TARGET_JIRA], true)
+            ? $target
             : self::TICKET_TARGET_GITLAB;
     }
 
@@ -130,6 +134,59 @@ class ModuleSettings
     public function getWeclappAssigneeId(): string
     {
         return $this->getNumericId('tabslfeedback_weclapp_assignee_id');
+    }
+
+    /**
+     * Site-Adresse (https://firma.atlassian.net) oder Gateway-Adresse für
+     * Tokens von Service-Accounts (https://api.atlassian.com/ex/jira/{cloudId}),
+     * jeweils ohne API-Pfad.
+     */
+    public function getJiraUrl(): string
+    {
+        $url = rtrim(trim((string) $this->get('tabslfeedback_jira_url')), '/');
+
+        return (string) preg_replace('#/rest/api/\d+$#i', '', $url);
+    }
+
+    public function getJiraEmail(): string
+    {
+        return trim((string) $this->get('tabslfeedback_jira_email'));
+    }
+
+    public function getJiraToken(): string
+    {
+        return trim((string) $this->get('tabslfeedback_jira_token'));
+    }
+
+    /**
+     * Projekt-Key (SHOP) oder rein numerische Projekt-ID; alles andere gilt als
+     * nicht gesetzt.
+     */
+    public function getJiraProject(): string
+    {
+        $project = strtoupper(trim((string) $this->get('tabslfeedback_jira_project_key')));
+
+        return preg_match('/^([A-Z][A-Z0-9_]*|\d+)$/', $project) === 1 ? $project : '';
+    }
+
+    /**
+     * Name (Task) oder rein numerische ID des Vorgangstyps.
+     */
+    public function getJiraIssueType(): string
+    {
+        $issueType = mb_substr(trim((string) $this->get('tabslfeedback_jira_issue_type')), 0, 255);
+
+        return $issueType !== '' ? $issueType : 'Task';
+    }
+
+    /**
+     * Deckt alte 24-stellige Hex-IDs wie neue `712020:uuid`-IDs ab.
+     */
+    public function getJiraAssigneeAccountId(): string
+    {
+        $accountId = trim((string) $this->get('tabslfeedback_jira_assignee_account_id'));
+
+        return preg_match('/^[A-Za-z0-9:_-]{1,128}$/', $accountId) === 1 ? $accountId : '';
     }
 
     /**
@@ -234,9 +291,14 @@ class ModuleSettings
      */
     public function isConfigured(): bool
     {
-        return $this->getTicketTarget() === self::TICKET_TARGET_WECLAPP
-            ? $this->isWeclappConfigured()
-            : $this->isGitLabConfigured();
+        switch ($this->getTicketTarget()) {
+            case self::TICKET_TARGET_WECLAPP:
+                return $this->isWeclappConfigured();
+            case self::TICKET_TARGET_JIRA:
+                return $this->isJiraConfigured();
+            default:
+                return $this->isGitLabConfigured();
+        }
     }
 
     public function isGitLabConfigured(): bool
@@ -288,6 +350,35 @@ class ModuleSettings
             && !isset($url['query'])
             && !isset($url['fragment'])
             && $this->getWeclappToken() !== '';
+    }
+
+    /**
+     * Jira Cloud ist nur per https erreichbar. Einen Pfad hat allein das
+     * Service-Account-Gateway, und dort ist er Pflicht; jeder andere Pfad stammt
+     * meist aus der Browserzeile und führte zu 404 bei jeder Meldung.
+     */
+    public function isJiraConfigured(): bool
+    {
+        $url = parse_url($this->getJiraUrl());
+
+        if (!is_array($url)) {
+            return false;
+        }
+
+        $host = strtolower((string) ($url['host'] ?? ''));
+        $path = (string) ($url['path'] ?? '');
+        $validPath = $host === 'api.atlassian.com'
+            ? preg_match('#^/ex/jira/[A-Za-z0-9-]+$#', $path) === 1
+            : $path === '';
+
+        return strtolower((string) ($url['scheme'] ?? '')) === 'https'
+            && $host !== ''
+            && $validPath
+            && !isset($url['query'])
+            && !isset($url['fragment'])
+            && strpos($this->getJiraEmail(), '@') !== false
+            && $this->getJiraToken() !== ''
+            && $this->getJiraProject() !== '';
     }
 
     /**

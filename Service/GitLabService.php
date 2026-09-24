@@ -12,7 +12,7 @@ use Tabsl\Feedback\Exception\FeedbackException;
  * Kapselt die beiden benötigten GitLab-Vorgänge: Datei hochladen und Issue anlegen.
  *
  * Die Fehler sind nach Vorgang unterscheidbar (TYPE_UPLOAD / TYPE_GITLAB), damit
- * FeedbackService einen fehlgeschlagenen Screenshot anders behandeln kann als
+ * GitLabTicketTarget einen fehlgeschlagenen Screenshot anders behandeln kann als
  * eine fehlgeschlagene Issue-Anlage. Kein Retry.
  */
 class GitLabService

@@ -1,6 +1,6 @@
 {
   "name": "tabsl/tabslfeedback",
-  "description": "Feedback-Formular für Backend und Frontend mit KI-Aufbereitung und Ticket-Anlage in GitLab oder weclapp.",
+  "description": "Feedback-Formular für Backend und Frontend mit KI-Aufbereitung und Ticket-Anlage in GitLab, weclapp oder Jira Cloud.",
   "type": "oxideshop-module",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/tabsl/tabslFeedback",
@@ -11,6 +11,7 @@
     "feedback",
     "gitlab",
     "weclapp",
+    "jira",
     "openai",
     "anthropic"
   ],

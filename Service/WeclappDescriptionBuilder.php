@@ -12,7 +12,7 @@ namespace Tabsl\Feedback\Service;
  * Jeder Wert gilt als untrusted und wird escaped: Freitext, Name, E-Mail und
  * Umgebungsangaben kommen aus dem Browser des Melders, der KI-Text ist aus dem
  * Freitext abgeleitet. Markup entsteht ausschließlich aus den festen Tags
- * dieser Klasse (siehe docs/adr/ADR-001). Bewusst ohne Tabellen, Links und
+ * dieser Klasse (siehe docs/adr/ADR-002). Bewusst ohne Tabellen, Links und
  * Bilder, weil nicht dokumentiert ist, wie weclapp HTML bereinigt.
  */
 class WeclappDescriptionBuilder
