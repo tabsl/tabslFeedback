@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Tabsl\Feedback\Service;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
+use Tabsl\Feedback\Core\ModuleRegistry;
 
 /**
  * Weiche Anbindung an das optionale Modul tabslTurnstile.
@@ -64,10 +63,7 @@ class TurnstileGate
         try {
             // Die Klasse kann über Composer im Dateisystem liegen, während das
             // Modul im Shop deaktiviert ist — Klassen-Existenz allein genügt nicht.
-            $container = ContainerFactory::getInstance()->getContainer();
-            $activationBridge = $container->get(ModuleActivationBridgeInterface::class);
-
-            if (!$activationBridge->isActive(self::MODULE_ID, (int) Registry::getConfig()->getShopId())) {
+            if (!(new ModuleRegistry())->isActive(self::MODULE_ID)) {
                 return self::STATE_OFF;
             }
 

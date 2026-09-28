@@ -7,9 +7,7 @@ namespace Tabsl\Feedback\Service;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Eshop\Core\Theme;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
+use Tabsl\Feedback\Core\ModuleRegistry;
 use Tabsl\Feedback\Core\ModuleSettings;
 
 /**
@@ -333,28 +331,7 @@ class MetadataCollector
     private function collectActiveModules(): array
     {
         try {
-            $container = ContainerFactory::getInstance()->getContainer();
-            $shopConfiguration = $container->get(ShopConfigurationDaoBridgeInterface::class)->get();
-            $activationBridge = $container->get(ModuleActivationBridgeInterface::class);
-            $shopId = (int) Registry::getConfig()->getShopId();
-
-            $modules = [];
-
-            // ModuleConfiguration kennt selbst kein isActivated() — der Aktivstatus
-            // kommt ausschließlich über die Activation-Bridge.
-            foreach ($shopConfiguration->getModuleConfigurations() as $moduleConfiguration) {
-                $moduleId = $moduleConfiguration->getId();
-
-                if (!$activationBridge->isActive($moduleId, $shopId)) {
-                    continue;
-                }
-
-                $modules[$moduleId] = $moduleConfiguration->getVersion();
-            }
-
-            ksort($modules);
-
-            return $modules;
+            return (new ModuleRegistry())->getActiveModuleVersions();
         } catch (\Throwable $e) {
             return [];
         }

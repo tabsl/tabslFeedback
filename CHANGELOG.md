@@ -7,6 +7,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Fixed
+
+- oxideshop-ce vor 6.5 (etwa 6.3.x in OXID eShop 6.1): Mit installiertem tabslTurnstile scheiterte jede Feedback-Übermittlung, weil Modulstatus und Modulliste über den DI-Container ermittelt wurden, den es dort noch nicht gibt. Vor oxideshop-ce 6.5 greift das Modul jetzt auf `Module`/`ModuleList` zurück ([#1](https://github.com/tabsl/tabslFeedback/issues/1))
+
 ## [1.3.0] - 2026-09-24
 
 ### Added
