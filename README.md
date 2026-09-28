@@ -165,6 +165,19 @@ nicht Jira Data Center oder Server.
    Meldung ab, und das Shop-Log nennt das fehlende Feld, etwa `customfield_10020`.
 5. **Optional: zuständige Person** — deren accountId steht in der Adresse ihres
    Jira-Profils. Die Person muss im Projekt zuweisbar sein.
+6. **Optional: Kommentar am Vorgang der Seite** — mit
+   `tabslfeedback_jira_comment_page_issue` sucht das Shop-Widget im Quelltext
+   der Seite nach Verweisen wie `…/browse/SHOP-123`. Gehört einer davon zum
+   eingestellten Projekt, wird die Meldung als Kommentar an diesem Vorgang
+   gespeichert, die Screenshots hängen mit Zeitstempel im Dateinamen am Vorgang.
+   Es gilt der erste passende Verweis. Lehnt Jira den Kommentar ab (Vorgang
+   gelöscht, keine Berechtigung), entsteht wie sonst ein neuer Vorgang. Setzt
+   einen Projekt-Key voraus, eine numerische Projekt-ID genügt nicht. Das Konto
+   braucht im Projekt zusätzlich das Recht, Vorgänge zu kommentieren und Anhänge
+   hinzuzufügen. Der Verweis kommt aus dem Browser: Wer das Formular erreicht,
+   kann jeden Vorgang des Projekts kommentieren lassen, den das Konto sehen
+   darf. Die Option deshalb nur einschalten, wo das Formular nicht öffentlich
+   erreichbar ist oder Turnstile davor steht.
 
 ### Modul konfigurieren
 
@@ -193,6 +206,7 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_jira_project_key` | Projekt-Key oder numerische Projekt-ID — **Pflicht** bei Ziel `jira` | leer |
 | `tabslfeedback_jira_issue_type` | Name oder ID des Vorgangstyps; leer = `Task` | `Task` |
 | `tabslfeedback_jira_assignee_account_id` | accountId für die Zuweisung; leer = Standardzuweisung des Projekts | leer |
+| `tabslfeedback_jira_comment_page_issue` | Meldung als Kommentar an dem Vorgang, auf den die Seite verweist (`/browse/KEY-123`), statt als neuer Vorgang; siehe oben | aus |
 | `tabslfeedback_notice_text` | Kurzer Hinweistext vor dem Absenden-Knopf; leer = kein Hinweis | Hinweis auf Screenshot-Übermittlung |
 | `tabslfeedback_ai_provider` | `none`, `openai` oder `anthropic` — bei `none` erscheint statt der Aufbereitung ein Betreff-Feld | `openai` |
 | `tabslfeedback_openai_key` | OpenAI API-Key; nur bei Anbieter `openai`; leer = Ticket ohne Aufbereitung | leer |
@@ -259,7 +273,10 @@ zusätzlich der übergebene Bezug. Kundendaten **nur** bei aktivem
 Bestellkontext, Browser-Konsolenmeldungen. Bei einer eigenen GitLab-Installation
 verlassen die Daten die eigene Infrastruktur nicht; bei weclapp liegen sie beim
 Mandanten in der weclapp-Cloud, Screenshots als Dokumente am Ticket; bei Jira
-Cloud in der Atlassian-Cloud, Screenshots als Anhänge am Vorgang.
+Cloud in der Atlassian-Cloud, Screenshots als Anhänge am Vorgang. Mit aktivem
+`tabslfeedback_jira_comment_page_issue` sendet das Widget zusätzlich bis zu zehn
+im Quelltext gefundene Vorgangs-Keys an den Shop; sie dienen nur der Wahl des
+Vorgangs und stehen nicht im Kommentar.
 
 **An Cloudflare (`challenges.cloudflare.com`)** — nur bei aktivem
 `tabslTurnstile`: der Turnstile-Token und die von Cloudflare selbst erhobenen
@@ -282,6 +299,8 @@ Shop-Log fest, jeweils mit dem Präfix `[tabslFeedback]`:
 | weclapp bzw. Jira antwortet bei der Ticket-Anlage nicht (Zeitüberschreitung) — Ticket kann trotzdem entstanden sein, vor erneutem Absenden nachsehen | `error` |
 | Screenshot-Upload fehlgeschlagen (Bild fehlt im Ticket) | `error` |
 | Kommentar am weclapp-Ticket bzw. Jira-Vorgang fehlgeschlagen | `error` |
+| Jira lehnt den Kommentar am Vorgang der Seite ab — stattdessen entsteht ein neuer Vorgang | `error` |
+| Jira antwortet beim Kommentar am Vorgang der Seite nicht oder mit 5xx — Kommentar kann trotzdem stehen, vor erneutem Absenden nachsehen | `error` |
 | KI-Aufbereitung fehlgeschlagen — inkl. HTTP-Status und Fehlermeldung | `error` |
 | Absendung bei unvollständiger Konfiguration abgewiesen | `error` |
 | Unerwarteter Fehler beim Absenden (einzeilig und gekürzt) | `error` |

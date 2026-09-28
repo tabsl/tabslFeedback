@@ -100,6 +100,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_jira_assignee_account_id' => 'Assignee (account ID)',
         'HELP_SHOP_MODULE_tabslfeedback_jira_assignee_account_id' => 'Atlassian account ID of the person new issues are assigned to, shown in the address of their Jira profile. The person must be assignable in the project, otherwise Jira rejects every report. Leave empty for the project default assignment.',
 
+        'SHOP_MODULE_tabslfeedback_jira_comment_page_issue' => 'Report as comment on the issue of the page',
+        'HELP_SHOP_MODULE_tabslfeedback_jira_comment_page_issue' => 'If the source of the shop page links to an issue of the configured project (e.g. …/browse/SHOP-123), the report and its screenshots are stored as a comment on that issue instead of a new issue. With several links the first one applies. Works only with a project key, not with a numeric project ID, and only in the storefront. If Jira rejects the comment (issue deleted, no permission), a new issue is created. Note: the link is reported by the browser; anyone who can reach the form can have any issue of the project commented on that the account can see.',
+
         // AI processing
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'AI provider',
         'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Whether and through which service the report is turned into a title and description. "Without AI" skips any external transmission entirely — the form then shows a subject field instead, whose content is used directly as the ticket title. With OpenAI or Anthropic, the matching API key remains required; without it, the ticket is created without processing as well.',

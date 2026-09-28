@@ -47,6 +47,9 @@ class InputValidator
      */
     public const MAX_REFERENCE_LENGTH = 200;
 
+    /** Wie viele Jira-Vorgangs-Keys aus dem Seitenquelltext übernommen werden. */
+    public const MAX_PAGE_ISSUE_KEYS = 10;
+
     /** Erlaubte Schlüssel aus fb_meta; alles andere wird verworfen. */
     private const CLIENT_META_KEYS = ['url', 'referrer', 'viewport', 'screen', 'reference'];
 
@@ -100,7 +103,8 @@ class InputValidator
             $this->validateContactField($rawName),
             $this->validateEmail($rawEmail),
             $this->validateImages($rawImages),
-            $this->extractClientMeta($rawMeta)
+            $this->extractClientMeta($rawMeta),
+            $this->extractPageIssueKeys($rawMeta)
         );
     }
 
@@ -371,5 +375,37 @@ class InputValidator
         }
 
         return $meta;
+    }
+
+    /**
+     * Nur formal gültige Keys; ungültige Einträge entfallen einzeln, statt die
+     * Meldung abzuweisen — der Melder hat sie nicht eingegeben.
+     *
+     * @return array<int,string>
+     */
+    private function extractPageIssueKeys(string $rawMeta): array
+    {
+        $decoded = json_decode($rawMeta, true);
+
+        if (!is_array($decoded) || !isset($decoded['issues']) || !is_array($decoded['issues'])) {
+            return [];
+        }
+
+        $keys = [];
+
+        foreach ($decoded['issues'] as $key) {
+            if (is_string($key)
+                && preg_match('/^[A-Z][A-Z0-9_]{0,254}-[1-9][0-9]{0,9}$/D', $key) === 1
+                && !in_array($key, $keys, true)
+            ) {
+                $keys[] = $key;
+            }
+
+            if (count($keys) >= self::MAX_PAGE_ISSUE_KEYS) {
+                break;
+            }
+        }
+
+        return $keys;
     }
 }

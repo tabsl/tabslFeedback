@@ -190,6 +190,17 @@ class ModuleSettings
     }
 
     /**
+     * Meldungen von einer Seite, die per `/browse/KEY-123` auf einen Vorgang
+     * des eingestellten Projekts verweist, landen als Kommentar an diesem
+     * Vorgang statt als neuer Vorgang. Greift nur bei Ticket-Ziel Jira.
+     */
+    public function isJiraPageIssueCommentEnabled(): bool
+    {
+        return $this->getTicketTarget() === self::TICKET_TARGET_JIRA
+            && (bool) $this->get('tabslfeedback_jira_comment_page_issue');
+    }
+
+    /**
      * @return string none|openai|anthropic
      */
     public function getAiProvider(): string

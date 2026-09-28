@@ -7,6 +7,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Jira Cloud: Mit `tabslfeedback_jira_comment_page_issue` sucht das Shop-Widget im Quelltext der Seite nach Verweisen wie `/browse/SHOP-123`. Gehört einer zum eingestellten Projekt, wird die Meldung samt Screenshots als Kommentar an diesem Vorgang gespeichert statt als neuer Vorgang. Lehnt Jira den Kommentar ab, entsteht wie bisher ein neuer Vorgang
+
 ### Fixed
 
 - oxideshop-ce vor 6.5 (etwa 6.3.x in OXID eShop 6.1): Mit installiertem tabslTurnstile scheiterte jede Feedback-Übermittlung, weil Modulstatus und Modulliste über den DI-Container ermittelt wurden, den es dort noch nicht gibt. Vor oxideshop-ce 6.5 greift das Modul jetzt auf `Module`/`ModuleList` zurück ([#1](https://github.com/tabsl/tabslFeedback/issues/1))

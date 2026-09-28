@@ -18,6 +18,7 @@
          data-subject="[{if $oViewConf->showTabslFeedbackSubjectField()}]1[{else}]0[{/if}]"
          data-screenshots="[{if $oViewConf->showTabslFeedbackScreenshots()}]1[{else}]0[{/if}]"
          data-autoopen="[{if $oViewConf->isTabslFeedbackAutoOpen()}]1[{else}]0[{/if}]"
+         data-issuescan="[{if $oViewConf->shouldTabslFeedbackScanPageIssues()}]1[{else}]0[{/if}]"
          data-notice="[{$oViewConf->getTabslFeedbackNoticeText()|escape:'html'}]"
          data-turnstile-sitekey="[{if $oViewConf->isTabslFeedbackTurnstileActive()}][{$oViewConf->getTabslFeedbackTurnstileSiteKey()|escape:'html'}][{/if}]"
          data-limits="[{$oViewConf->getTabslFeedbackLimitsJson()|escape:'html'}]"

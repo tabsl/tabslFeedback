@@ -56,8 +56,10 @@
      *
      * Der Bezug ist die Ausnahme: Er wird nicht erhoben, sondern von der Stelle
      * gesetzt, die den Dialog geöffnet hat (window.tabslFeedback.open).
+     * Die Jira-Vorgänge der Seite kommen nur mit, wenn der Betreiber das
+     * Kommentieren am Seitenvorgang eingeschaltet hat.
      */
-    function collectMeta(reference) {
+    function collectMeta(reference, scanIssues) {
         var meta = {
             url: window.location.href,
             referrer: document.referrer || ''
@@ -65,6 +67,14 @@
 
         if (reference) {
             meta.reference = reference;
+        }
+
+        if (scanIssues) {
+            var issues = findPageIssueKeys();
+
+            if (issues.length) {
+                meta.issues = issues;
+            }
         }
 
         if (window.innerWidth && window.innerHeight) {
@@ -76,6 +86,26 @@
         }
 
         return JSON.stringify(meta);
+    }
+
+    /**
+     * Vorgangs-Keys aus Verweisen wie `…/browse/DK-594`, in der Reihenfolge des
+     * Quelltexts. Welcher davon zum eingestellten Projekt gehört, entscheidet
+     * der Server — das Projekt steht bewusst nicht in der Seite.
+     */
+    function findPageIssueKeys() {
+        var pattern = /\/browse\/([A-Z][A-Z0-9_]*-[1-9][0-9]{0,9})(?![0-9A-Za-z_-])/g;
+        var html = document.documentElement ? document.documentElement.innerHTML : '';
+        var keys = [];
+        var match;
+
+        while ((match = pattern.exec(html)) !== null && keys.length < 10) {
+            if (keys.indexOf(match[1]) === -1) {
+                keys.push(match[1]);
+            }
+        }
+
+        return keys;
     }
 
     /* ------------------------------------------------------------------ *
@@ -695,7 +725,7 @@
         body.append('fb_subject', values.subject);
         body.append('fb_name', values.name);
         body.append('fb_email', values.email);
-        body.append('fb_meta', collectMeta(this.reference));
+        body.append('fb_meta', collectMeta(this.reference, this.config.scanIssues));
 
         if (this.store) {
             this.store.dataUrls().forEach(function (dataUrl) {
@@ -946,6 +976,7 @@
             showSubject: config.getAttribute('data-subject') === '1',
             showScreenshots: config.getAttribute('data-screenshots') === '1',
             autoOpen: config.getAttribute('data-autoopen') === '1',
+            scanIssues: config.getAttribute('data-issuescan') === '1',
             notice: config.getAttribute('data-notice') || '',
             turnstileSiteKey: config.getAttribute('data-turnstile-sitekey') || '',
             limits: parseJsonAttribute(config, 'data-limits', {}),

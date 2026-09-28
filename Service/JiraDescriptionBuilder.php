@@ -36,19 +36,43 @@ class JiraDescriptionBuilder
      */
     public function buildDescription(TicketDraft $draft, array $environment): array
     {
-        $document = $this->document($this->buildBlocks($draft, $environment, true, true));
+        return $this->fitDocument($draft, $environment, []);
+    }
+
+    /**
+     * Die Meldung als Kommentar an einem bestehenden Vorgang. Ein Kommentar hat
+     * keine Zusammenfassung, der Titel steht deshalb als erste Überschrift.
+     *
+     * @param array{rows:array<string,string>,modules:array<string,string>} $environment
+     *
+     * @return array<string,mixed>
+     */
+    public function buildPageIssueComment(TicketDraft $draft, array $environment): array
+    {
+        return $this->fitDocument($draft, $environment, [$this->heading($this->singleLine($draft->getTitle()))]);
+    }
+
+    /**
+     * @param array{rows:array<string,string>,modules:array<string,string>} $environment
+     * @param array<int,array<string,mixed>> $leading
+     *
+     * @return array<string,mixed>
+     */
+    private function fitDocument(TicketDraft $draft, array $environment, array $leading): array
+    {
+        $document = $this->document(array_merge($leading, $this->buildBlocks($draft, $environment, true, true)));
 
         if ($this->length($document) <= self::MAX_DOCUMENT_LENGTH) {
             return $document;
         }
 
-        $document = $this->document($this->buildBlocks($draft, $environment, false, true));
+        $document = $this->document(array_merge($leading, $this->buildBlocks($draft, $environment, false, true)));
 
         if ($this->length($document) <= self::MAX_DOCUMENT_LENGTH) {
             return $document;
         }
 
-        return $this->document($this->buildBlocks($draft, $environment, false, false));
+        return $this->document(array_merge($leading, $this->buildBlocks($draft, $environment, false, false)));
     }
 
     /**

@@ -10,7 +10,7 @@ use Tabsl\Feedback\Exception\FeedbackException;
 
 /**
  * Kapselt die Jira-Cloud-Vorgänge (REST API v3): Vorgang anlegen, Screenshot
- * anhängen, Kommentar.
+ * anhängen, Kommentar — als Vermerk oder als Meldung an einem Seitenvorgang.
  *
  * Wie bei weclapp entsteht der Vorgang zuerst; die Bilder hängen danach am
  * Vorgang. Die Fehler sind nach Vorgang unterscheidbar (TYPE_JIRA /
@@ -134,6 +134,46 @@ class JiraService
 
             throw FeedbackException::upload('upload of ' . $safeFilename . ' failed');
         }
+    }
+
+    /**
+     * Die Meldung selbst als Kommentar an einem bestehenden Vorgang — anders als
+     * addComment() der Hauptvorgang, deshalb mit vollem Zeitbudget.
+     *
+     * @param array<string,mixed> $body ADF-Dokument
+     *
+     * @return bool false = Jira hat abgelehnt (Vorgang fehlt, keine Berechtigung,
+     *              Inhalt ungültig); der Aufrufer legt dann einen neuen Vorgang an
+     *
+     * @throws FeedbackException vom Typ JIRA, wenn keine Antwort kam, oder CONFIG
+     */
+    public function commentOnIssue(string $issueKey, array $body): bool
+    {
+        $this->assertConfigured();
+
+        $response = $this->request(
+            '/issue/' . rawurlencode($issueKey) . '/comment',
+            $this->encode(['body' => $body]),
+            ['Content-Type: application/json']
+        );
+
+        if ($response['ok']) {
+            return true;
+        }
+
+        // Nur eine eindeutige Ablehnung (4xx) führt zum Ersatzvorgang. Ohne
+        // Antwort oder bei 5xx kann der Kommentar trotzdem stehen; die Meldung
+        // stünde dann doppelt in Jira.
+        if ($response['status'] < 400 || $response['status'] >= 500) {
+            $this->log('comment on page issue failed — comment state unknown, check Jira before resubmitting'
+                . $this->describeFailure($response));
+
+            throw FeedbackException::jira('page issue comment failed');
+        }
+
+        $this->log('comment on page issue rejected, creating a new issue instead' . $this->describeFailure($response));
+
+        return false;
     }
 
     /**

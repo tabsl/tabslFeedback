@@ -91,6 +91,7 @@ $aModule = [
         ['group' => 'tabslfeedback_jira', 'name' => 'tabslfeedback_jira_project_key', 'type' => 'str', 'value' => ''],
         ['group' => 'tabslfeedback_jira', 'name' => 'tabslfeedback_jira_issue_type', 'type' => 'str', 'value' => 'Task'],
         ['group' => 'tabslfeedback_jira', 'name' => 'tabslfeedback_jira_assignee_account_id', 'type' => 'str', 'value' => ''],
+        ['group' => 'tabslfeedback_jira', 'name' => 'tabslfeedback_jira_comment_page_issue', 'type' => 'bool', 'value' => false],
         // KI-Aufbereitung
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_ai_provider', 'type' => 'select', 'value' => 'openai', 'constraints' => 'none|openai|anthropic'],
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_openai_key', 'type' => 'password', 'value' => ''],

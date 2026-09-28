@@ -96,6 +96,15 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
+     * Nur dann sucht das Widget im Quelltext nach Jira-Vorgängen — sonst
+     * wandert nichts davon zum Server.
+     */
+    public function shouldTabslFeedbackScanPageIssues(): bool
+    {
+        return $this->getTabslFeedbackSettings()->isJiraPageIssueCommentEnabled();
+    }
+
+    /**
      * Dieselbe Zustandsermittlung, die auch SubmitController serverseitig nutzt.
      */
     public function isTabslFeedbackTurnstileActive(): bool

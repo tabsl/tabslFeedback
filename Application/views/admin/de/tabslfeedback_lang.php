@@ -103,6 +103,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_jira_assignee_account_id' => 'Zuständige Person (accountId)',
         'HELP_SHOP_MODULE_tabslfeedback_jira_assignee_account_id' => 'Atlassian-accountId der Person, der neue Vorgänge zugewiesen werden; sie steht in der Adresse des Jira-Profils. Die Person muss im Projekt zuweisbar sein, sonst lehnt Jira jede Meldung ab. Leer = Standardzuweisung des Projekts.',
 
+        'SHOP_MODULE_tabslfeedback_jira_comment_page_issue' => 'Meldung als Kommentar am Vorgang der Seite',
+        'HELP_SHOP_MODULE_tabslfeedback_jira_comment_page_issue' => 'Enthält der Quelltext der Shop-Seite einen Verweis auf einen Vorgang des eingestellten Projekts (etwa …/browse/SHOP-123), wird die Meldung samt Screenshots als Kommentar an diesem Vorgang gespeichert statt als neuer Vorgang. Bei mehreren Verweisen gilt der erste. Funktioniert nur mit Projekt-Key, nicht mit numerischer Projekt-ID, und nur im Shop-Frontend. Lehnt Jira den Kommentar ab (Vorgang gelöscht, keine Berechtigung), entsteht ein neuer Vorgang. Achtung: Der Verweis kommt aus dem Browser; wer das Formular erreicht, kann damit jeden Vorgang des Projekts kommentieren lassen, den das Konto sehen darf.',
+
         // KI-Aufbereitung
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'KI-Anbieter',
         'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Ob und über welchen Dienst der Freitext zu Titel und Beschreibung aufbereitet wird. „Ohne KI" verzichtet vollständig auf eine externe Übermittlung — im Formular erscheint dafür ein Betreff-Feld, dessen Inhalt direkt als Ticket-Titel dient. Bei OpenAI oder Anthropic bleibt zusätzlich der jeweilige API-Key erforderlich; fehlt er, entsteht das Ticket ebenfalls ohne Aufbereitung.',
