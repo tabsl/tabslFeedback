@@ -11,9 +11,17 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 - Jira Cloud: Mit `tabslfeedback_jira_comment_page_issue` sucht das Shop-Widget im Quelltext der Seite nach Verweisen wie `/browse/SHOP-123`. Gehört einer zum eingestellten Projekt, wird die Meldung samt Screenshots als Kommentar an diesem Vorgang gespeichert statt als neuer Vorgang. Lehnt Jira den Kommentar ab, entsteht wie bisher ein neuer Vorgang
 
-### Fixed
+### Changed
 
-- oxideshop-ce vor 6.5 (etwa 6.3.x in OXID eShop 6.1): Mit installiertem tabslTurnstile scheiterte jede Feedback-Übermittlung, weil Modulstatus und Modulliste über den DI-Container ermittelt wurden, den es dort noch nicht gibt. Vor oxideshop-ce 6.5 greift das Modul jetzt auf `Module`/`ModuleList` zurück ([#1](https://github.com/tabsl/tabslFeedback/issues/1))
+- Unterstützt OXID eShop 7.0 bis 7.5 mit Twig (Apex und davon abgeleitete Themes, Twig-Admin) und PHP 8.0 bis 8.5. OXID 6 bleibt bei der Linie 1.x auf `main`, diese Linie 2.x liegt auf `b-7.x`
+- Einstellungen werden über den ModuleSettingService aus der Modul-Konfiguration gelesen; Namen und Standardwerte sind unverändert
+- Frontend-Assets liegen unter `assets/` und werden nach `out/modules/tabslFeedback` verlinkt. Fehlen sie, bleibt die Seite benutzbar, das Widget entfällt und das Shop-Log nennt den Grund
+
+### Removed
+
+- Smarty-Templates, damit auch OXID 7.0 mit Smarty (Theme `wave`)
+- Unterstützung für OXID 6 und PHP 7.4
+- Installation per Entpacken nach `source/modules`
 
 ## [1.3.0] - 2026-09-24
 

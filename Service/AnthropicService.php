@@ -100,7 +100,6 @@ class AnthropicService implements AiTicketGeneratorInterface
         $response = curl_exec($curl);
         $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $curlError = curl_error($curl);
-        curl_close($curl);
 
         if (!is_string($response) || $status !== 200) {
             // Ohne Protokoll ist im Nachhinein nicht feststellbar, warum ein

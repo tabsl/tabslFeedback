@@ -235,7 +235,6 @@ class WeclappService
         $response = curl_exec($curl);
         $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $curlError = curl_error($curl);
-        curl_close($curl);
 
         // Die Spec nennt für die Anlage 201, für den Upload 200 — jeder 2xx gilt als Erfolg.
         return [

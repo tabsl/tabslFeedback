@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Tabsl\Feedback\Core;
 
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleSettingNotFountException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * Zentraler, typisierter Zugriff auf die Modul-Einstellungen.
  *
- * Der Bestand kennt drei Zugriffsvarianten (getConfigParam, getShopConfVar mit
- * Modul-Präfix, gekapselter Helper). Hier wird durchgängig getShopConfVar mit
- * 'module:tabslFeedback' verwendet — die eindeutige Variante, die auch dann
- * korrekt liest, wenn ein anderes Modul ein gleichnamiges Setting führt.
+ * In OXID 7 liegen Moduleinstellungen in der YAML-Konfiguration, nicht mehr in
+ * oxconfig; gelesen wird deshalb über den ModuleSettingService. Fehlt eine
+ * Einstellung, liefert get() wie bisher null — die Getter setzen ihre
+ * Rückfallwerte selbst.
  *
  * Bewusst nicht eine private Zugriffsmethode je Service: Bei rund dreißig
  * Settings und über zehn Nutzern hätte das die Setting-Namen über mehrere
@@ -20,7 +23,16 @@ use OxidEsales\Eshop\Core\Registry;
  */
 class ModuleSettings
 {
-    private const MODULE_ID = 'module:tabslFeedback';
+    private const MODULE_ID = 'tabslFeedback';
+
+    private const BOOLEAN_SETTINGS = [
+        'tabslfeedback_admin_enabled',
+        'tabslfeedback_frontend_enabled',
+        'tabslfeedback_jira_comment_page_issue',
+        'tabslfeedback_show_contact_fields',
+        'tabslfeedback_send_customer_data',
+        'tabslfeedback_screenshots_enabled',
+    ];
 
     public const AI_PROVIDER_NONE = 'none';
 
@@ -33,6 +45,15 @@ class ModuleSettings
     public const TICKET_TARGET_WECLAPP = 'weclapp';
 
     public const TICKET_TARGET_JIRA = 'jira';
+
+    /** @var ModuleSettingServiceInterface */
+    private $moduleSettingService;
+
+    public function __construct(?ModuleSettingServiceInterface $moduleSettingService = null)
+    {
+        $this->moduleSettingService = $moduleSettingService
+            ?? ContainerFactory::getInstance()->getContainer()->get(ModuleSettingServiceInterface::class);
+    }
 
     public function isAdminFormEnabled(): bool
     {
@@ -252,8 +273,8 @@ class ModuleSettings
 
     /**
      * Einziges Bool-Setting mit Standardwert true (siehe metadata.php) — ein
-     * reiner Datei-Deploy auf eine bereits aktive Installation trägt diesen
-     * Default nicht automatisch in oxconfig ein, das übernimmt erst eine
+     * Update auf eine bereits aktive Installation trägt diesen Default nicht
+     * automatisch in die Modul-Konfiguration ein, das übernimmt erst eine
      * erneute Modul-Aktivierung. Bis dahin liefert get() null; das darf nicht
      * als „ausgeschaltet" gelesen werden, sonst verlieren bestehende
      * Installationen die Screenshot-Funktion unbemerkt.
@@ -404,10 +425,31 @@ class ModuleSettings
     }
 
     /**
+     * Die typisierten Getter des ModuleSettingService werfen unter strict_types
+     * einen TypeError, wenn der gespeicherte Wert einen anderen Typ hat, etwa
+     * '1' statt true oder 123 statt '123' aus einer migrierten
+     * OXID-6-Konfiguration. Dann wird der Wert über die übrigen Getter gelesen;
+     * die Aufrufer casten ohnehin selbst.
+     *
      * @return mixed
      */
     private function get(string $name)
     {
-        return Registry::getConfig()->getShopConfVar($name, null, self::MODULE_ID);
+        $getters = in_array($name, self::BOOLEAN_SETTINGS, true)
+            ? ['getBoolean', 'getString', 'getInteger']
+            : ['getString', 'getInteger', 'getBoolean'];
+
+        foreach ($getters as $getter) {
+            try {
+                $value = $this->moduleSettingService->$getter($name, self::MODULE_ID);
+
+                return $value instanceof UnicodeString ? $value->toString() : $value;
+            } catch (ModuleSettingNotFountException $exception) {
+                return null;
+            } catch (\TypeError $exception) {
+            }
+        }
+
+        return null;
     }
 }

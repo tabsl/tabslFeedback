@@ -9,8 +9,8 @@
 #   make minify
 #   make verify
 
-JS_DIR ?= out/src/js
-CSS_DIR ?= out/src/css
+JS_DIR ?= assets/js
+CSS_DIR ?= assets/css
 
 # Die Werkzeuge sind in package.json auf exakte Versionen festgelegt und werden
 # aus node_modules aufgerufen, nicht per "npx --yes" aus der Registry: Die

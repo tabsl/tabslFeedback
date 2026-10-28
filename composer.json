@@ -22,19 +22,22 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
+    "php": "^8.0",
     "ext-curl": "*",
     "ext-json": "*",
     "ext-fileinfo": "*"
   },
+  "conflict": {
+    "oxid-esales/oxideshop-ce": "<7.0"
+  },
   "autoload": {
     "psr-4": {
-      "Tabsl\\Feedback\\": "../../../source/modules/tabsl/tabslFeedback"
+      "Tabsl\\Feedback\\": "./"
     }
   },
   "extra": {
-    "oxideshop": {
-      "target-directory": "tabsl/tabslFeedback"
+    "branch-alias": {
+      "dev-b-7.x": "2.x-dev"
     }
   }
 }

@@ -100,12 +100,15 @@ auf gewöhnlichen Seiten kein Widget und damit kein `window.tabslFeedback`.
 ## Schnellstart
 
 ```bash
-composer require tabsl/tabslfeedback
+composer require tabsl/tabslfeedback:^2.0
 vendor/bin/oe-console oe:module:activate tabslFeedback
+vendor/bin/oe-console oe:cache:clear
 ```
 
-Alternativ manuell nach `source/modules/tabsl/tabslFeedback/` entpacken und im
-Backend unter **Erweiterungen → Module** aktivieren.
+Installiert wird nur über Composer. Composer verlinkt dabei `assets/` nach
+`source/out/modules/tabslFeedback`. Fehlt dieser Link, erscheint das Widget
+nicht, und das Shop-Log nennt den Grund; dann
+`vendor/bin/oe-console oe:module:install-assets` ausführen.
 
 ### GitLab vorbereiten
 
@@ -329,7 +332,7 @@ kann also sowohl das Projekt bzw. den Helpdesk fluten als auch Kosten
 verursachen.
 
 Das Modul unterstützt dafür [tabslTurnstile](https://github.com/tabsl/tabslTurnstile)
-(Cloudflare Turnstile für OXID 6): Ist es installiert, aktiviert und mit
+(Cloudflare Turnstile, für OXID 7 ab Version 2.x): Ist es installiert, aktiviert und mit
 Site-Key konfiguriert, erscheint im Formular ein Turnstile-Widget und die
 Absendung wird serverseitig geprüft — besteht die Prüfung nicht, entsteht
 **weder** ein Ticket **noch** wird OpenAI angesprochen. Fehlt das Modul, läuft
@@ -374,14 +377,25 @@ dieser Posten vollständig. **Cloudflare Turnstile** — dauerhaft kostenlos.
 
 ## Kompatibilität
 
-OXID eShop 6.x, PHP 7.4 und PHP 8.x. Getestet mit den Themes `wave` und `ps`;
-das Frontend-Widget bindet sich an den Block `base_js` und setzt weder jQuery
-noch Bootstrap voraus.
+OXID eShop 7.0 bis 7.5 mit Twig, PHP 8.0 bis 8.5. Getestet mit dem Theme
+`apex` und einem davon abgeleiteten Theme; das Frontend-Widget bindet sich an
+den Block `base_js` und setzt weder jQuery noch Bootstrap voraus. Im Backend
+braucht es den Twig-Admin.
+
+OXID 7.0 mit Smarty (Theme `wave`, Smarty-Admin) wird nicht unterstützt: Das
+Modul lässt sich dort aktivieren, zeigt aber weder Widget noch Backend-Eintrag.
+
+| Linie | Branch | OXID eShop | PHP |
+| --- | --- | --- | --- |
+| 2.x | `b-7.x` | 7.0 bis 7.5 (Twig) | 8.0 bis 8.5 |
+| 1.x | `main` | 6.x | 7.4 und 8.x |
+
+Für OXID 6 bleibt die Linie 1.x: `composer require tabsl/tabslfeedback:^1.3`.
 
 ## Frontend-Assets
 
-Ausgeliefert werden `out/src/js/tabslfeedback.min.js` und
-`out/src/css/tabslfeedback.min.css`. Die lesbaren Quelldateien liegen unter
+Ausgeliefert werden `assets/js/tabslfeedback.min.js` und
+`assets/css/tabslfeedback.min.css`. Die lesbaren Quelldateien liegen unter
 demselben Namen ohne `.min` daneben und sind die **einzige** Stelle, an der
 Änderungen vorgenommen werden — die minifizierten Fassungen entstehen daraus:
 

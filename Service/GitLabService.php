@@ -176,7 +176,6 @@ class GitLabService
 
         $response = curl_exec($curl);
         $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
 
         if (!is_string($response) || $status !== $expectedStatus) {
             return null;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tabsl\Feedback\Core;
 
+use OxidEsales\Eshop\Core\Exception\FileException;
+use OxidEsales\Eshop\Core\Registry;
 use Tabsl\Feedback\Service\FrontendAccess;
 use Tabsl\Feedback\Service\TurnstileGate;
 use Tabsl\Feedback\Service\UiTexts;
@@ -11,7 +13,7 @@ use Tabsl\Feedback\Service\UiTexts;
 /**
  * Template-Brücke des Moduls.
  *
- * Die Blocks fragen ausschließlich diese Getter — es liegt keine Logik in den
+ * Die Templates fragen ausschließlich diese Getter — es liegt keine Logik in den
  * Templates. Alle Namen tragen das Modul-Präfix, weil ViewConfig im Shop von
  * mehreren Modulen erweitert wird und gleichnamige Getter einander überschreiben
  * würden.
@@ -122,15 +124,28 @@ class ViewConfig extends ViewConfig_parent
      * Skriptstand hängt: Eine Seite, die den Dialog selbst öffnet, findet die
      * Schnittstelle beim wiederkehrenden Besucher nicht vor und ihr Einstieg
      * bliebe wirkungslos.
+     *
+     * Fehlen die Assets unter out/modules, wirft getModuleUrl() nur mit iDebug;
+     * dann leer, und die Templates binden nichts ein, statt die Seite
+     * abzubrechen. Ohne iDebug loggt der Core selbst und liefert die URL, das
+     * Widget bleibt mangels Skript unsichtbar.
+     *
+     * @param string $file relativ zu assets/, etwa js/tabslfeedback.min.js
      */
     public function getTabslFeedbackAssetUrl(string $file): string
     {
-        $url = (string) $this->getModuleUrl('tabslFeedback', $file);
+        try {
+            $url = (string) $this->getModuleUrl('tabslFeedback', $file);
+        } catch (FileException $exception) {
+            Registry::getLogger()->error('[tabslFeedback] assets not installed, run oe:module:install-assets', [$exception]);
 
-        // Pfad aus dem Ort dieser Klasse, nicht aus dem erwarteten Modulverzeichnis:
-        // Wird das Modul unter einem anderen Namen entpackt, fiele der Zeitstempel
-        // sonst still auf 0 zurück — und mit ihm der Zweck dieser Methode.
-        $path = dirname(__DIR__) . '/' . ltrim($file, '/');
+            return '';
+        }
+
+        // Pfad aus dem Paketverzeichnis dieser Klasse, nicht aus der Kopie unter
+        // out/modules: Die ist je nach Installation ein Symlink oder eine Kopie,
+        // deren Zeitstempel nichts über den Quellstand sagt.
+        $path = dirname(__DIR__) . '/assets/' . ltrim($file, '/');
         $version = is_file($path) ? (string) filemtime($path) : '0';
 
         return $url . (strpos($url, '?') === false ? '?' : '&') . 'v=' . $version;
@@ -142,7 +157,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getTabslFeedbackSubmitUrl(): string
     {
-        return $this->getConfig()->getShopUrl() . 'index.php?cl=tabslfeedback_submit';
+        return Registry::getConfig()->getShopUrl() . 'index.php?cl=tabslfeedback_submit';
     }
 
     /**

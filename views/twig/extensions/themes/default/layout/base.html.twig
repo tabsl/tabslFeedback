@@ -1,0 +1,41 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block base_js %}
+    {{ parent() }}
+
+    {# Feedback-Widget. Liegt auf base_js, weil dieser Block in Apex und davon
+       abgeleiteten Themes vorhanden ist.
+       Die Konfiguration wandert über data-Attribute ins JavaScript; im Template
+       steht bewusst keine Logik. #}
+    {% if oViewConf.isTabslFeedbackFrontendAvailable() %}
+        {% set tabslFeedbackCssUrl = oViewConf.getTabslFeedbackAssetUrl('css/tabslfeedback.min.css') %}
+        {% set tabslFeedbackJsUrl = oViewConf.getTabslFeedbackAssetUrl('js/tabslfeedback.min.js') %}
+
+        {% if tabslFeedbackCssUrl and tabslFeedbackJsUrl %}
+            <link rel="stylesheet" type="text/css" href="{{ tabslFeedbackCssUrl }}">
+
+            {# Kein |raw auf den JSON-Werten: Erst das automatische HTML-Escaping
+               verhindert, dass ihre Anführungszeichen das Attribut beenden. #}
+            <div id="tabslfeedback-config"
+                 hidden
+                 data-url="{{ oViewConf.getTabslFeedbackSubmitUrl() }}"
+                 data-stoken="{{ oViewConf.getSessionChallengeToken() }}"
+                 data-position="{{ oViewConf.getTabslFeedbackButtonPosition() }}"
+                 data-contact="{{ oViewConf.showTabslFeedbackContactFields() ? '1' : '0' }}"
+                 data-subject="{{ oViewConf.showTabslFeedbackSubjectField() ? '1' : '0' }}"
+                 data-screenshots="{{ oViewConf.showTabslFeedbackScreenshots() ? '1' : '0' }}"
+                 data-autoopen="{{ oViewConf.isTabslFeedbackAutoOpen() ? '1' : '0' }}"
+                 data-issuescan="{{ oViewConf.shouldTabslFeedbackScanPageIssues() ? '1' : '0' }}"
+                 data-notice="{{ oViewConf.getTabslFeedbackNoticeText() }}"
+                 data-turnstile-sitekey="{{ oViewConf.isTabslFeedbackTurnstileActive() ? oViewConf.getTabslFeedbackTurnstileSiteKey() : '' }}"
+                 data-limits="{{ oViewConf.getTabslFeedbackLimitsJson() }}"
+                 data-texts="{{ oViewConf.getTabslFeedbackTextsJson() }}"></div>
+
+            {% if oViewConf.shouldLoadTabslFeedbackTurnstileScript() %}
+                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+            {% endif %}
+
+            <script type="text/javascript" src="{{ tabslFeedbackJsUrl }}" defer></script>
+        {% endif %}
+    {% endif %}
+{% endblock %}

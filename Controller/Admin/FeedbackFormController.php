@@ -57,7 +57,7 @@ class FeedbackFormController extends AdminController
         $this->_aViewData['tabslfeedbackLimits'] = $uiTexts->getLimitsJson();
         $this->_aViewData['tabslfeedbackTexts'] = $uiTexts->getTextsJson();
 
-        return 'tabslfeedback_form.tpl';
+        return '@tabslFeedback/admin/tabslfeedback_form';
     }
 
     /**

@@ -49,21 +49,6 @@ $aModule = [
         'tabslfeedback_submit' => \Tabsl\Feedback\Controller\SubmitController::class,
         'tabslfeedback_form' => \Tabsl\Feedback\Controller\Admin\FeedbackFormController::class,
     ],
-    'templates' => [
-        'tabslfeedback_form.tpl' => 'tabsl/tabslFeedback/Application/views/admin/tpl/tabslfeedback_form.tpl',
-    ],
-    'blocks' => [
-        [
-            'template' => 'layout/base.tpl',
-            'block' => 'base_js',
-            'file' => 'views/blocks/feedback_frontend_widget.tpl',
-        ],
-        [
-            'template' => 'include/header_links.tpl',
-            'block' => 'admin_header_links',
-            'file' => 'views/blocks/feedback_admin_link.tpl',
-        ],
-    ],
     'settings' => [
         // Grundeinstellungen
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_admin_enabled', 'type' => 'bool', 'value' => false],
@@ -104,9 +89,4 @@ $aModule = [
         ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_send_customer_data', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_screenshots_enabled', 'type' => 'bool', 'value' => true],
     ],
-    'events' => [
-        'onActivate' => '\Tabsl\Feedback\Core\Setup::onActivate',
-        'onDeactivate' => '\Tabsl\Feedback\Core\Setup::onDeactivate',
-    ],
-    'smartyPluginDirectories' => [],
 ];

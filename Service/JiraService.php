@@ -281,7 +281,6 @@ class JiraService
         $response = curl_exec($curl);
         $result['status'] = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $result['curlError'] = curl_error($curl);
-        curl_close($curl);
 
         $result['body'] = is_string($response) ? $response : '';
         $result['ok'] = is_string($response) && $result['status'] >= 200 && $result['status'] < 300;

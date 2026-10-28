@@ -1,0 +1,118 @@
+{% include "headitem.html.twig" with {title: "TABSLFEEDBACK_TITLE"|translate} %}
+
+{% set tabslFeedbackCssUrl = oViewConf.getTabslFeedbackAssetUrl('css/tabslfeedback.min.css') %}
+{% set tabslFeedbackJsUrl = oViewConf.getTabslFeedbackAssetUrl('js/tabslfeedback.min.js') %}
+
+{% if tabslFeedbackCssUrl %}
+    <link rel="stylesheet" type="text/css" href="{{ tabslFeedbackCssUrl }}">
+{% endif %}
+
+<div class="tabslfeedback-widget tabslfeedback-admin-page">
+
+    {% if not tabslfeedbackAvailable %}
+
+        <p class="tabslfeedback-message tabslfeedback-message--error">
+            {{ translate({ ident: "TABSLFEEDBACK_ADMIN_UNAVAILABLE" }) }}
+        </p>
+
+    {% else %}
+
+        <h1 class="tabslfeedback-dialog__title">{{ translate({ ident: "TABSLFEEDBACK_TITLE" }) }}</h1>
+
+        {% if tabslfeedbackResultMessage %}
+            <p class="tabslfeedback-message tabslfeedback-message--{{ tabslfeedbackResultOk ? 'success' : 'error' }}">
+                {{ tabslfeedbackResultMessage }}
+            </p>
+        {% endif %}
+
+        {# Die Bilder reisen als base64 in normalen POST-Feldern mit, nicht als
+           Datei-Upload — dieselbe Entscheidung wie im Frontend. #}
+        <form id="tabslfeedback-admin-form"
+              action="{{ oViewConf.getSelfLink()|raw }}"
+              method="post"
+              data-limits="{{ tabslfeedbackLimits }}"
+              data-texts="{{ tabslfeedbackTexts }}">
+
+            <input type="hidden" name="cl" value="tabslfeedback_form">
+            <input type="hidden" name="fnc" value="submit">
+            <input type="hidden" name="stoken" value="{{ oViewConf.getSessionChallengeToken() }}">
+            <input type="hidden" name="fb_meta" value="">
+
+            <p class="tabslfeedback-message tabslfeedback-message--error tabslfeedback-message--client" hidden></p>
+
+            {% if tabslfeedbackShowSubjectField %}
+                <div class="tabslfeedback-field">
+                    <label class="tabslfeedback-label" for="tabslfeedback-admin-subject">
+                        {{ translate({ ident: "TABSLFEEDBACK_SUBJECT_LABEL" }) }}
+                    </label>
+                    <input class="tabslfeedback-input"
+                           id="tabslfeedback-admin-subject"
+                           type="text"
+                           name="fb_subject"
+                           value="{{ tabslfeedbackValues.fb_subject }}">
+                </div>
+            {% endif %}
+
+            <div class="tabslfeedback-field">
+                <label class="tabslfeedback-label" for="tabslfeedback-admin-message">
+                    {{ translate({ ident: "TABSLFEEDBACK_MESSAGE_LABEL" }) }}
+                </label>
+                <textarea class="tabslfeedback-textarea"
+                          id="tabslfeedback-admin-message"
+                          name="fb_message"
+                          rows="7">{{ tabslfeedbackValues.fb_message }}</textarea>
+            </div>
+
+            {% if tabslfeedbackShowScreenshots %}
+                <div class="tabslfeedback-field">
+                    <span class="tabslfeedback-label">{{ translate({ ident: "TABSLFEEDBACK_SCREENSHOTS_LABEL" }) }}</span>
+                    <span class="tabslfeedback-hint">{{ translate({ ident: "TABSLFEEDBACK_SCREENSHOTS_HINT" }) }}</span>
+                    <ul class="tabslfeedback-previews"></ul>
+                    <div class="tabslfeedback-image-values"></div>
+                </div>
+            {% endif %}
+
+            {% if tabslfeedbackShowContactFields %}
+                <div class="tabslfeedback-field">
+                    <label class="tabslfeedback-label" for="tabslfeedback-admin-name">
+                        {{ translate({ ident: "TABSLFEEDBACK_NAME_LABEL" }) }}
+                    </label>
+                    <input class="tabslfeedback-input"
+                           id="tabslfeedback-admin-name"
+                           type="text"
+                           name="fb_name"
+                           value="{{ tabslfeedbackValues.fb_name }}">
+                </div>
+
+                <div class="tabslfeedback-field">
+                    <label class="tabslfeedback-label" for="tabslfeedback-admin-email">
+                        {{ translate({ ident: "TABSLFEEDBACK_EMAIL_LABEL" }) }}
+                    </label>
+                    <input class="tabslfeedback-input"
+                           id="tabslfeedback-admin-email"
+                           type="email"
+                           name="fb_email"
+                           value="{{ tabslfeedbackValues.fb_email }}">
+                </div>
+            {% endif %}
+
+            {% if tabslfeedbackNoticeText %}
+                <p class="tabslfeedback-notice">{{ tabslfeedbackNoticeText }}</p>
+            {% endif %}
+
+            <div class="tabslfeedback-actions">
+                <button class="tabslfeedback-button tabslfeedback-button--primary" type="submit">
+                    {{ translate({ ident: "TABSLFEEDBACK_SUBMIT" }) }}
+                </button>
+            </div>
+        </form>
+
+        {% if tabslFeedbackJsUrl %}
+            <script type="text/javascript" src="{{ tabslFeedbackJsUrl }}" defer></script>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+{% include "bottomitem.html.twig" %}
