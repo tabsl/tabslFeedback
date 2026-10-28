@@ -7,6 +7,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-28
+
 ### Added
 
 - Jira Cloud: Mit `tabslfeedback_jira_comment_page_issue` sucht das Shop-Widget im Quelltext der Seite nach Verweisen wie `/browse/SHOP-123`. Gehört einer zum eingestellten Projekt, wird die Meldung samt Screenshots als Kommentar an diesem Vorgang gespeichert statt als neuer Vorgang. Lehnt Jira den Kommentar ab, entsteht wie bisher ein neuer Vorgang
@@ -90,7 +92,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Sitzungskennungen und geheimnisverdächtige Parameter werden aus Seite und Referrer entfernt
 - Ohne vollständige GitLab-Angaben nimmt der Shop kein Feedback entgegen
 
-[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.3.0...HEAD
+[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.4.0...HEAD
+[1.4.0]: https://github.com/tabsl/tabslFeedback/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/tabsl/tabslFeedback/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/tabsl/tabslFeedback/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/tabsl/tabslFeedback/compare/1.0.0...1.1.0
