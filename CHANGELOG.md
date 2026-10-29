@@ -10,6 +10,7 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 ### Added
 
 - Kästchen "Als neuen Vorgang anlegen" im Shop-Dialog: Bei aktivem `tabslfeedback_jira_comment_page_issue` und einem `/browse/`-Verweis auf der Seite legt der Melder damit einen neuen Vorgang an statt eines Kommentars am verlinkten Vorgang
+- Eigener KI-Endpunkt als dritter Anbieter (`tabslfeedback_ai_provider` = `custom`, `tabslfeedback_custom_ai_url`, `tabslfeedback_custom_ai_token`). Überträgt anders als OpenAI und Anthropic Shop-Sprache, Ticket-Sprache und bei erlaubten Screenshots die Bilder
 
 ## [1.4.0] - 2026-10-28
 

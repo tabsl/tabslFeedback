@@ -41,7 +41,7 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_button_position_none' => 'Kein Button',
 
         'SHOP_MODULE_tabslfeedback_notice_text' => 'Hinweistext im Formular',
-        'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Kurzer Text unmittelbar vor dem Absenden-Knopf, im Backend- wie im Frontend-Formular. Leer lässt den Hinweis entfallen. Der Standardtext weist auf die Übermittlung von Screenshots hin — anzupassen, sobald sich Umfang oder Empfänger der Übermittlung ändern, etwa bei aktiver KI-Aufbereitung.',
+        'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Kurzer Text unmittelbar vor dem Absenden-Knopf, im Backend- wie im Frontend-Formular. Leer lässt den Hinweis entfallen. Der Standardtext weist auf die Übermittlung von Screenshots hin — anzupassen, sobald sich Umfang oder Empfänger der Übermittlung ändern, etwa bei aktiver KI-Aufbereitung. Beim KI-Anbieter „Eigener Endpunkt" gehen Screenshots zusätzlich an dessen Adresse; der Hinweis sollte das nennen.',
 
         'SHOP_MODULE_tabslfeedback_ticket_target' => 'Ticket-Ziel',
         'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Wo aus einer Meldung ein Ticket entsteht: als Issue in GitLab, als Helpdesk-Ticket in weclapp oder als Vorgang in Jira Cloud. Es gelten jeweils nur die Angaben der passenden Einstellungsgruppe.',
@@ -108,10 +108,11 @@ $aLang = array_merge(
 
         // KI-Aufbereitung
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'KI-Anbieter',
-        'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Ob und über welchen Dienst der Freitext zu Titel und Beschreibung aufbereitet wird. „Ohne KI" verzichtet vollständig auf eine externe Übermittlung — im Formular erscheint dafür ein Betreff-Feld, dessen Inhalt direkt als Ticket-Titel dient. Bei OpenAI oder Anthropic bleibt zusätzlich der jeweilige API-Key erforderlich; fehlt er, entsteht das Ticket ebenfalls ohne Aufbereitung.',
+        'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Ob und über welchen Dienst der Freitext zu Titel und Beschreibung aufbereitet wird. „Ohne KI" verzichtet vollständig auf eine externe Übermittlung — im Formular erscheint dafür ein Betreff-Feld, dessen Inhalt direkt als Ticket-Titel dient. Bei OpenAI und Anthropic bleibt zusätzlich der jeweilige API-Key, beim eigenen Endpunkt Adresse und Token erforderlich; fehlt das, entsteht das Ticket ebenfalls ohne Aufbereitung. Der eigene Endpunkt erhält anders als OpenAI und Anthropic bei erlaubten Screenshots auch die Bilder.',
         'SHOP_MODULE_tabslfeedback_ai_provider_none' => 'Ohne KI',
         'SHOP_MODULE_tabslfeedback_ai_provider_openai' => 'OpenAI',
         'SHOP_MODULE_tabslfeedback_ai_provider_anthropic' => 'Anthropic (Claude)',
+        'SHOP_MODULE_tabslfeedback_ai_provider_custom' => 'Eigener Endpunkt',
 
         'SHOP_MODULE_tabslfeedback_openai_key' => 'OpenAI API-Key',
         'HELP_SHOP_MODULE_tabslfeedback_openai_key' => 'Nur wirksam, wenn KI-Anbieter auf OpenAI steht. Ohne Key entsteht das Ticket trotzdem — dann mit dem unveränderten Meldungstext statt einer Aufbereitung. Bilder werden nie an OpenAI übermittelt.',
@@ -124,6 +125,12 @@ $aLang = array_merge(
 
         'SHOP_MODULE_tabslfeedback_anthropic_model' => 'Anthropic-Modell',
         'HELP_SHOP_MODULE_tabslfeedback_anthropic_model' => 'Das für die Aufbereitung verwendete Modell. Der Standardwert claude-haiku-4-5-20251001 genügt für diese Aufgabe; anzupassen nur, wenn das Modell abgekündigt wird.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ai_url' => 'Eigener Endpunkt: Adresse',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ai_url' => 'Nur wirksam, wenn KI-Anbieter auf „Eigener Endpunkt" steht. Vollständige Adresse, an die jede Meldung geht, etwa https://ki.example.com/feedback/drafts. Muss mit https:// beginnen; http:// nur für localhost. Mit der Adresse bestimmen Sie den Empfänger von Freitext und, bei erlaubten Screenshots, den Bildern. Leer: Ticket ohne Aufbereitung.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ai_token' => 'Eigener Endpunkt: Token',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ai_token' => 'Wird als Header X-API-Token gesendet. Ohne Token entsteht das Ticket trotzdem — dann mit dem unveränderten Meldungstext statt einer Aufbereitung.',
 
         'SHOP_MODULE_tabslfeedback_ticket_language' => 'Sprache des Tickets',
         'HELP_SHOP_MODULE_tabslfeedback_ticket_language' => 'Ob Titel und Beschreibung in der Sprache der Meldung bleiben oder einheitlich auf Englisch erzeugt werden. Gilt auch für die festen Ticket-Überschriften ohne KI-Aufbereitung.',

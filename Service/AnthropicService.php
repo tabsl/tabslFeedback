@@ -43,7 +43,10 @@ class AnthropicService implements AiTicketGeneratorInterface
         $this->promptBuilder = $promptBuilder ?? new AiPromptBuilder();
     }
 
-    public function generateTicket(string $message): ?array
+    /**
+     * @param array<int,array{bytes:string,mime:string,filename:string}> $images
+     */
+    public function generateTicket(string $message, array $images = []): ?array
     {
         $apiKey = $this->settings->getAnthropicKey();
 

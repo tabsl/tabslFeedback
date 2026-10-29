@@ -28,6 +28,8 @@ class ModuleSettings
 
     public const AI_PROVIDER_ANTHROPIC = 'anthropic';
 
+    public const AI_PROVIDER_CUSTOM = 'custom';
+
     public const TICKET_TARGET_GITLAB = 'gitlab';
 
     public const TICKET_TARGET_WECLAPP = 'weclapp';
@@ -201,7 +203,7 @@ class ModuleSettings
     }
 
     /**
-     * @return string none|openai|anthropic
+     * @return string none|openai|anthropic|custom
      */
     public function getAiProvider(): string
     {
@@ -209,7 +211,7 @@ class ModuleSettings
 
         return in_array(
             $provider,
-            [self::AI_PROVIDER_NONE, self::AI_PROVIDER_OPENAI, self::AI_PROVIDER_ANTHROPIC],
+            [self::AI_PROVIDER_NONE, self::AI_PROVIDER_OPENAI, self::AI_PROVIDER_ANTHROPIC, self::AI_PROVIDER_CUSTOM],
             true
         ) ? $provider : self::AI_PROVIDER_OPENAI;
     }
@@ -248,6 +250,16 @@ class ModuleSettings
         $model = trim((string) $this->get('tabslfeedback_anthropic_model'));
 
         return $model !== '' ? $model : 'claude-haiku-4-5-20251001';
+    }
+
+    public function getCustomAiUrl(): string
+    {
+        return trim((string) $this->get('tabslfeedback_custom_ai_url'));
+    }
+
+    public function getCustomAiToken(): string
+    {
+        return trim((string) $this->get('tabslfeedback_custom_ai_token'));
     }
 
     /**

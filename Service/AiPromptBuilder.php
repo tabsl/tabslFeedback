@@ -12,7 +12,8 @@ use Tabsl\Feedback\Core\ModuleSettings;
  * Prüfung der Modellantwort. OpenAiService und AnthropicService unterscheiden
  * sich nur darin, wie eine Anfrage gestellt und die Antwort dem Modell
  * entnommen wird — Regeltext und Ergebnisprüfung sind identisch und liegen
- * deshalb hier an einer Stelle.
+ * deshalb hier an einer Stelle. CustomAiService baut keinen Prompt und nutzt
+ * nur normalize() und die Shop-Sprache.
  */
 class AiPromptBuilder
 {
@@ -113,15 +114,16 @@ class AiPromptBuilder
     }
 
     /**
-     * Sprache des Shops als ISO-639-1-Code. Dient nur als Rückfall für den
-     * Prompt; ist sie nicht ermittelbar, entfällt die Vorgabe stillschweigend.
+     * Sprache des Shops als ISO-639-1-Code in Kleinbuchstaben. Rückfall für
+     * den Prompt und Feld language des eigenen Endpunkts, der nur zwei
+     * Buchstaben annimmt — ein Kürzel wie "de-at" wird deshalb gekürzt.
      */
-    private function getShopLanguage(): string
+    public function getShopLanguage(): string
     {
         try {
-            $abbr = (string) Registry::getLang()->getLanguageAbbr();
+            $abbr = substr(strtolower((string) Registry::getLang()->getLanguageAbbr()), 0, 2);
 
-            return $abbr !== '' ? $abbr : 'de';
+            return preg_match('/^[a-z]{2}$/', $abbr) === 1 ? $abbr : 'de';
         } catch (\Throwable $exception) {
             return 'de';
         }

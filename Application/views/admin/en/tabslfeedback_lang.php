@@ -38,7 +38,7 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_button_position_none' => 'No button',
 
         'SHOP_MODULE_tabslfeedback_notice_text' => 'Notice text in the form',
-        'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Short text shown right before the submit button, in both the backend and storefront form. Leave empty to omit the notice. The default text mentions that screenshots are transmitted — adjust it once the scope or recipient of the transmission changes, for example with AI processing enabled.',
+        'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Short text shown right before the submit button, in both the backend and storefront form. Leave empty to omit the notice. The default text mentions that screenshots are transmitted — adjust it once the scope or recipient of the transmission changes, for example with AI processing enabled. With the AI provider "Custom endpoint", screenshots are also sent to its URL; the notice should say so.',
 
         'SHOP_MODULE_tabslfeedback_ticket_target' => 'Ticket target',
         'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Where a report turns into a ticket: as an issue in GitLab, as a helpdesk ticket in weclapp or as an issue in Jira Cloud. Only the settings of the matching group apply.',
@@ -105,10 +105,11 @@ $aLang = array_merge(
 
         // AI processing
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'AI provider',
-        'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Whether and through which service the report is turned into a title and description. "Without AI" skips any external transmission entirely — the form then shows a subject field instead, whose content is used directly as the ticket title. With OpenAI or Anthropic, the matching API key remains required; without it, the ticket is created without processing as well.',
+        'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Whether and through which service the report is turned into a title and description. "Without AI" skips any external transmission entirely — the form then shows a subject field instead, whose content is used directly as the ticket title. With OpenAI and Anthropic, the matching API key remains required, with a custom endpoint its URL and token; without them, the ticket is created without processing as well. Unlike OpenAI and Anthropic, the custom endpoint also receives the images when screenshots are allowed.',
         'SHOP_MODULE_tabslfeedback_ai_provider_none' => 'Without AI',
         'SHOP_MODULE_tabslfeedback_ai_provider_openai' => 'OpenAI',
         'SHOP_MODULE_tabslfeedback_ai_provider_anthropic' => 'Anthropic (Claude)',
+        'SHOP_MODULE_tabslfeedback_ai_provider_custom' => 'Custom endpoint',
 
         'SHOP_MODULE_tabslfeedback_openai_key' => 'OpenAI API key',
         'HELP_SHOP_MODULE_tabslfeedback_openai_key' => 'Only effective while AI provider is set to OpenAI. Without a key the ticket is still created — carrying the unchanged report instead of a processed version. Images are never sent to OpenAI.',
@@ -121,6 +122,12 @@ $aLang = array_merge(
 
         'SHOP_MODULE_tabslfeedback_anthropic_model' => 'Anthropic model',
         'HELP_SHOP_MODULE_tabslfeedback_anthropic_model' => 'The model used for processing. The default claude-haiku-4-5-20251001 is sufficient for this task; change it only once the model is discontinued.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ai_url' => 'Custom endpoint: URL',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ai_url' => 'Only effective while AI provider is set to "Custom endpoint". Full URL every report is sent to, for example https://ki.example.com/feedback/drafts. Must start with https://; http:// only for localhost. The URL determines who receives the report text and, if screenshots are allowed, the images. Empty: ticket without processing.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ai_token' => 'Custom endpoint: token',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ai_token' => 'Sent as header X-API-Token. Without a token the ticket is still created — carrying the unchanged report instead of a processed version.',
 
         'SHOP_MODULE_tabslfeedback_ticket_language' => 'Ticket language',
         'HELP_SHOP_MODULE_tabslfeedback_ticket_language' => 'Whether title and description keep the language of the report or are always written in English. Also applies to the fixed ticket headings when AI processing is off.',

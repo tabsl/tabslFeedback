@@ -16,8 +16,8 @@ use Exception;
  *
  * Ein Ausfall der KI-Aufbereitung ist hier bewusst NICHT vertreten: er ist
  * kein Fehlerzustand des Vorgangs, sondern führt lediglich zu einem Ticket ohne
- * Aufbereitung. OpenAiService und AnthropicService signalisieren das per
- * null-Rückgabe.
+ * Aufbereitung. OpenAiService, AnthropicService und CustomAiService
+ * signalisieren das per null-Rückgabe.
  */
 class FeedbackException extends Exception
 {
