@@ -18,6 +18,7 @@ return [
     'TABSLFEEDBACK_SCREENSHOTS_HINT' => 'Paste an image from the clipboard with Ctrl+V or ⌘+V. Several images are possible.',
     'TABSLFEEDBACK_NAME_LABEL' => 'Name (optional)',
     'TABSLFEEDBACK_EMAIL_LABEL' => 'Email (optional)',
+    'TABSLFEEDBACK_NEW_ISSUE_LABEL' => 'Create a new issue (instead of a comment on the linked issue)',
     'TABSLFEEDBACK_SUBMIT' => 'Send',
     'TABSLFEEDBACK_CANCEL' => 'Cancel',
     'TABSLFEEDBACK_CLOSE' => 'Close',

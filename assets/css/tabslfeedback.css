@@ -187,6 +187,22 @@
     font-size: 12px;
 }
 
+.tabslfeedback-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.tabslfeedback-checkbox[hidden] {
+    display: none;
+}
+
+.tabslfeedback-checkbox input {
+    margin: 2px 0 0;
+}
+
 .tabslfeedback-input,
 .tabslfeedback-textarea {
     width: 100%;
