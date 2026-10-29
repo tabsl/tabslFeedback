@@ -38,9 +38,11 @@ class OpenAiService implements AiTicketGeneratorInterface
     }
 
     /**
+     * @param array<int,array{bytes:string,mime:string,filename:string}> $images
+     *
      * @return array{title:string,description:string}|null null = keine Aufbereitung möglich
      */
-    public function generateTicket(string $message): ?array
+    public function generateTicket(string $message, array $images = []): ?array
     {
         $apiKey = $this->settings->getOpenAiKey();
 

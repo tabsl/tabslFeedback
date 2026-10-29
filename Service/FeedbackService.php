@@ -52,10 +52,10 @@ class FeedbackService
     {
         $labels = new TicketLabels($this->settings->getTicketLanguage());
 
-        $ticket = $this->aiService !== null ? $this->aiService->generateTicket($input->getMessage()) : null;
-        $title = $this->resolveTitle($ticket, $input, $labels);
-
         $images = $this->settings->areScreenshotsEnabled() ? $input->getImages() : [];
+
+        $ticket = $this->aiService !== null ? $this->aiService->generateTicket($input->getMessage(), $images) : null;
+        $title = $this->resolveTitle($ticket, $input, $labels);
 
         $this->ticketTarget->createTicket(new TicketDraft($title, $ticket, $input, $contextKey, $images, $labels));
     }
@@ -67,6 +67,8 @@ class FeedbackService
                 return new OpenAiService($settings);
             case ModuleSettings::AI_PROVIDER_ANTHROPIC:
                 return new AnthropicService($settings);
+            case ModuleSettings::AI_PROVIDER_CUSTOM:
+                return new CustomAiService($settings);
             default:
                 return null;
         }

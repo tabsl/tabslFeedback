@@ -1,8 +1,8 @@
 # tabslFeedback
 
 OXID eShop Modul für ein Feedback-Formular in Backend und Shop. Der Freitext des
-Melders wird wahlweise von OpenAI oder Anthropic zu Titel und Beschreibung
-aufbereitet; daraus entsteht ein GitLab-Issue, ein weclapp-Helpdesk-Ticket oder
+Melders wird wahlweise von OpenAI, Anthropic oder einem eigenen Endpunkt
+zu Titel und Beschreibung aufbereitet; daraus entsteht ein GitLab-Issue, ein weclapp-Helpdesk-Ticket oder
 ein Jira-Cloud-Vorgang mit Screenshots und technischem Kontext. Auch ganz ohne KI nutzbar.
 
 Statt „Das geht nicht" per Telefon oder E-Mail — ohne URL, ohne Browser, ohne
@@ -29,8 +29,11 @@ ausblenden, etwa wenn Screenshots datenschutzrechtlich vermieden werden sollen.
 
 **KI-Aufbereitung mit Rückfallebene — oder ganz ohne KI** — der ursprüngliche
 Wortlaut steht immer zusätzlich im Ticket. `tabslfeedback_ai_provider` wählt
-zwischen OpenAI, Anthropic und „Ohne KI". Fehlt bei aktivem Anbieter der
-API-Key oder antwortet der Dienst nicht, entsteht das Ticket trotzdem: mit
+zwischen OpenAI, Anthropic, einem eigenen Endpunkt und „Ohne KI". Der eigene
+Endpunkt ist eine frei eintragbare Adresse, die den unten beschriebenen Vertrag
+erfüllt; er erhält anders als OpenAI und Anthropic bei erlaubten
+Screenshots auch die Bilder. Fehlt bei aktivem Anbieter der API-Key (beim
+eigenen Endpunkt Adresse oder Token) oder antwortet der Dienst nicht, entsteht das Ticket trotzdem: mit
 Rohtext, Screenshots, Kontext und einem Vermerk, dass keine Aufbereitung
 stattfand. Bei „Ohne KI" zeigt das Formular stattdessen ein Betreff-Feld, dessen
 Inhalt direkt zum Ticket-Titel wird. Der Melder bemerkt in keinem Fall einen
@@ -215,11 +218,13 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_jira_assignee_account_id` | accountId für die Zuweisung; leer = Standardzuweisung des Projekts | leer |
 | `tabslfeedback_jira_comment_page_issue` | Meldung als Kommentar an dem Vorgang, auf den die Seite verweist (`/browse/KEY-123`), statt als neuer Vorgang; siehe oben | aus |
 | `tabslfeedback_notice_text` | Kurzer Hinweistext vor dem Absenden-Knopf; leer = kein Hinweis | Hinweis auf Screenshot-Übermittlung |
-| `tabslfeedback_ai_provider` | `none`, `openai` oder `anthropic` — bei `none` erscheint statt der Aufbereitung ein Betreff-Feld | `openai` |
+| `tabslfeedback_ai_provider` | `none`, `openai`, `anthropic` oder `custom` (eigener Endpunkt) — bei `none` erscheint statt der Aufbereitung ein Betreff-Feld | `openai` |
 | `tabslfeedback_openai_key` | OpenAI API-Key; nur bei Anbieter `openai`; leer = Ticket ohne Aufbereitung | leer |
 | `tabslfeedback_openai_model` | Verwendetes OpenAI-Modell | `gpt-4o-mini` |
 | `tabslfeedback_anthropic_key` | Anthropic API-Key; nur bei Anbieter `anthropic`; leer = Ticket ohne Aufbereitung | leer |
 | `tabslfeedback_anthropic_model` | Verwendetes Anthropic-Modell | `claude-haiku-4-5-20251001` |
+| `tabslfeedback_custom_ai_url` | Adresse des eigenen Endpunkts, z. B. `https://ki.example.com/feedback/drafts`; nur `https://`, `http://` nur für `localhost`; leer = Ticket ohne Aufbereitung | leer |
+| `tabslfeedback_custom_ai_token` | Token für den Header `X-API-Token`; leer = Ticket ohne Aufbereitung | leer |
 | `tabslfeedback_ticket_language` | `source` = Sprache der Meldung behalten, `en` = immer Englisch | `source` |
 | `tabslfeedback_show_contact_fields` | Optionale Felder für Name und E-Mail anzeigen | aus |
 | `tabslfeedback_send_customer_data` | Bei angemeldeten Kunden Kundennummer, Name und E-Mail ins Ticket übernehmen | aus |
@@ -238,6 +243,27 @@ Modul enthält **keine** Vorbelegung für Adressen, Projekt-IDs oder Zugangsdate
 > Netz. Für interne Instanzen bleibt `http://` möglich, wird aber bei jeder
 > Absendung im Shop-Log vermerkt.
 
+### Eigener KI-Endpunkt
+
+Mit `tabslfeedback_ai_provider` = `custom` schickt das Modul jede Meldung per
+`POST` an `tabslfeedback_custom_ai_url`, mit dem Token im Header `X-API-Token`.
+Jede Gegenstelle, die diesen Vertrag erfüllt, ist nutzbar.
+
+- Ohne Bilder: `Content-Type: application/json`, Body
+  `{"text": "…", "language": "de", "ticketLanguage": "source"}`
+- Mit Bildern: `multipart/form-data` mit den Feldern `text`, `language`,
+  `ticketLanguage` und je Bild einer Datei unter `images[]`. Bilder gehen nur
+  mit, wenn `tabslfeedback_screenshots_enabled` aktiv ist.
+- `language` ist die Shop-Sprache als ISO 639-1 in Kleinbuchstaben,
+  `ticketLanguage` der Wert von `tabslfeedback_ticket_language`.
+- Erfolg: HTTP `200` mit `{"title": "…", "description": "…"}`. Der Titel wird auf
+  120 Zeichen gekürzt, die Beschreibung darf leer sein.
+- Jeder andere Status, am besten mit `{"code": "…", "message": "…"}`, führt zum
+  Ticket ohne Aufbereitung; Status, `code`, `message` und bei `429` der Header
+  `Retry-After` stehen im Shop-Log.
+- Das Modul wartet höchstens 25 Sekunden, folgt keinen Weiterleitungen und
+  wiederholt keine Anfrage.
+
 ### Grenzwerte
 
 Fest eingebaut, bewusst nicht konfigurierbar: 5 Bilder je Meldung, 10 MB je Bild,
@@ -245,7 +271,8 @@ Fest eingebaut, bewusst nicht konfigurierbar: 5 Bilder je Meldung, 10 MB je Bild
 Betreff (nur bei Anbieter „Ohne KI" sichtbar), je 255 Zeichen für Name und
 E-Mail, 200 Zeichen für den Bezug; Formate PNG, JPG, GIF, WebP.
 
-Alle Grenzen werden serverseitig durchgesetzt. Damit mehrere Screenshots
+Alle Grenzen werden serverseitig durchgesetzt. Der Vertrag des eigenen
+KI-Endpunkts hat dieselben Grenzen. Damit mehrere Screenshots
 durchkommen, sollten `post_max_size` und `memory_limit` der PHP-Installation
 oberhalb von 20 MB liegen.
 
@@ -255,7 +282,9 @@ nicht mehr übertragene Bilder vermerkt ein Kommentar am Ticket. Der Timeout des
 Webservers (etwa `fastcgi_read_timeout` bei nginx, Standard 60 Sekunden) sollte
 bei diesen Zielen mindestens 120 Sekunden betragen. Sonst kann der Melder eine
 Fehlermeldung sehen, obwohl das Ticket bereits angelegt ist, und durch
-erneutes Absenden ein zweites Ticket erzeugen.
+erneutes Absenden ein zweites Ticket erzeugen. Mit einem eigenen KI-Endpunkt
+kann schon die Aufbereitung bis etwa 30 Sekunden dauern; die Empfehlung von
+120 Sekunden gilt dann für alle Ziele, auch für GitLab.
 
 ## Welche Daten gehen an wen
 
@@ -264,11 +293,18 @@ ausschließlich beim Absenden einer Meldung.
 
 **An OpenAI (`api.openai.com`) oder Anthropic (`api.anthropic.com`)** — je nach
 `tabslfeedback_ai_provider` ausschließlich der Freitext der Meldung, an genau
-einen der beiden Dienste. Nicht: Screenshots, Name, E-Mail, Kundendaten,
+einen der KI-Dienste. Nicht: Screenshots, Name, E-Mail, Kundendaten,
 Umgebungsdaten, IP-Adresse, Shop-Adresse. Schreibt ein Melder personenbezogene
 Angaben in den Freitext, werden diese mit übertragen — darauf hat das Modul
 keinen Einfluss. Steht der Anbieter auf „Ohne KI" oder fehlt der API-Key,
 findet **keine** Übermittlung statt.
+
+**An den eigenen Endpunkt** — bei Anbieter `custom` der
+Freitext, die Shop-Sprache, die Ticket-Sprache und bei aktivem
+`tabslfeedback_screenshots_enabled` alle angehängten Screenshots. Empfänger ist
+die in `tabslfeedback_custom_ai_url` eingetragene Adresse; deren Wahl verantwortet
+der Betreiber. Nicht: Name, E-Mail, Kundendaten, Umgebungsdaten, IP-Adresse des
+Melders. Fehlen Adresse oder Token, findet **keine** Übermittlung statt.
 
 **An die konfigurierte GitLab-Instanz, den weclapp-Mandanten bzw. die
 Jira-Cloud-Site** — je nach `tabslfeedback_ticket_target` an genau eines der
@@ -325,14 +361,16 @@ Screenshots und Zugangsdaten.
 > werden: `$this->sLogLevel = 'warning';`
 >
 > Entsteht ein Ticket ohne Aufbereitung, steht der Grund als `error` im Log —
-> etwa `openai request failed — http 401, api: invalid_api_key`. Abgelaufener
+> etwa `openai request failed — http 401, api: invalid_api_key` oder
+> `custom ai request failed — http 429, retry-after: 30, api: …`. Abgelaufener
 > Schlüssel, erschöpftes Kontingent und Zeitüberschreitung sind daran
-> unterscheidbar.
+> unterscheidbar. Eine unzulässige Adresse des eigenen Endpunkts erscheint als
+> `custom ai url rejected — https required`; Adresse und Token stehen nie im Log.
 
 ## Missbrauchsschutz im Shop
 
 Das Frontend-Formular ist öffentlich erreichbar. Jede Absendung erzeugt ein
-Ticket im gewählten Ziel und einen kostenpflichtigen OpenAI-Aufruf — ein Bot
+Ticket im gewählten Ziel und einen kostenpflichtigen KI-Aufruf — ein Bot
 kann also sowohl das Projekt bzw. den Helpdesk fluten als auch Kosten
 verursachen.
 
@@ -340,7 +378,7 @@ Das Modul unterstützt dafür [tabslTurnstile](https://github.com/tabsl/tabslTur
 (Cloudflare Turnstile, für OXID 7 ab Version 2.x): Ist es installiert, aktiviert und mit
 Site-Key konfiguriert, erscheint im Formular ein Turnstile-Widget und die
 Absendung wird serverseitig geprüft — besteht die Prüfung nicht, entsteht
-**weder** ein Ticket **noch** wird OpenAI angesprochen. Fehlt das Modul, läuft
+**weder** ein Ticket **noch** wird der KI-Anbieter angesprochen. Fehlt das Modul, läuft
 tabslFeedback vollständig weiter; der Schutz entfällt ersatzlos, ohne Fehler und
 ohne Installationsaufforderung. Das Backend-Formular ist von der Prüfung
 ausgenommen, da bereits durch die Anmeldung geschützt.
@@ -361,7 +399,8 @@ normales Konto für den Shop belegt allerdings einen Benutzer-Platz. **OpenAI od
 ein Aufruf mit dem Freitext (höchstens 5.000 Zeichen) und einer kurzen
 Antwort; mit den voreingestellten Modellen (`gpt-4o-mini` bzw.
 `claude-haiku-4-5-20251001`) liegen die Kosten pro Meldung bei Bruchteilen
-eines Cents, Bilder werden nicht übermittelt. Bei Anbieter „Ohne KI" entfällt
+eines Cents, Bilder werden nicht übermittelt. **Eigener Endpunkt** — nach
+Vereinbarung mit dessen Betreiber; Bilder werden mitübertragen. Bei Anbieter „Ohne KI" entfällt
 dieser Posten vollständig. **Cloudflare Turnstile** — dauerhaft kostenlos.
 
 ## Was das Modul nicht tut
@@ -369,7 +408,8 @@ dieser Posten vollständig. **Cloudflare Turnstile** — dauerhaft kostenlos.
 - Keine Feedback-Übersicht, kein Archiv, keine Wiedervorlage — das gewählte
   Ticket-Ziel ist die einzige Ablage
 - Keine Hintergrundverarbeitung: das Ticket entsteht beim Absenden
-- Keine Bildauswertung durch die KI
+- Keine Bildauswertung durch OpenAI oder Anthropic; beim eigenen Endpunkt
+  entscheidet dessen Betreiber, ob er die übermittelten Screenshots auswertet
 - Keine Labels, keine automatische Einstufung von Priorität oder Kategorie, keine
   Duplikaterkennung; bei weclapp lassen sich Priorität und Kategorie fest vorgeben
 - Keine Rückmeldung an den Melder über den Bearbeitungsstand
