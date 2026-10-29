@@ -7,6 +7,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-29
+
 ### Added
 
 - Kästchen "Als neuen Vorgang anlegen" im Shop-Dialog: Bei aktivem `tabslfeedback_jira_comment_page_issue` und einem `/browse/`-Verweis auf der Seite legt der Melder damit einen neuen Vorgang an statt eines Kommentars am verlinkten Vorgang
@@ -103,7 +105,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Sitzungskennungen und geheimnisverdächtige Parameter werden aus Seite und Referrer entfernt
 - Ohne vollständige GitLab-Angaben nimmt der Shop kein Feedback entgegen
 
-[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/tabsl/tabslFeedback/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/tabsl/tabslFeedback/compare/1.4.0...2.0.0
 [1.4.0]: https://github.com/tabsl/tabslFeedback/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/tabsl/tabslFeedback/compare/1.2.0...1.3.0

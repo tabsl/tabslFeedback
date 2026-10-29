@@ -19,7 +19,7 @@ $sMetadataVersion = '2.1';
 // tabsl module id
 $psModuleId = 'tabslFeedback';
 $psModuleName = '<b>tabsl</b>Feedback';
-$psModuleVersion = '2.0.0';
+$psModuleVersion = '2.1.0';
 
 // tabsl module description
 $psModuleDesc = 'Feedback-Formular für Backend und Frontend mit KI-Aufbereitung und Ticket-Anlage in GitLab, weclapp oder Jira Cloud.';
