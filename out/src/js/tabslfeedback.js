@@ -467,6 +467,10 @@
             this.form.appendChild(this.buildContactField('email'));
         }
 
+        if (this.config.scanIssues) {
+            this.form.appendChild(this.buildNewIssueField());
+        }
+
         if (this.config.turnstileSiteKey) {
             // Bewusst OHNE die Klasse cf-turnstile und ohne data-sitekey: sonst
             // rendert Cloudflare das Widget von sich aus, und die widgetId, die
@@ -564,6 +568,20 @@
         return field;
     };
 
+    FrontendWidget.prototype.buildNewIssueField = function () {
+        this.newIssueField = createElement('label', 'tabslfeedback-checkbox');
+        this.newIssueField.hidden = true;
+
+        this.newIssueInput = createElement('input');
+        this.newIssueInput.type = 'checkbox';
+        this.newIssueInput.id = 'tabslfeedback-new-issue';
+
+        this.newIssueField.appendChild(this.newIssueInput);
+        this.newIssueField.appendChild(createElement('span', '', this.texts.newIssueLabel));
+
+        return this.newIssueField;
+    };
+
     FrontendWidget.prototype.buildActions = function () {
         var actions = createElement('div', 'tabslfeedback-actions');
 
@@ -591,6 +609,16 @@
         this.reference = options && options.reference ? String(options.reference) : '';
         this.lastFocus = document.activeElement;
         this.overlay.hidden = false;
+
+        // Bei jedem Öffnen neu: Seiten, die Inhalte nachladen, können seit dem
+        // Laden einen Verweis bekommen oder verloren haben.
+        if (this.newIssueField) {
+            this.newIssueField.hidden = findPageIssueKeys().length === 0;
+
+            if (this.newIssueField.hidden) {
+                this.newIssueInput.checked = false;
+            }
+        }
 
         // Die Bestätigung des letzten Vorgangs bleibt nach dem Absenden stehen;
         // beim erneuten Öffnen wäre sie irreführend. Mit ihr fällt auch die
@@ -725,7 +753,12 @@
         body.append('fb_subject', values.subject);
         body.append('fb_name', values.name);
         body.append('fb_email', values.email);
-        body.append('fb_meta', collectMeta(this.reference, this.config.scanIssues));
+        // Ohne Vorgangs-Keys findet der Server keinen Seitenvorgang und legt
+        // einen neuen Vorgang an.
+        body.append('fb_meta', collectMeta(
+            this.reference,
+            this.config.scanIssues && !(this.newIssueInput && this.newIssueInput.checked)
+        ));
 
         if (this.store) {
             this.store.dataUrls().forEach(function (dataUrl) {
@@ -785,6 +818,10 @@
 
         if (this.emailInput) {
             this.emailInput.value = '';
+        }
+
+        if (this.newIssueInput) {
+            this.newIssueInput.checked = false;
         }
 
         if (this.store) {

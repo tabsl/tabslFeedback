@@ -7,6 +7,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Kästchen "Als neuen Vorgang anlegen" im Shop-Dialog: Bei aktivem `tabslfeedback_jira_comment_page_issue` und einem `/browse/`-Verweis auf der Seite legt der Melder damit einen neuen Vorgang an statt eines Kommentars am verlinkten Vorgang
+
 ## [1.4.0] - 2026-10-28
 
 ### Added

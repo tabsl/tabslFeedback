@@ -171,7 +171,11 @@ nicht Jira Data Center oder Server.
    eingestellten Projekt, wird die Meldung als Kommentar an diesem Vorgang
    gespeichert, die Screenshots hängen mit Zeitstempel im Dateinamen am Vorgang.
    Es gilt der erste passende Verweis. Lehnt Jira den Kommentar ab (Vorgang
-   gelöscht, keine Berechtigung), entsteht wie sonst ein neuer Vorgang. Setzt
+   gelöscht, keine Berechtigung), entsteht wie sonst ein neuer Vorgang. Enthält
+   die Seite einen solchen Verweis, zeigt der Dialog das Kästchen "Als neuen
+   Vorgang anlegen"; angehakt entsteht statt des Kommentars ein neuer Vorgang.
+   Das Kästchen erscheint auch, wenn kein Verweis zum eingestellten Projekt
+   gehört, und ist dann wirkungslos. Setzt
    einen Projekt-Key voraus, eine numerische Projekt-ID genügt nicht. Das Konto
    braucht im Projekt zusätzlich das Recht, Vorgänge zu kommentieren und Anhänge
    hinzuzufügen. Der Verweis kommt aus dem Browser: Wer das Formular erreicht,
@@ -276,7 +280,8 @@ Mandanten in der weclapp-Cloud, Screenshots als Dokumente am Ticket; bei Jira
 Cloud in der Atlassian-Cloud, Screenshots als Anhänge am Vorgang. Mit aktivem
 `tabslfeedback_jira_comment_page_issue` sendet das Widget zusätzlich bis zu zehn
 im Quelltext gefundene Vorgangs-Keys an den Shop; sie dienen nur der Wahl des
-Vorgangs und stehen nicht im Kommentar.
+Vorgangs und stehen nicht im Kommentar. Hakt der Melder "Als neuen Vorgang
+anlegen" an, sendet das Widget keine Keys.
 
 **An Cloudflare (`challenges.cloudflare.com`)** — nur bei aktivem
 `tabslTurnstile`: der Turnstile-Token und die von Cloudflare selbst erhobenen

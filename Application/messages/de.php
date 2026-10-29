@@ -20,6 +20,7 @@ return [
     'TABSLFEEDBACK_SCREENSHOTS_HINT' => 'Ein Bild aus der Zwischenablage mit Strg+V bzw. ⌘+V einfügen. Mehrere Bilder sind möglich.',
     'TABSLFEEDBACK_NAME_LABEL' => 'Name (optional)',
     'TABSLFEEDBACK_EMAIL_LABEL' => 'E-Mail (optional)',
+    'TABSLFEEDBACK_NEW_ISSUE_LABEL' => 'Als neuen Vorgang anlegen (statt Kommentar am verlinkten Vorgang)',
     'TABSLFEEDBACK_SUBMIT' => 'Absenden',
     'TABSLFEEDBACK_CANCEL' => 'Abbrechen',
     'TABSLFEEDBACK_CLOSE' => 'Schließen',

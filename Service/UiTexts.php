@@ -26,6 +26,7 @@ class UiTexts
         'screenshotsHint' => 'TABSLFEEDBACK_SCREENSHOTS_HINT',
         'nameLabel' => 'TABSLFEEDBACK_NAME_LABEL',
         'emailLabel' => 'TABSLFEEDBACK_EMAIL_LABEL',
+        'newIssueLabel' => 'TABSLFEEDBACK_NEW_ISSUE_LABEL',
         'submit' => 'TABSLFEEDBACK_SUBMIT',
         'cancel' => 'TABSLFEEDBACK_CANCEL',
         'close' => 'TABSLFEEDBACK_CLOSE',
