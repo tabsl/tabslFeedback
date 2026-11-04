@@ -7,7 +7,7 @@ namespace Tabsl\Feedback\Service;
 use Tabsl\Feedback\Exception\FeedbackException;
 
 /**
- * Vertrag der Ticket-Ziele (GitLab, weclapp, Jira): aus einem Entwurf ein
+ * Vertrag der Ticket-Ziele (GitLab, weclapp, Jira, eigener Endpunkt): aus einem Entwurf ein
  * Ticket anlegen. Die Reihenfolge von Anlage und Screenshot-Upload bestimmt das
  * Ziel selbst.
  *

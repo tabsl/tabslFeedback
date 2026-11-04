@@ -46,7 +46,7 @@ class FeedbackService
     /**
      * @param string $contextKey self::CONTEXT_ADMIN|self::CONTEXT_FRONTEND
      *
-     * @throws FeedbackException vom Typ GITLAB, WECLAPP, JIRA oder CONFIG — nur diese beenden den Vorgang
+     * @throws FeedbackException vom Typ GITLAB, WECLAPP, JIRA, CUSTOM_TICKET oder CONFIG — nur diese beenden den Vorgang
      */
     public function submit(FeedbackInput $input, string $contextKey): void
     {
@@ -81,6 +81,8 @@ class FeedbackService
                 return new WeclappTicketTarget($settings);
             case ModuleSettings::TICKET_TARGET_JIRA:
                 return new JiraTicketTarget($settings);
+            case ModuleSettings::TICKET_TARGET_CUSTOM:
+                return new CustomTicketTarget($settings);
             default:
                 return new GitLabTicketTarget($settings);
         }

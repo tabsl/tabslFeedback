@@ -9,7 +9,7 @@ use Exception;
 /**
  * Fehlerzustände der Feedback-Verarbeitung.
  *
- * Für den Melder sind CONFIG, UPLOAD, GITLAB, WECLAPP und JIRA ununterscheidbar
+ * Für den Melder sind CONFIG, UPLOAD, GITLAB, WECLAPP, JIRA und CUSTOM_TICKET ununterscheidbar
  * — er sieht in allen Fällen dieselbe neutrale Meldung. Nur
  * VALIDATION erzeugt einen benennenden Hinweis, damit eine zu große Datei oder
  * eine unplausible E-Mail korrigierbar ist statt still zu scheitern.
@@ -27,6 +27,7 @@ class FeedbackException extends Exception
     public const TYPE_GITLAB = 'gitlab';
     public const TYPE_WECLAPP = 'weclapp';
     public const TYPE_JIRA = 'jira';
+    public const TYPE_CUSTOM_TICKET = 'custom_ticket';
 
     /** @var string */
     private $type;
@@ -84,6 +85,11 @@ class FeedbackException extends Exception
     public static function jira(string $internalMessage): self
     {
         return new self(self::TYPE_JIRA, 'TABSLFEEDBACK_ERROR_GENERIC', $internalMessage);
+    }
+
+    public static function customTicket(string $internalMessage): self
+    {
+        return new self(self::TYPE_CUSTOM_TICKET, 'TABSLFEEDBACK_ERROR_GENERIC', $internalMessage);
     }
 
     public function getType(): string
