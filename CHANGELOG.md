@@ -7,6 +7,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-04
+
 ### Added
 
 - Eigener Endpunkt als viertes Ticket-Ziel (`tabslfeedback_ticket_target` = `custom`, `tabslfeedback_custom_ticket_url`, `tabslfeedback_custom_ticket_token`, `tabslfeedback_custom_ticket_project_key`, `tabslfeedback_custom_ticket_issue_type`, `tabslfeedback_custom_ticket_comment_page_issue`). Meldung und Screenshots gehen in einem multipart-Aufruf an die eingetragene Adresse, der Shop braucht keine Zugangsdaten zum Ticketsystem. Die neuen Einstellungen erscheinen erst nach `oe:module:install`
