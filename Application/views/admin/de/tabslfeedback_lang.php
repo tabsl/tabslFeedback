@@ -16,13 +16,14 @@ $aLang = array_merge(
 
         // Navigation
         'TABSLFEEDBACK_ADMIN_LINK' => 'Feedback',
-        'TABSLFEEDBACK_ADMIN_UNAVAILABLE' => 'Das Feedback-Formular ist nicht verfügbar. Prüfen Sie unter Erweiterungen → Module → tabslFeedback, ob das Backend-Formular aktiviert und das gewählte Ticket-Ziel vollständig eingerichtet ist: bei GitLab Adresse, Projekt-ID und Token, bei weclapp https-Adresse und API-Token, bei Jira Cloud Adresse, E-Mail, API-Token und Projekt.',
+        'TABSLFEEDBACK_ADMIN_UNAVAILABLE' => 'Das Feedback-Formular ist nicht verfügbar. Prüfen Sie unter Erweiterungen → Module → tabslFeedback, ob das Backend-Formular aktiviert und das gewählte Ticket-Ziel vollständig eingerichtet ist: bei GitLab Adresse, Projekt-ID und Token, bei weclapp https-Adresse und API-Token, bei Jira Cloud Adresse, E-Mail, API-Token und Projekt, beim eigenen Endpunkt Adresse, Token und Projekt-Key.',
 
         // Einstellungsgruppen
         'SHOP_MODULE_GROUP_tabslfeedback_main' => 'Grundeinstellungen',
         'SHOP_MODULE_GROUP_tabslfeedback_gitlab' => 'GitLab',
         'SHOP_MODULE_GROUP_tabslfeedback_weclapp' => 'weclapp',
         'SHOP_MODULE_GROUP_tabslfeedback_jira' => 'Jira Cloud',
+        'SHOP_MODULE_GROUP_tabslfeedback_custom_ticket' => 'Eigener Endpunkt (Ticket-Ziel)',
         'SHOP_MODULE_GROUP_tabslfeedback_openai' => 'KI-Aufbereitung',
         'SHOP_MODULE_GROUP_tabslfeedback_privacy' => 'Datenschutz',
 
@@ -44,10 +45,11 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Kurzer Text unmittelbar vor dem Absenden-Knopf, im Backend- wie im Frontend-Formular. Leer lässt den Hinweis entfallen. Der Standardtext weist auf die Übermittlung von Screenshots hin — anzupassen, sobald sich Umfang oder Empfänger der Übermittlung ändern, etwa bei aktiver KI-Aufbereitung. Beim KI-Anbieter „Eigener Endpunkt" gehen Screenshots zusätzlich an dessen Adresse; der Hinweis sollte das nennen.',
 
         'SHOP_MODULE_tabslfeedback_ticket_target' => 'Ticket-Ziel',
-        'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Wo aus einer Meldung ein Ticket entsteht: als Issue in GitLab, als Helpdesk-Ticket in weclapp oder als Vorgang in Jira Cloud. Es gelten jeweils nur die Angaben der passenden Einstellungsgruppe.',
+        'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Wo aus einer Meldung ein Ticket entsteht: als Issue in GitLab, als Helpdesk-Ticket in weclapp, als Vorgang in Jira Cloud oder über einen eigenen Endpunkt, der den Vorgang anlegt. Es gelten jeweils nur die Angaben der passenden Einstellungsgruppe.',
         'SHOP_MODULE_tabslfeedback_ticket_target_gitlab' => 'GitLab',
         'SHOP_MODULE_tabslfeedback_ticket_target_weclapp' => 'weclapp',
         'SHOP_MODULE_tabslfeedback_ticket_target_jira' => 'Jira Cloud',
+        'SHOP_MODULE_tabslfeedback_ticket_target_custom' => 'Eigener Endpunkt',
 
         // GitLab
         'SHOP_MODULE_tabslfeedback_gitlab_url' => 'GitLab-Adresse',
@@ -105,6 +107,22 @@ $aLang = array_merge(
 
         'SHOP_MODULE_tabslfeedback_jira_comment_page_issue' => 'Meldung als Kommentar am Vorgang der Seite',
         'HELP_SHOP_MODULE_tabslfeedback_jira_comment_page_issue' => 'Enthält der Quelltext der Shop-Seite einen Verweis auf einen Vorgang des eingestellten Projekts (etwa …/browse/SHOP-123), wird die Meldung samt Screenshots als Kommentar an diesem Vorgang gespeichert statt als neuer Vorgang. Bei mehreren Verweisen gilt der erste. Funktioniert nur mit Projekt-Key, nicht mit numerischer Projekt-ID, und nur im Shop-Frontend. Lehnt Jira den Kommentar ab (Vorgang gelöscht, keine Berechtigung), entsteht ein neuer Vorgang. Achtung: Der Verweis kommt aus dem Browser; wer das Formular erreicht, kann damit jeden Vorgang des Projekts kommentieren lassen, den das Konto sehen darf.',
+
+        // Eigener Endpunkt
+        'SHOP_MODULE_tabslfeedback_custom_ticket_url' => 'Adresse',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_url' => 'Vollständige Adresse, an die jede Meldung geht, etwa https://tickets.example.com/api/v1/jira/ticket-actions. Muss mit https:// beginnen; http:// nur für localhost. Der Endpunkt erhält die vollständige Meldung samt Kontakt- und Kundendaten, Umgebungsangaben und Screenshots; die Wahl des Empfängers verantworten Sie. Pflichtangabe bei Ticket-Ziel Eigener Endpunkt.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ticket_token' => 'Token',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_token' => 'Token vom Betreiber des Endpunkts, wird als Header X-API-Token gesendet. Unabhängig vom Token des KI-Endpunkts. Pflichtangabe bei Ticket-Ziel Eigener Endpunkt.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ticket_project_key' => 'Projekt-Key',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_project_key' => 'Key des Zielprojekts, z. B. SHOP: mindestens zwei Zeichen, Buchstaben und Ziffern. Eine numerische Projekt-ID gilt hier nicht. Pflichtangabe bei Ticket-Ziel Eigener Endpunkt.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ticket_issue_type' => 'Vorgangstyp',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_issue_type' => 'Name des Vorgangstyps, z. B. Task oder Bug, oder dessen numerische ID. Der Typ darf außer Zusammenfassung und Beschreibung keine weiteren Pflichtfelder haben, sonst wird jede Meldung abgelehnt; das Shop-Log nennt dann das Feld. Leer = Task.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ticket_comment_page_issue' => 'Meldung als Kommentar am Vorgang der Seite',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_comment_page_issue' => 'Enthält der Quelltext der Shop-Seite einen Verweis auf einen Vorgang des eingestellten Projekts (etwa …/browse/SHOP-123), geht die Meldung samt Screenshots als Kommentar an diesen Vorgang statt als neuer Vorgang. Bei mehreren Verweisen gilt der erste. Funktioniert nur im Shop-Frontend. Wird der Kommentar abgelehnt (Vorgang gelöscht, keine Berechtigung), legt der Endpunkt einen neuen Vorgang an. Achtung: Der Verweis kommt aus dem Browser; wer das Formular erreicht, kann damit jeden Vorgang des Projekts kommentieren lassen, den der Endpunkt sehen darf.',
 
         // KI-Aufbereitung
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'KI-Anbieter',

@@ -36,6 +36,8 @@ class ModuleSettings
 
     public const TICKET_TARGET_JIRA = 'jira';
 
+    public const TICKET_TARGET_CUSTOM = 'custom';
+
     public function isAdminFormEnabled(): bool
     {
         return (bool) $this->get('tabslfeedback_admin_enabled');
@@ -66,13 +68,13 @@ class ModuleSettings
      * Ein fehlender Wert ist der Normalfall nach einem reinen Datei-Deploy ohne
      * erneute Aktivierung — dann gilt weiter GitLab, das bisher einzige Ziel.
      *
-     * @return string gitlab|weclapp|jira
+     * @return string gitlab|weclapp|jira|custom
      */
     public function getTicketTarget(): string
     {
         $target = $this->get('tabslfeedback_ticket_target');
 
-        return in_array($target, [self::TICKET_TARGET_WECLAPP, self::TICKET_TARGET_JIRA], true)
+        return in_array($target, [self::TICKET_TARGET_WECLAPP, self::TICKET_TARGET_JIRA, self::TICKET_TARGET_CUSTOM], true)
             ? $target
             : self::TICKET_TARGET_GITLAB;
     }
@@ -202,6 +204,41 @@ class ModuleSettings
             && (bool) $this->get('tabslfeedback_jira_comment_page_issue');
     }
 
+    public function getCustomTicketUrl(): string
+    {
+        return trim((string) $this->get('tabslfeedback_custom_ticket_url'));
+    }
+
+    public function getCustomTicketToken(): string
+    {
+        return trim((string) $this->get('tabslfeedback_custom_ticket_token'));
+    }
+
+    /**
+     * Enger als getJiraProject(): Der Vertrag des Endpunkts kennt keine
+     * numerische Projekt-ID und keine Unterstriche und lehnte sie bei jeder
+     * Meldung ab. Alles andere gilt deshalb als nicht gesetzt.
+     */
+    public function getCustomTicketProject(): string
+    {
+        $project = strtoupper(trim((string) $this->get('tabslfeedback_custom_ticket_project_key')));
+
+        return preg_match('/^[A-Z][A-Z0-9]{1,49}$/D', $project) === 1 ? $project : '';
+    }
+
+    public function getCustomTicketIssueType(): string
+    {
+        $issueType = mb_substr(trim((string) $this->get('tabslfeedback_custom_ticket_issue_type')), 0, 255);
+
+        return $issueType !== '' ? $issueType : 'Task';
+    }
+
+    public function isCustomTicketPageIssueCommentEnabled(): bool
+    {
+        return $this->getTicketTarget() === self::TICKET_TARGET_CUSTOM
+            && (bool) $this->get('tabslfeedback_custom_ticket_comment_page_issue');
+    }
+
     /**
      * @return string none|openai|anthropic|custom
      */
@@ -319,6 +356,8 @@ class ModuleSettings
                 return $this->isWeclappConfigured();
             case self::TICKET_TARGET_JIRA:
                 return $this->isJiraConfigured();
+            case self::TICKET_TARGET_CUSTOM:
+                return $this->isCustomTicketConfigured();
             default:
                 return $this->isGitLabConfigured();
         }
@@ -402,6 +441,31 @@ class ModuleSettings
             && strpos($this->getJiraEmail(), '@') !== false
             && $this->getJiraToken() !== ''
             && $this->getJiraProject() !== '';
+    }
+
+    /**
+     * Der Token geht nur verschlüsselt, außer auf demselben Rechner (Entwicklung,
+     * Mock-Endpunkte). Ein externer Dienst über http wäre ein Tippfehler, der den
+     * Token offenlegt. curl_init() wirft bei einem Nullbyte, parse_url() nicht.
+     */
+    public function isCustomTicketConfigured(): bool
+    {
+        $address = $this->getCustomTicketUrl();
+        $url = parse_url($address);
+
+        if (!is_array($url) || preg_match('/[\x00-\x20\x7F]/', $address) === 1) {
+            return false;
+        }
+
+        $scheme = strtolower((string) ($url['scheme'] ?? ''));
+        $host = strtolower((string) ($url['host'] ?? ''));
+
+        return ($scheme === 'https' || ($scheme === 'http' && in_array($host, ['localhost', '127.0.0.1', '[::1]', '::1'], true)))
+            && $host !== ''
+            && !isset($url['user'])
+            && !isset($url['pass'])
+            && $this->getCustomTicketToken() !== ''
+            && $this->getCustomTicketProject() !== '';
     }
 
     /**

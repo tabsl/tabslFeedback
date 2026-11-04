@@ -13,13 +13,14 @@ $aLang = array_merge(
 
         // Navigation
         'TABSLFEEDBACK_ADMIN_LINK' => 'Feedback',
-        'TABSLFEEDBACK_ADMIN_UNAVAILABLE' => 'The feedback form is not available. Check under Extensions → Modules → tabslFeedback whether the backend form is enabled and the selected ticket target is fully set up: for GitLab the address, project ID and token, for weclapp the https address and API token, for Jira Cloud the address, email, API token and project.',
+        'TABSLFEEDBACK_ADMIN_UNAVAILABLE' => 'The feedback form is not available. Check under Extensions → Modules → tabslFeedback whether the backend form is enabled and the selected ticket target is fully set up: for GitLab the address, project ID and token, for weclapp the https address and API token, for Jira Cloud the address, email, API token and project, for a custom endpoint the address, token and project key.',
 
         // Setting groups
         'SHOP_MODULE_GROUP_tabslfeedback_main' => 'General',
         'SHOP_MODULE_GROUP_tabslfeedback_gitlab' => 'GitLab',
         'SHOP_MODULE_GROUP_tabslfeedback_weclapp' => 'weclapp',
         'SHOP_MODULE_GROUP_tabslfeedback_jira' => 'Jira Cloud',
+        'SHOP_MODULE_GROUP_tabslfeedback_custom_ticket' => 'Custom endpoint (ticket target)',
         'SHOP_MODULE_GROUP_tabslfeedback_openai' => 'AI processing',
         'SHOP_MODULE_GROUP_tabslfeedback_privacy' => 'Privacy',
 
@@ -41,10 +42,11 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Short text shown right before the submit button, in both the backend and storefront form. Leave empty to omit the notice. The default text mentions that screenshots are transmitted — adjust it once the scope or recipient of the transmission changes, for example with AI processing enabled. With the AI provider "Custom endpoint", screenshots are also sent to its URL; the notice should say so.',
 
         'SHOP_MODULE_tabslfeedback_ticket_target' => 'Ticket target',
-        'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Where a report turns into a ticket: as an issue in GitLab, as a helpdesk ticket in weclapp or as an issue in Jira Cloud. Only the settings of the matching group apply.',
+        'HELP_SHOP_MODULE_tabslfeedback_ticket_target' => 'Where a report turns into a ticket: as an issue in GitLab, as a helpdesk ticket in weclapp, as an issue in Jira Cloud or through a custom endpoint that creates the issue. Only the settings of the matching group apply.',
         'SHOP_MODULE_tabslfeedback_ticket_target_gitlab' => 'GitLab',
         'SHOP_MODULE_tabslfeedback_ticket_target_weclapp' => 'weclapp',
         'SHOP_MODULE_tabslfeedback_ticket_target_jira' => 'Jira Cloud',
+        'SHOP_MODULE_tabslfeedback_ticket_target_custom' => 'Custom endpoint',
 
         // GitLab
         'SHOP_MODULE_tabslfeedback_gitlab_url' => 'GitLab address',
@@ -102,6 +104,22 @@ $aLang = array_merge(
 
         'SHOP_MODULE_tabslfeedback_jira_comment_page_issue' => 'Report as comment on the issue of the page',
         'HELP_SHOP_MODULE_tabslfeedback_jira_comment_page_issue' => 'If the source of the shop page links to an issue of the configured project (e.g. …/browse/SHOP-123), the report and its screenshots are stored as a comment on that issue instead of a new issue. With several links the first one applies. Works only with a project key, not with a numeric project ID, and only in the storefront. If Jira rejects the comment (issue deleted, no permission), a new issue is created. Note: the link is reported by the browser; anyone who can reach the form can have any issue of the project commented on that the account can see.',
+
+        // Custom endpoint
+        'SHOP_MODULE_tabslfeedback_custom_ticket_url' => 'Address',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_url' => 'Full URL every report is sent to, for example https://tickets.example.com/api/v1/jira/ticket-actions. Must start with https://; http:// only for localhost. The endpoint receives the complete report including contact and customer data, environment details and screenshots; you are responsible for choosing the recipient. Required for ticket target Custom endpoint.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ticket_token' => 'Token',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_token' => 'Token from the operator of the endpoint, sent as header X-API-Token. Independent of the token of the AI endpoint. Required for ticket target Custom endpoint.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ticket_project_key' => 'Project key',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_project_key' => 'Key of the target project, e.g. SHOP: at least two characters, letters and digits. A numeric project ID is not valid here. Required for ticket target Custom endpoint.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ticket_issue_type' => 'Issue type',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_issue_type' => 'Name of the issue type, e.g. Task or Bug, or its numeric ID. Apart from summary and description the type must not have further required fields, otherwise every report is rejected; the shop log then names the field. Empty = Task.',
+
+        'SHOP_MODULE_tabslfeedback_custom_ticket_comment_page_issue' => 'Report as comment on the issue of the page',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_comment_page_issue' => 'If the source of the shop page links to an issue of the configured project (e.g. …/browse/SHOP-123), the report and its screenshots go to that issue as a comment instead of a new issue. With several links the first one applies. Works only in the storefront. If the comment is rejected (issue deleted, no permission), the endpoint creates a new issue. Note: the link is reported by the browser; anyone who can reach the form can have any issue of the project commented on that the endpoint can see.',
 
         // AI processing
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'AI provider',

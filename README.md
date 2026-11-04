@@ -2,8 +2,8 @@
 
 OXID eShop Modul für ein Feedback-Formular in Backend und Shop. Der Freitext des
 Melders wird wahlweise von OpenAI, Anthropic oder einem eigenen Endpunkt
-zu Titel und Beschreibung aufbereitet; daraus entsteht ein GitLab-Issue, ein weclapp-Helpdesk-Ticket oder
-ein Jira-Cloud-Vorgang mit Screenshots und technischem Kontext. Auch ganz ohne KI nutzbar.
+zu Titel und Beschreibung aufbereitet; daraus entsteht ein GitLab-Issue, ein weclapp-Helpdesk-Ticket, ein
+Jira-Cloud-Vorgang oder ein Vorgang über einen eigenen Endpunkt, mit Screenshots und technischem Kontext. Auch ganz ohne KI nutzbar.
 
 Statt „Das geht nicht" per Telefon oder E-Mail — ohne URL, ohne Browser, ohne
 Screenshot, und ohne dass jemand die Meldung von Hand ins Ticketsystem überträgt.
@@ -15,9 +15,10 @@ links, im Shop ein kleiner Button auf jeder Seite (Position wählbar). „Beide
 aus" ist ein zulässiger Zustand; ist das Ticket-Ziel nicht vollständig
 eingerichtet, erscheint gar kein Einstieg.
 
-**GitLab, weclapp oder Jira Cloud** — `tabslfeedback_ticket_target` bestimmt, wo
-das Ticket entsteht: als GitLab-Issue, als Ticket im weclapp-Helpdesk oder als
-Vorgang in Jira Cloud. Inhalt und Ablauf sind für den Melder identisch. In
+**GitLab, weclapp, Jira Cloud oder eigener Endpunkt** — `tabslfeedback_ticket_target`
+bestimmt, wo das Ticket entsteht: als GitLab-Issue, als Ticket im weclapp-Helpdesk,
+als Vorgang in Jira Cloud oder über einen eigenen Endpunkt, der den Vorgang anlegt;
+der Shop braucht dann keine Zugangsdaten zum Ticketsystem. Inhalt und Ablauf sind für den Melder identisch. In
 weclapp hängen die Screenshots als Dokumente, in Jira als Anhänge am Ticket; die
 Beschreibung ist dort HTML bzw. Atlassian Document Format statt Markdown.
 
@@ -186,6 +187,43 @@ nicht Jira Data Center oder Server.
    darf. Die Option deshalb nur einschalten, wo das Formular nicht öffentlich
    erreichbar ist oder Turnstile davor steht.
 
+### Eigener Endpunkt vorbereiten
+
+Nur nötig bei Ticket-Ziel `custom`. Das Modul schickt jede Meldung in genau einem
+Aufruf an `tabslfeedback_custom_ticket_url`; Anlage, Anhänge und Upload-Vermerk
+übernimmt der Endpunkt. Jede Gegenstelle, die diesen festen Vertrag erfüllt, ist
+nutzbar. Er ist kein allgemeiner Webhook: Die Gegenstelle muss Atlassian Document
+Format, Projekt-Key und Vorgangstyp verstehen.
+
+- Aufruf: `POST`, immer `multipart/form-data`, auch ohne Bild, Token im Header
+  `X-API-Token`. Beispieladresse:
+  `https://tickets.example.com/api/v1/jira/ticket-actions`
+- Felder: `action` (fest `create_issue`), `projectKey`, `issueType`, `summary`
+  (höchstens 255 Zeichen, einzeilig), `description` (ADF als JSON-String),
+  `ticketLanguage` (`source` oder `en`, für die Sprache des Upload-Vermerks), je
+  Bild eine Datei unter `images[]`.
+- Mit aktivem `tabslfeedback_custom_ticket_comment_page_issue` und einem
+  passenden Verweis auf der Shop-Seite zusätzlich `commentOnIssue` (Key) und
+  `comment` (ADF als JSON-String). Die Meldung soll dann als Kommentar an diesen
+  Vorgang gehen; lehnt das Ticketsystem ihn ab, legt der Endpunkt aus den übrigen
+  Feldern einen neuen Vorgang an. Für die Option gelten die Hinweise bei Jira
+  Cloud (Punkt 6): Der Verweis kommt aus dem Browser.
+- Erfolg: HTTP `201` mit `{"key": "SHOP-123", "created": true, "attachmentsFailed": 0}`.
+  `key` muss zum eingestellten Projekt gehören. `created: false` meldet den
+  Kommentar am bestehenden Vorgang. Eine Zahl in `attachmentsFailed` steht im
+  Shop-Log; den Vermerk am Vorgang schreibt der Endpunkt.
+- Jede andere Antwort beendet den Vorgang mit der allgemeinen Fehlermeldung. Als
+  sicher nicht entstanden gelten 3xx, 4xx, `503` mit
+  `{"reason": "instance_not_ready"}` und `502` mit `{"issueStateUnknown": false}`.
+  Alles andere gilt als unbekannter Zustand, auch ein anderes 2xx oder eine
+  abgebrochene Antwort.
+- Fürs Shop-Log wertet das Modul `reason`, `jiraStatus`, `fields` und bei `429`
+  den Header `Retry-After` aus, jeweils nur bekannte Werte. Freie Texte wie
+  `message` übernimmt es nie, damit keine zurückgespiegelten Meldungsinhalte im
+  Log landen. Die genaue Ursache einer Ablehnung steht dann nur bei der Gegenstelle.
+- Das Modul wartet höchstens 95 Sekunden, folgt keinen Weiterleitungen und
+  wiederholt keine Anfrage. `assigneeAccountId` und `internal` sendet es nicht.
+
 ### Modul konfigurieren
 
 Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
@@ -195,7 +233,7 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_admin_enabled` | Feedback-Link im Backend-Header einblenden | aus |
 | `tabslfeedback_frontend_enabled` | Widget im Shop einbinden — mit Button, außer die Position steht auf `none` (nur Sichtbarkeit, nicht Erreichbarkeit) | aus |
 | `tabslfeedback_button_position` | `bottom-left`, `center`, `bottom-right` oder `none` (kein Button, siehe unten) | `bottom-right` |
-| `tabslfeedback_ticket_target` | `gitlab`, `weclapp` oder `jira` — wo das Ticket entsteht | `gitlab` |
+| `tabslfeedback_ticket_target` | `gitlab`, `weclapp`, `jira` oder `custom` (eigener Endpunkt) — wo das Ticket entsteht | `gitlab` |
 | `tabslfeedback_gitlab_url` | Basis-Adresse der GitLab-Instanz inkl. Schema, ohne `/api/v4` — **Pflicht** bei Ziel `gitlab` | leer |
 | `tabslfeedback_gitlab_project_id` | Numerische ID des Zielprojekts — **Pflicht** bei Ziel `gitlab` | leer |
 | `tabslfeedback_gitlab_token` | Project-Access-Token mit Scope `api` — **Pflicht** bei Ziel `gitlab` | leer |
@@ -214,6 +252,11 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_jira_issue_type` | Name oder ID des Vorgangstyps; leer = `Task` | `Task` |
 | `tabslfeedback_jira_assignee_account_id` | accountId für die Zuweisung; leer = Standardzuweisung des Projekts | leer |
 | `tabslfeedback_jira_comment_page_issue` | Meldung als Kommentar an dem Vorgang, auf den die Seite verweist (`/browse/KEY-123`), statt als neuer Vorgang; siehe oben | aus |
+| `tabslfeedback_custom_ticket_url` | Adresse des Endpunkts, z. B. `https://tickets.example.com/api/v1/jira/ticket-actions`; nur `https://`, `http://` nur für `localhost` — **Pflicht** bei Ziel `custom` | leer |
+| `tabslfeedback_custom_ticket_token` | Token für den Header `X-API-Token`, unabhängig vom Token des KI-Endpunkts — **Pflicht** bei Ziel `custom` | leer |
+| `tabslfeedback_custom_ticket_project_key` | Projekt-Key, mindestens zwei Zeichen, Buchstaben und Ziffern, keine numerische ID — **Pflicht** bei Ziel `custom` | leer |
+| `tabslfeedback_custom_ticket_issue_type` | Name oder ID des Vorgangstyps; leer = `Task` | `Task` |
+| `tabslfeedback_custom_ticket_comment_page_issue` | Meldung als Kommentar am Vorgang der Seite, wie bei Jira; siehe oben | aus |
 | `tabslfeedback_notice_text` | Kurzer Hinweistext vor dem Absenden-Knopf; leer = kein Hinweis | Hinweis auf Screenshot-Übermittlung |
 | `tabslfeedback_ai_provider` | `none`, `openai`, `anthropic` oder `custom` (eigener Endpunkt) — bei `none` erscheint statt der Aufbereitung ein Betreff-Feld | `openai` |
 | `tabslfeedback_openai_key` | OpenAI API-Key; nur bei Anbieter `openai`; leer = Ticket ohne Aufbereitung | leer |
@@ -230,7 +273,8 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 Fehlt eine Pflichtangabe des gewählten Ziels — bei GitLab eine der drei
 Angaben oder das `http://` bzw. `https://` in der Adresse, bei weclapp Token oder
 `https://`, bei Jira Cloud eine der vier Pflichtangaben, `https://`, ein gültiger
-Projekt-Key oder eine Adresse ohne zusätzlichen Pfad (außer der Gateway-Adresse) —,
+Projekt-Key oder eine Adresse ohne zusätzlichen Pfad (außer der Gateway-Adresse),
+beim eigenen Endpunkt Token, gültiger Projekt-Key oder eine zulässige Adresse —,
 erscheint weder Header-Link noch Frontend-Button: ein Formular,
 das kein Ticket erzeugen kann, wird gar nicht erst angeboten. Das
 Modul enthält **keine** Vorbelegung für Adressen, Projekt-IDs oder Zugangsdaten.
@@ -283,6 +327,13 @@ erneutes Absenden ein zweites Ticket erzeugen. Mit einem eigenen KI-Endpunkt
 kann schon die Aufbereitung bis etwa 30 Sekunden dauern; die Empfehlung von
 120 Sekunden gilt dann für alle Ziele, auch für GitLab.
 
+Beim Ticket-Ziel `custom` gehen Meldung und Screenshots in einem Aufruf, der bis
+zu 95 Sekunden dauern darf. Der Webserver-Timeout sollte dort mindestens 130
+Sekunden betragen. Die Bilder liegen beim Absenden als Daten-URL, dekodiert und
+im Aufruf zugleich im Speicher; `memory_limit` entsprechend großzügig wählen.
+Der Vertrag des Endpunkts hat dieselben Bildgrenzen wie das Modul. Lehnt der
+Endpunkt die Bilder trotzdem ab, entsteht kein Ticket.
+
 ## Welche Daten gehen an wen
 
 Grundlage für die Datenschutzerklärung des einsetzenden Shops. Übermittelt wird
@@ -302,6 +353,18 @@ Freitext, die Shop-Sprache, die Ticket-Sprache und bei aktivem
 die in `tabslfeedback_custom_ai_url` eingetragene Adresse; deren Wahl verantwortet
 der Betreiber. Nicht: Name, E-Mail, Kundendaten, Umgebungsdaten, IP-Adresse des
 Melders. Fehlen Adresse oder Token, findet **keine** Übermittlung statt.
+
+**An den eigenen Endpunkt als Ticket-Ziel** — bei Ziel `custom` dasselbe wie an ein
+direktes Ticket-Ziel, also deutlich mehr als an den KI-Endpunkt: Freitext,
+aufbereiteter Titel und Beschreibung, alle Screenshots, optional Name und E-Mail,
+der technische Kontext samt Seitenadresse und Modulliste, Kundendaten **nur** bei
+aktivem `tabslfeedback_send_customer_data`. Empfänger ist die in
+`tabslfeedback_custom_ticket_url` eingetragene Adresse; was dort gespeichert oder
+weitergegeben wird, bestimmt deren Betreiber, und die Wahl verantwortet der
+Shop-Betreiber. Ist dieselbe Gegenstelle auch KI-Endpunkt, erhält sie beides. Mit
+aktivem `tabslfeedback_custom_ticket_comment_page_issue` sendet das Widget
+zusätzlich bis zu zehn im Quelltext gefundene Vorgangs-Keys an den Shop, der
+ausgewählte geht an den Endpunkt.
 
 **An die konfigurierte GitLab-Instanz, den weclapp-Mandanten bzw. die
 Jira-Cloud-Site** — je nach `tabslfeedback_ticket_target` an genau eines der
@@ -342,6 +405,9 @@ Shop-Log fest, jeweils mit dem Präfix `[tabslFeedback]`:
 | Kommentar am weclapp-Ticket bzw. Jira-Vorgang fehlgeschlagen | `error` |
 | Jira lehnt den Kommentar am Vorgang der Seite ab — stattdessen entsteht ein neuer Vorgang | `error` |
 | Jira antwortet beim Kommentar am Vorgang der Seite nicht oder mit 5xx — Kommentar kann trotzdem stehen, vor erneutem Absenden nachsehen | `error` |
+| Eigener Endpunkt lehnt ab (Meldung verloren) — mit HTTP-Status und bekannten Werten aus `reason` und `fields`, bei `400` und `413` Anzahl und Größe der Bilder, bei `429` `retry-after` | `error` |
+| Eigener Endpunkt antwortet nicht eindeutig (`ticket state unknown`) — Ticket kann trotzdem entstanden sein, vor erneutem Absenden nachsehen | `error` |
+| Eigener Endpunkt meldet nicht angehängte Screenshots (Anzahl und Vorgang) | `error` |
 | KI-Aufbereitung fehlgeschlagen — inkl. HTTP-Status und Fehlermeldung | `error` |
 | Absendung bei unvollständiger Konfiguration abgewiesen | `error` |
 | Unerwarteter Fehler beim Absenden (einzeilig und gekürzt) | `error` |
@@ -392,7 +458,8 @@ Es gibt bewusst kein eigenes Rate-Limiting: ohne Zwischenspeicher wäre es nur
 **GitLab** — keine zusätzlichen Kosten. **weclapp** — keine Kosten über die
 bestehende weclapp-Lizenz hinaus; der API-Benutzer belegt allerdings einen
 Benutzer-Platz. **Jira Cloud** — keine Kosten über die Jira-Lizenz hinaus; ein
-normales Konto für den Shop belegt allerdings einen Benutzer-Platz. **OpenAI oder Anthropic** — je Meldung
+normales Konto für den Shop belegt allerdings einen Benutzer-Platz. **Eigener
+Endpunkt als Ticket-Ziel** — nach Vereinbarung mit dessen Betreiber. **OpenAI oder Anthropic** — je Meldung
 ein Aufruf mit dem Freitext (höchstens 5.000 Zeichen) und einer kurzen
 Antwort; mit den voreingestellten Modellen (`gpt-4o-mini` bzw.
 `claude-haiku-4-5-20251001`) liegen die Kosten pro Meldung bei Bruchteilen
@@ -410,11 +477,14 @@ dieser Posten vollständig. **Cloudflare Turnstile** — dauerhaft kostenlos.
 - Keine Labels, keine automatische Einstufung von Priorität oder Kategorie, keine
   Duplikaterkennung; bei weclapp lassen sich Priorität und Kategorie fest vorgeben
 - Keine Rückmeldung an den Melder über den Bearbeitungsstand
-- Genau ein Ziel je Shop: ein GitLab-Projekt, ein weclapp-Mandant oder ein
-  Jira-Cloud-Projekt, nicht mehrere zugleich; kein Jira Data Center, keine
+- Genau ein Ziel je Shop: ein GitLab-Projekt, ein weclapp-Mandant, ein
+  Jira-Cloud-Projekt oder ein eigener Endpunkt, nicht mehrere zugleich; kein Jira Data Center, keine
   GitHub- oder E-Mail-Ziele
-- Bei Jira keine Zusatzfelder: Vorgangstypen mit weiteren Pflichtfeldern werden
-  nicht unterstützt
+- Bei Jira und beim eigenen Endpunkt keine Zusatzfelder: Vorgangstypen mit
+  weiteren Pflichtfeldern werden nicht unterstützt
+- Beim eigenen Endpunkt keine frei abbildbaren Felder oder Formate und keine
+  Wiederholung; schöpft das öffentliche Formular ein Limit der Gegenstelle aus,
+  gehen Meldungen verloren, Turnstile davor senkt das Risiko
 - Keine Verknüpfung des Melders mit einem weclapp-Kunden oder -Kontakt
 
 ## Kompatibilität

@@ -96,12 +96,14 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * Nur dann sucht das Widget im Quelltext nach Jira-Vorgängen — sonst
+     * Nur dann sucht das Widget im Quelltext nach Vorgängen — sonst
      * wandert nichts davon zum Server.
      */
     public function shouldTabslFeedbackScanPageIssues(): bool
     {
-        return $this->getTabslFeedbackSettings()->isJiraPageIssueCommentEnabled();
+        $settings = $this->getTabslFeedbackSettings();
+
+        return $settings->isJiraPageIssueCommentEnabled() || $settings->isCustomTicketPageIssueCommentEnabled();
     }
 
     /**

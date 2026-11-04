@@ -7,6 +7,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Eigener Endpunkt als viertes Ticket-Ziel (`tabslfeedback_ticket_target` = `custom`, `tabslfeedback_custom_ticket_url`, `tabslfeedback_custom_ticket_token`, `tabslfeedback_custom_ticket_project_key`, `tabslfeedback_custom_ticket_issue_type`, `tabslfeedback_custom_ticket_comment_page_issue`). Meldung und Screenshots gehen in einem multipart-Aufruf an die eingetragene Adresse, der Shop braucht keine Zugangsdaten zum Ticketsystem. Die neuen Einstellungen erscheinen erst nach erneutem Aktivieren des Moduls, unter OXID 6.4 mit vorherigem `oe:module:install-configuration`
+
 ## [1.5.0] - 2026-10-29
 
 ### Added
