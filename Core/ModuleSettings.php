@@ -30,6 +30,7 @@ class ModuleSettings
         'tabslfeedback_frontend_enabled',
         'tabslfeedback_jira_comment_page_issue',
         'tabslfeedback_custom_ticket_comment_page_issue',
+        'tabslfeedback_custom_ticket_internal',
         'tabslfeedback_show_contact_fields',
         'tabslfeedback_send_customer_data',
         'tabslfeedback_screenshots_enabled',
@@ -259,6 +260,11 @@ class ModuleSettings
     {
         return $this->getTicketTarget() === self::TICKET_TARGET_CUSTOM
             && (bool) $this->get('tabslfeedback_custom_ticket_comment_page_issue');
+    }
+
+    public function isCustomTicketInternal(): bool
+    {
+        return (bool) $this->get('tabslfeedback_custom_ticket_internal');
     }
 
     /**

@@ -65,6 +65,8 @@ class CustomTicketService
             'summary' => mb_substr(trim((string) preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $summary)), 0, self::MAX_SUMMARY_LENGTH),
             'description' => $this->encode($description),
             'ticketLanguage' => $this->settings->getTicketLanguage(),
+            // Immer gesetzt: Ohne das Feld darf der Endpunkt selbst entscheiden und markiert den Vorgang womöglich als intern.
+            'internal' => $this->settings->isCustomTicketInternal() ? 'true' : 'false',
         ];
 
         if ($commentOnIssue !== '') {

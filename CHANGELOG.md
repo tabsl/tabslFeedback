@@ -7,6 +7,14 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Einstellung `tabslfeedback_custom_ticket_internal` (Standard aus) für das Ticket-Ziel `custom`. Erscheint erst nach `oe:module:install`
+
+### Fixed
+
+- Ticket-Ziel `custom`: Das Modul sendet `internal` jetzt immer mit. Bisher fehlte das Feld, und ein Endpunkt, der dann intern als Standard annimmt, markierte jeden Vorgang als intern
+
 ## [2.2.0] - 2026-11-04
 
 ### Added

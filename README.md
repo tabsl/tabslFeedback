@@ -203,8 +203,9 @@ Format, Projekt-Key und Vorgangstyp verstehen.
   `https://tickets.example.com/api/v1/jira/ticket-actions`
 - Felder: `action` (fest `create_issue`), `projectKey`, `issueType`, `summary`
   (höchstens 255 Zeichen, einzeilig), `description` (ADF als JSON-String),
-  `ticketLanguage` (`source` oder `en`, für die Sprache des Upload-Vermerks), je
-  Bild eine Datei unter `images[]`.
+  `ticketLanguage` (`source` oder `en`, für die Sprache des Upload-Vermerks),
+  `internal` (`true` oder `false` nach `tabslfeedback_custom_ticket_internal`,
+  immer gesendet), je Bild eine Datei unter `images[]`.
 - Mit aktivem `tabslfeedback_custom_ticket_comment_page_issue` und einem
   passenden Verweis auf der Shop-Seite zusätzlich `commentOnIssue` (Key) und
   `comment` (ADF als JSON-String). Die Meldung soll dann als Kommentar an diesen
@@ -225,7 +226,7 @@ Format, Projekt-Key und Vorgangstyp verstehen.
   `message` übernimmt es nie, damit keine zurückgespiegelten Meldungsinhalte im
   Log landen. Die genaue Ursache einer Ablehnung steht dann nur bei der Gegenstelle.
 - Das Modul wartet höchstens 95 Sekunden, folgt keinen Weiterleitungen und
-  wiederholt keine Anfrage. `assigneeAccountId` und `internal` sendet es nicht.
+  wiederholt keine Anfrage. `assigneeAccountId` sendet es nicht.
 
 ### Modul konfigurieren
 
@@ -260,6 +261,7 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_custom_ticket_project_key` | Projekt-Key, mindestens zwei Zeichen, Buchstaben und Ziffern, keine numerische ID — **Pflicht** bei Ziel `custom` | leer |
 | `tabslfeedback_custom_ticket_issue_type` | Name oder ID des Vorgangstyps; leer = `Task` | `Task` |
 | `tabslfeedback_custom_ticket_comment_page_issue` | Meldung als Kommentar am Vorgang der Seite, wie bei Jira; siehe oben | aus |
+| `tabslfeedback_custom_ticket_internal` | Neuen Vorgang als intern markieren (`internal` = `true`); aus sendet `internal` = `false` | aus |
 | `tabslfeedback_notice_text` | Kurzer Hinweistext vor dem Absenden-Knopf; leer = kein Hinweis | Hinweis auf Screenshot-Übermittlung |
 | `tabslfeedback_ai_provider` | `none`, `openai`, `anthropic` oder `custom` (eigener Endpunkt) — bei `none` erscheint statt der Aufbereitung ein Betreff-Feld | `openai` |
 | `tabslfeedback_openai_key` | OpenAI API-Key; nur bei Anbieter `openai`; leer = Ticket ohne Aufbereitung | leer |
