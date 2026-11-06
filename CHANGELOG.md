@@ -11,6 +11,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 - Einstellung `tabslfeedback_custom_ticket_internal` (Standard aus) für das Ticket-Ziel `custom`. Erscheint erst nach `oe:module:install`
 
+### Changed
+
+- `?tabslFeedback=1` wird in der Session vermerkt, das Widget bleibt auf den folgenden Seiten eingebunden. `?tabslFeedback=0` löscht den Vermerk. Für Gäste ohne Session `aRequireSessionWithParams` in der `config.inc.php` setzen
+
 ### Fixed
 
 - Ticket-Ziel `custom`: Das Modul sendet `internal` jetzt immer mit. Bisher fehlte das Feld, und ein Endpunkt, der dann intern als Standard annimmt, markierte jeden Vorgang als intern

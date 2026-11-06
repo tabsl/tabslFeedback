@@ -60,9 +60,18 @@ nützliche Parameter wie Kategorie, Suchbegriff oder Seitenzahl bleiben erhalten
 
 Jede Shop-Seite lässt sich mit `?tabslFeedback=1` aufrufen — das Formular öffnet
 sich sofort, auch bei ausgeblendetem Button. Gedacht für Testende und Redaktion:
-Man verschickt den Link, ohne den Button für alle einzuschalten. `?tabslFeedback=0`
-(ebenso `false`, `off`, `no`) verhindert nur das sofortige Öffnen; ein
-eingeschalteter Button bleibt sichtbar.
+Man verschickt den Link, ohne den Button für alle einzuschalten. Der Aufruf wird
+in der Session vermerkt: Auf den folgenden Seiten bleibt das Widget eingebunden,
+öffnet sich aber nicht mehr von selbst. `?tabslFeedback=0` (ebenso `false`, `off`,
+`no`) löscht den Vermerk und verhindert das sofortige Öffnen; ein eingeschalteter
+Button bleibt sichtbar.
+
+Für Gäste ohne Session-Cookie startet OXID keine Session. Damit der Vermerk auch
+beim ersten Aufruf greift, gehört der Parameter in die `config.inc.php`:
+
+```php
+$this->aRequireSessionWithParams = ['tabslFeedback' => true];
+```
 
 > ⚠️ **Der Parameter ist bewusst nicht durch ein Geheimnis geschützt**, und sein
 > Name steht in diesem quelloffenen Repository. Die Einstellung „Feedback-Button
@@ -88,7 +97,7 @@ worum es in der Meldung geht. Ohne Angabe öffnet der Dialog wie über den Butto
 
 Die Schnittstelle steht bereit, sobald das Widget auf der Seite liegt — also
 sobald „Feedback-Button im Shop anzeigen" eingeschaltet ist **oder** die Seite
-mit `?tabslFeedback=1` aufgerufen wurde.
+oder eine frühere Seite derselben Session mit `?tabslFeedback=1` aufgerufen wurde.
 
 Soll der Shop den Dialog ausschließlich selbst öffnen, ohne dass irgendwo ein
 Button erscheint, braucht es **beides**: die Einstellung „Feedback-Button im Shop
