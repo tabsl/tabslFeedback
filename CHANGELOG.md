@@ -7,6 +7,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-11-06
+
 ### Added
 
 - Einstellung `tabslfeedback_frontend_access_key` (Standard leer). Ist ein Schlüssel gesetzt, öffnet nur `?tabslFeedback=<schlüssel>` das Formular, ein geänderter Schlüssel beendet auch den Zugang laufender Sessions. Wirkt nur bei ausgeschaltetem `tabslfeedback_frontend_enabled`. Leer gilt das bisherige Verhalten. Regelt nur die Sichtbarkeit, der Absende-Endpunkt bleibt ohne tabslTurnstile offen. Erscheint erst nach erneutem Aktivieren des Moduls, unter OXID 6.4 mit vorherigem `oe:module:install-configuration`
