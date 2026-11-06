@@ -48,7 +48,8 @@ lässt den Hinweis entfallen.
 **Technischer Kontext am Ticket** — in einem eingeklappten Block: Herkunft der
 Meldung, aufgerufene Seite, Referrer, Browser inkl. Version und Betriebssystem,
 Fenster- und Bildschirmgröße, Shop-ID, Sprache, Währung, Theme mit Version,
-aktive Module mit Versionen, Shop- und PHP-Version. Bei angemeldeten Kunden
+aktive Module mit Versionen (abschaltbar über `tabslfeedback_send_module_list`),
+Shop- und PHP-Version. Bei angemeldeten Kunden
 optional Kundennummer, Name und E-Mail. Öffnet eine Shop-Seite das Formular
 selbst, steht davor zusätzlich der **Bezug** (siehe unten). Seite und Referrer
 werden zuvor
@@ -279,6 +280,7 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_ticket_language` | `source` = Sprache der Meldung behalten, `en` = immer Englisch | `source` |
 | `tabslfeedback_show_contact_fields` | Optionale Felder für Name und E-Mail anzeigen | aus |
 | `tabslfeedback_send_customer_data` | Bei angemeldeten Kunden Kundennummer, Name und E-Mail ins Ticket übernehmen | aus |
+| `tabslfeedback_send_module_list` | Liste der aktiven Module mit Versionen ins Ticket übernehmen | an |
 | `tabslfeedback_screenshots_enabled` | Screenshot-Funktion im Formular anzeigen | an |
 
 Fehlt eine Pflichtangabe des gewählten Ziels — bei GitLab eine der drei
@@ -368,7 +370,8 @@ Melders. Fehlen Adresse oder Token, findet **keine** Übermittlung statt.
 **An den eigenen Endpunkt als Ticket-Ziel** — bei Ziel `custom` dasselbe wie an ein
 direktes Ticket-Ziel, also deutlich mehr als an den KI-Endpunkt: Freitext,
 aufbereiteter Titel und Beschreibung, alle Screenshots, optional Name und E-Mail,
-der technische Kontext samt Seitenadresse und Modulliste, Kundendaten **nur** bei
+der technische Kontext samt Seitenadresse und, bei aktivem
+`tabslfeedback_send_module_list`, Modulliste, Kundendaten **nur** bei
 aktivem `tabslfeedback_send_customer_data`. Empfänger ist die in
 `tabslfeedback_custom_ticket_url` eingetragene Adresse; was dort gespeichert oder
 weitergegeben wird, bestimmt deren Betreiber, und die Wahl verantwortet der

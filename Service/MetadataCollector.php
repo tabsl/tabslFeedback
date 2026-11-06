@@ -330,6 +330,10 @@ class MetadataCollector
      */
     private function collectActiveModules(): array
     {
+        if (!$this->settings->sendModuleList()) {
+            return [];
+        }
+
         try {
             return (new ModuleRegistry())->getActiveModuleVersions();
         } catch (\Throwable $e) {
