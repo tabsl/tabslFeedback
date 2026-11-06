@@ -69,6 +69,7 @@ $aModule = [
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_admin_enabled', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_frontend_enabled', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_button_position', 'type' => 'select', 'value' => 'bottom-right', 'constraints' => 'bottom-left|bottom-right|center|none'],
+        ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_frontend_access_key', 'type' => 'str', 'value' => ''],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_ticket_target', 'type' => 'select', 'value' => 'gitlab', 'constraints' => 'gitlab|weclapp|jira|custom'],
         ['group' => 'tabslfeedback_main', 'name' => 'tabslfeedback_notice_text', 'type' => 'str', 'value' => 'Ihre Meldung wird inklusive eventuell angehängter Screenshots zur Bearbeitung verwendet.'],
         // GitLab

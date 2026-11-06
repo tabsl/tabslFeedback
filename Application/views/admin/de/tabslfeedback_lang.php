@@ -32,7 +32,7 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_admin_enabled' => 'Blendet im Backend-Header oben links einen Feedback-Link ein. Solange das gewählte Ticket-Ziel nicht vollständig eingerichtet ist, erscheint der Link nicht.',
 
         'SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Feedback-Button im Shop anzeigen',
-        'HELP_SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Blendet im Shop auf allen Seiten einen Feedback-Button ein. Ist die Einstellung aus, bleibt das Formular über den Aufruf einer beliebigen Shop-Seite mit ?tabslFeedback=1 erreichbar — praktisch für Testende, ohne den Button für alle Besucher zu zeigen. Die Einstellung steuert also die Sichtbarkeit, nicht die Erreichbarkeit: Sobald das gewählte Ticket-Ziel vollständig eingerichtet ist, nimmt der Shop Feedback entgegen. Öffentlicher Betrieb ohne das Modul tabslTurnstile erfolgt auf eigenes Risiko.',
+        'HELP_SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Blendet im Shop auf allen Seiten einen Feedback-Button ein. Ist die Einstellung aus, bleibt das Formular über den Aufruf einer beliebigen Shop-Seite mit ?tabslFeedback=1 erreichbar (bzw. mit dem eingestellten Zugangsschlüssel) — praktisch für Testende, ohne den Button für alle Besucher zu zeigen. Die Einstellung steuert also die Sichtbarkeit, nicht die Erreichbarkeit: Sobald das gewählte Ticket-Ziel vollständig eingerichtet ist, nimmt der Shop Feedback entgegen. Öffentlicher Betrieb ohne das Modul tabslTurnstile erfolgt auf eigenes Risiko.',
 
         'SHOP_MODULE_tabslfeedback_button_position' => 'Position des Buttons',
         'HELP_SHOP_MODULE_tabslfeedback_button_position' => 'Wo der Feedback-Button im Shop erscheint. „Kein Button" zeigt keinen Knopf — dann öffnet das Formular nur dort, wo eine Seite es selbst über window.tabslFeedback.open() aufruft. Eingebunden wird es dafür weiterhin nur, solange „Feedback-Button im Shop anzeigen" eingeschaltet ist.',
@@ -40,6 +40,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_button_position_bottom-right' => 'Unten rechts',
         'SHOP_MODULE_tabslfeedback_button_position_center' => 'Unten mittig',
         'SHOP_MODULE_tabslfeedback_button_position_none' => 'Kein Button',
+
+        'SHOP_MODULE_tabslfeedback_frontend_access_key' => 'Zugangsschlüssel für ?tabslFeedback=',
+        'HELP_SHOP_MODULE_tabslfeedback_frontend_access_key' => 'Leer öffnet ?tabslFeedback=1 das Formular wie bisher. Ist ein Schlüssel eingetragen, öffnet nur noch ?tabslFeedback=SCHLÜSSEL das Formular, jeder andere Wert bleibt ohne Wirkung. Eine Änderung des Schlüssels beendet auch den Zugang bereits geöffneter Sessions. Ist „Feedback-Button im Shop anzeigen" eingeschaltet, liegt das Widget ohnehin für alle Besucher auf jeder Seite; der Schlüssel wirkt nur, solange die Einstellung aus ist. Der Schlüssel steht in der Adresszeile und damit in Browserverlauf und Server-Logs; er ist ein Link für Testende, kein Passwort. Er regelt nur, ob das Formular erscheint: Ohne das Modul tabslTurnstile nimmt der Shop Feedback weiterhin von jedem entgegen, der den Absende-Endpunkt direkt aufruft.',
 
         'SHOP_MODULE_tabslfeedback_notice_text' => 'Hinweistext im Formular',
         'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Kurzer Text unmittelbar vor dem Absenden-Knopf, im Backend- wie im Frontend-Formular. Leer lässt den Hinweis entfallen. Der Standardtext weist auf die Übermittlung von Screenshots hin — anzupassen, sobald sich Umfang oder Empfänger der Übermittlung ändern, etwa bei aktiver KI-Aufbereitung. Beim KI-Anbieter „Eigener Endpunkt" gehen Screenshots zusätzlich an dessen Adresse; der Hinweis sollte das nennen.',

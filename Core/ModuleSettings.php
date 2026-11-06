@@ -65,6 +65,15 @@ class ModuleSettings
     }
 
     /**
+     * Leer heißt: jeder Wert außer 0/false/off/no öffnet das Formular über
+     * `?tabslFeedback=`, wie vor Einführung der Einstellung.
+     */
+    public function getFrontendAccessKey(): string
+    {
+        return trim((string) $this->get('tabslfeedback_frontend_access_key'));
+    }
+
+    /**
      * Ein fehlender Wert ist der Normalfall nach einem reinen Datei-Deploy ohne
      * erneute Aktivierung — dann gilt weiter GitLab, das bisher einzige Ziel.
      *

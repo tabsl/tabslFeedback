@@ -74,7 +74,18 @@ beim ersten Aufruf greift, gehört der Parameter in die `config.inc.php`:
 $this->aRequireSessionWithParams = ['tabslFeedback' => true];
 ```
 
-> ⚠️ **Der Parameter ist bewusst nicht durch ein Geheimnis geschützt**, und sein
+Mit `tabslfeedback_frontend_access_key` lässt sich der Wert festlegen, der das
+Formular öffnet: Ist ein Schlüssel eingetragen, wirkt nur noch
+`?tabslFeedback=<schlüssel>`, `?tabslFeedback=1` bleibt ohne Wirkung. Ein
+geänderter Schlüssel beendet auch den Zugang laufender Sessions. Das gilt nur,
+solange `tabslfeedback_frontend_enabled` aus ist: Eingeschaltet liegt das Widget
+ohnehin für alle Besucher auf jeder Seite. Im Ticket wird
+der Wert des Parameters wie andere geheimnisverdächtige Parameter durch `…`
+ersetzt. Der Schlüssel steht trotzdem in Adresszeile, Browserverlauf und
+Server-Logs; er ist ein Link für Testende, kein Passwort.
+
+> ⚠️ **Der Zugangsschlüssel regelt nur, ob das Formular erscheint.** Ohne
+> Schlüssel ist der Parameter durch kein Geheimnis geschützt, und sein
 > Name steht in diesem quelloffenen Repository. Die Einstellung „Feedback-Button
 > im Shop anzeigen" regelt deshalb nur die **Sichtbarkeit**, nicht die
 > **Erreichbarkeit**: Sobald das Ticket-Ziel vollständig eingerichtet ist, nimmt
@@ -244,6 +255,7 @@ Backend → **Erweiterungen → Module → tabslFeedback → Einstellungen**:
 | `tabslfeedback_admin_enabled` | Feedback-Link im Backend-Header einblenden | aus |
 | `tabslfeedback_frontend_enabled` | Widget im Shop einbinden — mit Button, außer die Position steht auf `none` (nur Sichtbarkeit, nicht Erreichbarkeit) | aus |
 | `tabslfeedback_button_position` | `bottom-left`, `center`, `bottom-right` oder `none` (kein Button, siehe unten) | `bottom-right` |
+| `tabslfeedback_frontend_access_key` | Zugangsschlüssel: Gesetzt öffnet nur `?tabslFeedback=<schlüssel>` das Formular, leer jeder Wert außer `0`/`false`/`off`/`no` (siehe unten) | leer |
 | `tabslfeedback_ticket_target` | `gitlab`, `weclapp`, `jira` oder `custom` (eigener Endpunkt) — wo das Ticket entsteht | `gitlab` |
 | `tabslfeedback_gitlab_url` | Basis-Adresse der GitLab-Instanz inkl. Schema, ohne `/api/v4` — **Pflicht** bei Ziel `gitlab` | leer |
 | `tabslfeedback_gitlab_project_id` | Numerische ID des Zielprojekts — **Pflicht** bei Ziel `gitlab` | leer |
