@@ -7,6 +7,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-11-06
+
 ### Added
 
 - Einstellung `tabslfeedback_custom_ticket_internal` (Standard aus) für das Ticket-Ziel `custom`. Erscheint erst nach erneutem Aktivieren des Moduls, unter OXID 6.4 mit vorherigem `oe:module:install-configuration`
@@ -111,7 +113,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Sitzungskennungen und geheimnisverdächtige Parameter werden aus Seite und Referrer entfernt
 - Ohne vollständige GitLab-Angaben nimmt der Shop kein Feedback entgegen
 
-[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.6.1...HEAD
+[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.7.0...HEAD
+[1.7.0]: https://github.com/tabsl/tabslFeedback/compare/1.6.1...1.7.0
 [1.6.1]: https://github.com/tabsl/tabslFeedback/compare/1.6.0...1.6.1
 [1.6.0]: https://github.com/tabsl/tabslFeedback/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/tabsl/tabslFeedback/compare/1.4.0...1.5.0
