@@ -33,6 +33,7 @@ class ModuleSettings
         'tabslfeedback_custom_ticket_internal',
         'tabslfeedback_show_contact_fields',
         'tabslfeedback_send_customer_data',
+        'tabslfeedback_send_module_list',
         'tabslfeedback_screenshots_enabled',
     ];
 
@@ -328,7 +329,7 @@ class ModuleSettings
     }
 
     /**
-     * Einziges Bool-Setting mit Standardwert true (siehe metadata.php) — ein
+     * Bool-Setting mit Standardwert true (siehe metadata.php), wie die Modulliste — ein
      * Update auf eine bereits aktive Installation trägt diesen Default nicht
      * automatisch in die Modul-Konfiguration ein, das übernimmt erst eine
      * erneute Modul-Aktivierung. Bis dahin liefert get() null; das darf nicht
@@ -367,6 +368,18 @@ class ModuleSettings
     public function sendCustomerData(): bool
     {
         return (bool) $this->get('tabslfeedback_send_customer_data');
+    }
+
+    /**
+     * Standard true wie bei den Screenshots: Vor Einführung der Einstellung ging
+     * die Liste immer mit, ein fehlender Wert nach reinem Datei-Deploy darf sie
+     * nicht abschalten.
+     */
+    public function sendModuleList(): bool
+    {
+        $value = $this->get('tabslfeedback_send_module_list');
+
+        return $value === null ? true : (bool) $value;
     }
 
     /**

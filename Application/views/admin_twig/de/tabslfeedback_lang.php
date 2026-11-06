@@ -165,6 +165,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_send_customer_data' => 'Kundendaten übermitteln',
         'HELP_SHOP_MODULE_tabslfeedback_send_customer_data' => 'Ergänzt bei angemeldeten Kunden Kundennummer, Name und E-Mail im Ticket. Ist die Einstellung aus, werden keine Kundendaten übermittelt.',
 
+        'SHOP_MODULE_tabslfeedback_send_module_list' => 'Liste der aktiven Module übermitteln',
+        'HELP_SHOP_MODULE_tabslfeedback_send_module_list' => 'Ergänzt im technischen Kontext des Tickets alle aktiven Module mit Version. Ist die Einstellung aus, entfällt die Liste; die übrigen Umgebungsangaben bleiben.',
+
         'SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Screenshots erlauben',
         'HELP_SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Blendet die Screenshot-Funktion im Formular ein. Ist die Einstellung aus, entfällt der Bereich vollständig — auch technisch mitgesendete Bilder werden dann verworfen.',
     ],

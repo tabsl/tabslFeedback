@@ -162,6 +162,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_send_customer_data' => 'Include customer data',
         'HELP_SHOP_MODULE_tabslfeedback_send_customer_data' => 'Adds customer number, name and email of signed-in customers to the ticket. While disabled, no customer data is transmitted.',
 
+        'SHOP_MODULE_tabslfeedback_send_module_list' => 'Include list of active modules',
+        'HELP_SHOP_MODULE_tabslfeedback_send_module_list' => 'Adds all active modules with their versions to the technical context of the ticket. While disabled, the list is omitted; the other environment details remain.',
+
         'SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Allow screenshots',
         'HELP_SHOP_MODULE_tabslfeedback_screenshots_enabled' => 'Shows the screenshot feature in the form. While disabled, the whole section is omitted — images sent regardless are discarded as well.',
     ],

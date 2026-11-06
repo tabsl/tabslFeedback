@@ -7,6 +7,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Added
+
+- Einstellung `tabslfeedback_send_module_list` (Standard an, Gruppe Datenschutz). Aus lässt die Liste der aktiven Module im Ticket weg, bei allen vier Ticket-Zielen. Ohne erneutes `oe:module:install` gilt sie als an
+
 ## [2.3.0] - 2026-11-06
 
 ### Added

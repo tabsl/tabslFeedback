@@ -96,6 +96,7 @@ $aModule = [
         // Datenschutz
         ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_show_contact_fields', 'type' => 'bool', 'value' => false],
         ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_send_customer_data', 'type' => 'bool', 'value' => false],
+        ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_send_module_list', 'type' => 'bool', 'value' => true],
         ['group' => 'tabslfeedback_privacy', 'name' => 'tabslfeedback_screenshots_enabled', 'type' => 'bool', 'value' => true],
     ],
 ];
