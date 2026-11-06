@@ -98,6 +98,7 @@ $aModule = [
         ['group' => 'tabslfeedback_custom_ticket', 'name' => 'tabslfeedback_custom_ticket_project_key', 'type' => 'str', 'value' => ''],
         ['group' => 'tabslfeedback_custom_ticket', 'name' => 'tabslfeedback_custom_ticket_issue_type', 'type' => 'str', 'value' => 'Task'],
         ['group' => 'tabslfeedback_custom_ticket', 'name' => 'tabslfeedback_custom_ticket_comment_page_issue', 'type' => 'bool', 'value' => false],
+        ['group' => 'tabslfeedback_custom_ticket', 'name' => 'tabslfeedback_custom_ticket_internal', 'type' => 'bool', 'value' => false],
         // KI-Aufbereitung
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_ai_provider', 'type' => 'select', 'value' => 'openai', 'constraints' => 'none|openai|anthropic|custom'],
         ['group' => 'tabslfeedback_openai', 'name' => 'tabslfeedback_openai_key', 'type' => 'password', 'value' => ''],

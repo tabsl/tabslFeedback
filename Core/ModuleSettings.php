@@ -239,6 +239,11 @@ class ModuleSettings
             && (bool) $this->get('tabslfeedback_custom_ticket_comment_page_issue');
     }
 
+    public function isCustomTicketInternal(): bool
+    {
+        return (bool) $this->get('tabslfeedback_custom_ticket_internal');
+    }
+
     /**
      * @return string none|openai|anthropic|custom
      */

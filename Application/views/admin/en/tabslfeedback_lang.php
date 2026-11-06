@@ -121,6 +121,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_custom_ticket_comment_page_issue' => 'Report as comment on the issue of the page',
         'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_comment_page_issue' => 'If the source of the shop page links to an issue of the configured project (e.g. …/browse/SHOP-123), the report and its screenshots go to that issue as a comment instead of a new issue. With several links the first one applies. Works only in the storefront. If the comment is rejected (issue deleted, no permission), the endpoint creates a new issue. Note: the link is reported by the browser; anyone who can reach the form can have any issue of the project commented on that the endpoint can see.',
 
+        'SHOP_MODULE_tabslfeedback_custom_ticket_internal' => 'Mark issue as internal',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_internal' => 'Sends internal=true; the endpoint then marks the new issue as internal. Off = internal=false, the issue is created without this mark. If the endpoint has nothing set up for internal issues, it rejects every report while this option is on. Does not apply to the comment on the issue of the page.',
+
         // AI processing
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'AI provider',
         'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Whether and through which service the report is turned into a title and description. "Without AI" skips any external transmission entirely — the form then shows a subject field instead, whose content is used directly as the ticket title. With OpenAI and Anthropic, the matching API key remains required, with a custom endpoint its URL and token; without them, the ticket is created without processing as well. Unlike OpenAI and Anthropic, the custom endpoint also receives the images when screenshots are allowed.',

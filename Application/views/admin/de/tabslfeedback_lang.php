@@ -124,6 +124,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_custom_ticket_comment_page_issue' => 'Meldung als Kommentar am Vorgang der Seite',
         'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_comment_page_issue' => 'Enthält der Quelltext der Shop-Seite einen Verweis auf einen Vorgang des eingestellten Projekts (etwa …/browse/SHOP-123), geht die Meldung samt Screenshots als Kommentar an diesen Vorgang statt als neuer Vorgang. Bei mehreren Verweisen gilt der erste. Funktioniert nur im Shop-Frontend. Wird der Kommentar abgelehnt (Vorgang gelöscht, keine Berechtigung), legt der Endpunkt einen neuen Vorgang an. Achtung: Der Verweis kommt aus dem Browser; wer das Formular erreicht, kann damit jeden Vorgang des Projekts kommentieren lassen, den der Endpunkt sehen darf.',
 
+        'SHOP_MODULE_tabslfeedback_custom_ticket_internal' => 'Vorgang als intern markieren',
+        'HELP_SHOP_MODULE_tabslfeedback_custom_ticket_internal' => 'Sendet internal=true, der Endpunkt markiert den neuen Vorgang dann als intern. Aus = internal=false, der Vorgang entsteht ohne diese Markierung. Hat der Endpunkt für interne Vorgänge nichts eingerichtet, lehnt er jede Meldung ab, solange die Option an ist. Gilt nicht für den Kommentar am Vorgang der Seite.',
+
         // KI-Aufbereitung
         'SHOP_MODULE_tabslfeedback_ai_provider' => 'KI-Anbieter',
         'HELP_SHOP_MODULE_tabslfeedback_ai_provider' => 'Ob und über welchen Dienst der Freitext zu Titel und Beschreibung aufbereitet wird. „Ohne KI" verzichtet vollständig auf eine externe Übermittlung — im Formular erscheint dafür ein Betreff-Feld, dessen Inhalt direkt als Ticket-Titel dient. Bei OpenAI und Anthropic bleibt zusätzlich der jeweilige API-Key, beim eigenen Endpunkt Adresse und Token erforderlich; fehlt das, entsteht das Ticket ebenfalls ohne Aufbereitung. Der eigene Endpunkt erhält anders als OpenAI und Anthropic bei erlaubten Screenshots auch die Bilder.',
