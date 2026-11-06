@@ -69,6 +69,7 @@ class InputValidator
         'sdeliveryaddressmd5',
         'token', 'access_token', 'auth', 'key', 'apikey', 'api_key',
         'password', 'passwd', 'pwd', 'secret', 'signature', 'hash',
+        'tabslfeedback',
     ];
 
     /**

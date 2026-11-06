@@ -29,7 +29,7 @@ $aLang = array_merge(
         'HELP_SHOP_MODULE_tabslfeedback_admin_enabled' => 'Adds a feedback link to the top left of the backend header. The link stays hidden while the selected ticket target is not fully set up.',
 
         'SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Show feedback button in the storefront',
-        'HELP_SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Adds a feedback button to every storefront page. While disabled, the form remains reachable by calling any storefront page with ?tabslFeedback=1 — useful for testers without showing the button to every visitor. The setting therefore controls visibility, not availability: as soon as the selected ticket target is fully set up, the shop accepts feedback. Running it publicly without the tabslTurnstile module is at your own risk.',
+        'HELP_SHOP_MODULE_tabslfeedback_frontend_enabled' => 'Adds a feedback button to every storefront page. While disabled, the form remains reachable by calling any storefront page with ?tabslFeedback=1 (or with the configured access key) — useful for testers without showing the button to every visitor. The setting therefore controls visibility, not availability: as soon as the selected ticket target is fully set up, the shop accepts feedback. Running it publicly without the tabslTurnstile module is at your own risk.',
 
         'SHOP_MODULE_tabslfeedback_button_position' => 'Button position',
         'HELP_SHOP_MODULE_tabslfeedback_button_position' => 'Where the feedback button appears in the storefront. "No button" shows no button — the form then only opens where a page calls window.tabslFeedback.open() itself. It is still embedded only while "Show feedback button in the storefront" is enabled.',
@@ -37,6 +37,9 @@ $aLang = array_merge(
         'SHOP_MODULE_tabslfeedback_button_position_bottom-right' => 'Bottom right',
         'SHOP_MODULE_tabslfeedback_button_position_center' => 'Bottom centre',
         'SHOP_MODULE_tabslfeedback_button_position_none' => 'No button',
+
+        'SHOP_MODULE_tabslfeedback_frontend_access_key' => 'Access key for ?tabslFeedback=',
+        'HELP_SHOP_MODULE_tabslfeedback_frontend_access_key' => 'When empty, ?tabslFeedback=1 opens the form as before. Once a key is set, only ?tabslFeedback=KEY opens the form; any other value has no effect. Changing the key also ends access for sessions that were already opened. While "Show feedback button in the storefront" is enabled, the widget is on every page for all visitors anyway; the key only takes effect while that setting is disabled. The key appears in the address bar and therefore in browser history and server logs; it is a link for testers, not a password. It only controls whether the form appears: without the tabslTurnstile module, the shop still accepts feedback from anyone who calls the submit endpoint directly.',
 
         'SHOP_MODULE_tabslfeedback_notice_text' => 'Notice text in the form',
         'HELP_SHOP_MODULE_tabslfeedback_notice_text' => 'Short text shown right before the submit button, in both the backend and storefront form. Leave empty to omit the notice. The default text mentions that screenshots are transmitted — adjust it once the scope or recipient of the transmission changes, for example with AI processing enabled. With the AI provider "Custom endpoint", screenshots are also sent to its URL; the notice should say so.',
