@@ -7,6 +7,10 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Changed
+
+- `?tabslFeedback=1` wird in der Session vermerkt, das Widget bleibt auf den folgenden Seiten eingebunden. `?tabslFeedback=0` löscht den Vermerk. Für Gäste ohne Session `aRequireSessionWithParams` in der `config.inc.php` setzen
+
 ## [1.6.0] - 2026-11-04
 
 ### Added
