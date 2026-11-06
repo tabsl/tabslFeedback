@@ -7,6 +7,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-11-06
+
 ### Changed
 
 - `?tabslFeedback=1` wird in der Session vermerkt, das Widget bleibt auf den folgenden Seiten eingebunden. `?tabslFeedback=0` löscht den Vermerk. Für Gäste ohne Session `aRequireSessionWithParams` in der `config.inc.php` setzen
@@ -101,7 +103,9 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Sitzungskennungen und geheimnisverdächtige Parameter werden aus Seite und Referrer entfernt
 - Ohne vollständige GitLab-Angaben nimmt der Shop kein Feedback entgegen
 
-[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.5.0...HEAD
+[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/1.6.1...HEAD
+[1.6.1]: https://github.com/tabsl/tabslFeedback/compare/1.6.0...1.6.1
+[1.6.0]: https://github.com/tabsl/tabslFeedback/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/tabsl/tabslFeedback/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/tabsl/tabslFeedback/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/tabsl/tabslFeedback/compare/1.2.0...1.3.0
