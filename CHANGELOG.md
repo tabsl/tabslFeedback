@@ -7,6 +7,8 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-11-06
+
 ### Added
 
 - Einstellung `tabslfeedback_custom_ticket_internal` (Standard aus) für das Ticket-Ziel `custom`. Erscheint erst nach `oe:module:install`
@@ -123,7 +125,9 @@ und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 - Sitzungskennungen und geheimnisverdächtige Parameter werden aus Seite und Referrer entfernt
 - Ohne vollständige GitLab-Angaben nimmt der Shop kein Feedback entgegen
 
-[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/2.1.0...HEAD
+[Unreleased]: https://github.com/tabsl/tabslFeedback/compare/2.3.0...HEAD
+[2.3.0]: https://github.com/tabsl/tabslFeedback/compare/2.2.0...2.3.0
+[2.2.0]: https://github.com/tabsl/tabslFeedback/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/tabsl/tabslFeedback/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/tabsl/tabslFeedback/compare/1.4.0...2.0.0
 [1.4.0]: https://github.com/tabsl/tabslFeedback/compare/1.3.0...1.4.0
